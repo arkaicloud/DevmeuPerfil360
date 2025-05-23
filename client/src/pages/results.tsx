@@ -41,7 +41,7 @@ export default function Results() {
   }, [navigate]);
 
   const { data: testResult, isLoading, error } = useQuery<TestResult>({
-    queryKey: ["/api/test/result", testId],
+    queryKey: [`/api/test/result/${testId}`],
     enabled: !!testId,
   });
 
