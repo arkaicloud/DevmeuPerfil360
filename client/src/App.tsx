@@ -9,6 +9,7 @@ import Results from "@/pages/results";
 import Checkout from "@/pages/checkout";
 import Dashboard from "@/pages/dashboard";
 import FindResults from "@/pages/find-results";
+import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,8 +19,9 @@ function Router() {
       <Route path="/test" component={Test} />
       <Route path="/results/:id" component={Results} />
       <Route path="/checkout/:testId" component={Checkout} />
-      <Route path="/dashboard/:userId" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/find-results" component={FindResults} />
+      <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>
   );

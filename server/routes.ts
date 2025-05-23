@@ -297,17 +297,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User login
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { username, password } = req.body;
 
-      const user = await storage.getUserByEmail(email);
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username e senha são obrigatórios" });
+      }
+
+      console.log(`Tentativa de login para usuário: ${username}`);
+
+      const user = await storage.getUserByUsername(username);
       if (!user || !user.password) {
-        return res.status(401).json({ message: "Credenciais inválidas" });
+        return res.status(401).json({ message: "Usuário ou senha incorretos" });
       }
 
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
-        return res.status(401).json({ message: "Credenciais inválidas" });
+        return res.status(401).json({ message: "Usuário ou senha incorretos" });
       }
+
+      console.log(`Login realizado com sucesso para usuário: ${username}`);
 
       res.json({
         id: user.id,
@@ -316,6 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Login realizado com sucesso",
       });
     } catch (error: any) {
+      console.error("Erro no login:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
