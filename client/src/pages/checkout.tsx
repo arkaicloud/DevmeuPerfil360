@@ -32,12 +32,17 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
 
     setIsProcessing(true);
 
-    const { error } = await stripe.confirmPayment({
+    // Use redirect: 'if_required' para evitar problemas de redirecionamento em alguns ambientes
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/results/${testId}?payment=success`,
-      },
+      redirect: 'if_required',
     });
+    
+    // Se bem-sucedido e não redirecionar, fazemos a navegação manualmente
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      navigate(`/results/${testId}?payment=success`);
+      return;
+    }
 
     setIsProcessing(false);
 
