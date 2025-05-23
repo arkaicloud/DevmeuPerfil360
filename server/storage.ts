@@ -25,6 +25,7 @@ export interface IStorage {
   getTestResult(id: number): Promise<TestResult | undefined>;
   getTestResultsByUser(userId: number): Promise<TestResult[]>;
   getTestResultByGuest(email: string): Promise<TestResult | undefined>;
+  getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined>;
   updateTestResultPremium(id: number, paymentId: string): Promise<TestResult>;
   
   // Payment operations
@@ -97,6 +98,15 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(testResults)
       .where(eq(testResults.guestEmail, email))
+      .orderBy(desc(testResults.createdAt));
+    return result || undefined;
+  }
+  
+  async getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined> {
+    const [result] = await db
+      .select()
+      .from(testResults)
+      .where(eq(testResults.guestWhatsapp, whatsapp))
       .orderBy(desc(testResults.createdAt));
     return result || undefined;
   }

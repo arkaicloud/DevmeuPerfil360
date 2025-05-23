@@ -281,9 +281,17 @@ export default function Home() {
             Começar Teste Gratuito
           </Button>
           
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground mb-3">
             ✓ 100% Gratuito ✓ Resultado Imediato ✓ Baseado em Ciência
           </p>
+          
+          <Button 
+            variant="link" 
+            className="w-full text-sm psychology-blue"
+            onClick={() => navigate("/find-results")}
+          >
+            Já fez o teste? Recupere seus resultados aqui
+          </Button>
         </div>
       </div>
     </div>

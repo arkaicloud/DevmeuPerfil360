@@ -79,6 +79,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar resultado" });
     }
   });
+  
+  // Find test result by email or WhatsApp
+  app.post("/api/test/find", async (req, res) => {
+    try {
+      const { identifier } = req.body;
+      
+      if (!identifier) {
+        return res.status(400).json({ message: "Email ou WhatsApp é obrigatório" });
+      }
+      
+      // Try to find by email first
+      let testResult = await storage.getTestResultByGuest(identifier);
+      
+      // If not found by email, try to find by WhatsApp
+      if (!testResult) {
+        // Use getTestResultByWhatsApp if you have implemented that method
+        // or you can modify getTestResultByGuest to search by either field
+        testResult = await storage.getTestResultByWhatsApp(identifier);
+      }
+      
+      if (!testResult) {
+        return res.json({ message: "Nenhum teste encontrado" });
+      }
+      
+      res.json({ 
+        testResultId: testResult.id,
+        message: "Teste encontrado com sucesso"
+      });
+    } catch (error: any) {
+      console.error("Find test error:", error);
+      res.status(500).json({ message: "Erro ao buscar teste" });
+    }
+  });
 
   // Create payment intent for premium upgrade
   app.post("/api/create-payment-intent", async (req, res) => {
