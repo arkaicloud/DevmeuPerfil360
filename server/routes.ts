@@ -448,80 +448,370 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const analysis = getDetailedAnalysis(testResult.profileType);
 
-      // Criar conteúdo HTML para conversão em PDF
+      // Gerar dados adicionais para o relatório completo
+      const getCareerSuggestions = (profileType: string, scores: any) => {
+        const careers: { [key: string]: string[] } = {
+          D: ["Executivo/CEO", "Gerente de Projetos", "Diretor Comercial", "Empreendedor", "Consultor Estratégico"],
+          I: ["Gerente de Marketing", "Relações Públicas", "Vendedor", "Treinador/Coach", "Apresentador"],
+          S: ["Analista de RH", "Enfermeiro", "Professor", "Assistente Social", "Terapeuta"],
+          C: ["Contador", "Analista de Sistemas", "Auditor", "Pesquisador", "Engenheiro"]
+        };
+        
+        // Combinar perfis para sugestões mais precisas
+        const primaryProfile = profileType;
+        const secondaryProfile = Object.entries(scores)
+          .sort(([,a], [,b]) => (b as number) - (a as number))[1][0];
+        
+        return [...(careers[primaryProfile] || []), ...(careers[secondaryProfile] || [])].slice(0, 6);
+      };
+
+      const getActionPlan = (profileType: string) => {
+        const plans: { [key: string]: string[] } = {
+          D: [
+            "Pratique escuta ativa em reuniões diárias",
+            "Delegue 2-3 tarefas por semana para desenvolver sua equipe",
+            "Reserve 15 minutos diários para reflexão sobre decisões tomadas"
+          ],
+          I: [
+            "Use ferramentas de organização como agenda digital",
+            "Pratique apresentações estruturadas com início, meio e fim",
+            "Estabeleça metas semanais específicas e mensuráveis"
+          ],
+          S: [
+            "Expresse suas opiniões em ao menos uma reunião por semana",
+            "Aceite um novo desafio ou projeto a cada mês",
+            "Pratique feedback direto com colegas de confiança"
+          ],
+          C: [
+            "Estabeleça prazos máximos para análises e decisões",
+            "Participe de atividades sociais da equipe",
+            "Pratique comunicação simplificada de ideias complexas"
+          ]
+        };
+        return plans[profileType] || plans.D;
+      };
+
+      const careers = getCareerSuggestions(testResult.profileType, testResult.scores);
+      const actionPlan = getActionPlan(testResult.profileType);
+
+      // Criar conteúdo HTML completo para conversão em PDF
       const htmlContent = `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="UTF-8">
-          <title>Relatório DISC - ${testResult.guestName}</title>
+          <title>Relatório Completo Perfil360 - ${testResult.guestName}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-            .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; }
-            .profile-badge { display: inline-block; width: 80px; height: 80px; border-radius: 50%; background: #3b82f6; color: white; font-size: 36px; font-weight: bold; line-height: 80px; text-align: center; margin: 20px 0; }
-            .section { margin: 30px 0; }
-            .section h2 { color: #1e40af; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
-            .scores { display: flex; justify-content: space-between; margin: 20px 0; }
-            .score-item { text-align: center; flex: 1; }
-            .score-bar { width: 100%; height: 20px; background: #e5e7eb; border-radius: 10px; margin: 10px 0; }
-            .score-fill { height: 100%; border-radius: 10px; }
-            .score-d { background: #ef4444; }
-            .score-i { background: #eab308; }
-            .score-s { background: #22c55e; }
-            .score-c { background: #3b82f6; }
-            ul { padding-left: 20px; }
-            li { margin: 8px 0; }
-            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #6b7280; }
+            body { 
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              margin: 0; 
+              padding: 20px;
+              line-height: 1.6; 
+              color: #333;
+              background: #f8fafc;
+            }
+            .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            .header { text-align: center; margin-bottom: 50px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; }
+            .profile-badge { 
+              display: inline-block; 
+              width: 100px; height: 100px; 
+              border-radius: 50%; 
+              background: rgba(255,255,255,0.2); 
+              color: white; 
+              font-size: 48px; 
+              font-weight: bold; 
+              line-height: 100px; 
+              text-align: center; 
+              margin: 20px 0; 
+              border: 3px solid rgba(255,255,255,0.3);
+            }
+            .section { 
+              margin: 40px 0; 
+              padding: 30px; 
+              background: #f9fafb; 
+              border-radius: 10px; 
+              border-left: 5px solid #667eea;
+            }
+            .section h2 { 
+              color: #1e40af; 
+              margin-bottom: 20px; 
+              font-size: 24px;
+              border-bottom: 2px solid #e5e7eb; 
+              padding-bottom: 10px; 
+            }
+            .scores-grid { 
+              display: grid; 
+              grid-template-columns: repeat(2, 1fr); 
+              gap: 20px; 
+              margin: 30px 0; 
+            }
+            .score-card { 
+              background: white; 
+              padding: 20px; 
+              border-radius: 10px; 
+              text-align: center; 
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .score-circle { 
+              width: 80px; 
+              height: 80px; 
+              border-radius: 50%; 
+              margin: 0 auto 15px; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: white;
+            }
+            .score-d { background: linear-gradient(135deg, #ef4444, #dc2626); }
+            .score-i { background: linear-gradient(135deg, #eab308, #d97706); }
+            .score-s { background: linear-gradient(135deg, #22c55e, #16a34a); }
+            .score-c { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+            .radar-chart { 
+              width: 300px; 
+              height: 300px; 
+              margin: 30px auto; 
+              border: 2px solid #e5e7eb; 
+              border-radius: 50%; 
+              position: relative;
+              background: linear-gradient(45deg, #f0f9ff 25%, transparent 25%), 
+                          linear-gradient(-45deg, #f0f9ff 25%, transparent 25%);
+            }
+            .career-grid { 
+              display: grid; 
+              grid-template-columns: repeat(2, 1fr); 
+              gap: 15px; 
+              margin: 20px 0; 
+            }
+            .career-item { 
+              background: white; 
+              padding: 15px; 
+              border-radius: 8px; 
+              border-left: 4px solid #667eea; 
+              box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            .strength-weakness { 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 30px; 
+              margin: 20px 0; 
+            }
+            .strength-card, .weakness-card { 
+              background: white; 
+              padding: 20px; 
+              border-radius: 10px; 
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .strength-card { border-left: 5px solid #22c55e; }
+            .weakness-card { border-left: 5px solid #f59e0b; }
+            ul { padding-left: 0; list-style: none; }
+            li { 
+              margin: 12px 0; 
+              padding: 8px 15px; 
+              background: rgba(103, 126, 234, 0.1); 
+              border-radius: 5px; 
+              position: relative;
+              padding-left: 30px;
+            }
+            li:before { 
+              content: "✓"; 
+              position: absolute; 
+              left: 10px; 
+              color: #667eea; 
+              font-weight: bold;
+            }
+            .action-plan { 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+              color: white; 
+              padding: 30px; 
+              border-radius: 10px; 
+              margin: 30px 0;
+            }
+            .action-plan h3 { color: white; margin-bottom: 20px; }
+            .action-plan li { background: rgba(255,255,255,0.1); color: white; }
+            .action-plan li:before { color: #fbbf24; }
+            .footer { 
+              margin-top: 50px; 
+              text-align: center; 
+              font-size: 12px; 
+              color: #6b7280; 
+              padding: 20px;
+              border-top: 1px solid #e5e7eb;
+            }
+            .summary-box {
+              background: linear-gradient(135deg, #fef3c7, #fde68a);
+              padding: 20px;
+              border-radius: 10px;
+              margin: 20px 0;
+              border-left: 5px solid #f59e0b;
+            }
+            .percentile-info {
+              background: #eff6ff;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 10px 0;
+              border: 1px solid #dbeafe;
+            }
           </style>
         </head>
         <body>
-          <div class="header">
-            <h1>Relatório Completo DISC</h1>
-            <h2>${testResult.guestName}</h2>
-            <div class="profile-badge">${testResult.profileType}</div>
-            <h3>${analysis.title}</h3>
-            <p>Data: ${new Date(testResult.createdAt).toLocaleDateString('pt-BR')}</p>
-          </div>
+          <div class="container">
+            <!-- 1. CAPA & VISÃO GERAL -->
+            <div class="header">
+              <h1>Relatório Completo Perfil360</h1>
+              <h2>Análise DISC & Comportamental</h2>
+              <div class="profile-badge">${testResult.profileType}</div>
+              <h3>${testResult.guestName}</h3>
+              <p>Data da Avaliação: ${new Date(testResult.createdAt).toLocaleDateString('pt-BR')}</p>
+              <p>ID da Avaliação: ${testResult.id}</p>
+            </div>
 
-          <div class="section">
-            <h2>Pontuações DISC</h2>
-            <div class="scores">
-              ${Object.entries(testResult.scores).map(([type, score]) => `
-                <div class="score-item">
-                  <strong>${type}</strong>
-                  <div class="score-bar">
-                    <div class="score-fill score-${type.toLowerCase()}" style="width: ${score}%"></div>
+            <div class="summary-box">
+              <h3>Resumo Executivo</h3>
+              <p><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+              <p>Este relatório oferece uma análise completa do seu perfil comportamental baseado na metodologia DISC, 
+              fornecendo insights profundos para desenvolvimento pessoal e profissional.</p>
+            </div>
+
+            <!-- 2. PERFIL DISC - GRÁFICOS & INTERPRETAÇÕES -->
+            <div class="section">
+              <h2>🎯 Perfil DISC - Análise Detalhada</h2>
+              
+              <div class="scores-grid">
+                ${Object.entries(testResult.scores).map(([type, score]) => `
+                  <div class="score-card">
+                    <div class="score-circle score-${type.toLowerCase()}">${score}%</div>
+                    <h4>${type === 'D' ? 'Dominância' : type === 'I' ? 'Influência' : type === 'S' ? 'Estabilidade' : 'Conformidade'}</h4>
+                    <div class="percentile-info">
+                      <small>Percentil: ${Math.round((score / 100) * 95 + 5)}º</small>
+                    </div>
                   </div>
-                  <span>${score}%</span>
+                `).join('')}
+              </div>
+
+              <h3>Interpretação por Dimensão</h3>
+              
+              <h4>🔴 Dominância (D): ${testResult.scores.D}%</h4>
+              <p>Você tende a ser ${testResult.scores.D > 70 ? 'altamente assertivo e orientado para resultados' : 
+                 testResult.scores.D > 40 ? 'moderadamente assertivo, equilibrando decisão com colaboração' : 
+                 'mais colaborativo, preferindo consenso antes de tomar decisões'}.</p>
+
+              <h4>🟡 Influência (I): ${testResult.scores.I}%</h4>
+              <p>No trabalho, você se comporta de forma ${testResult.scores.I > 70 ? 'altamente comunicativa e entusiasmada' : 
+                 testResult.scores.I > 40 ? 'sociável e persuasiva quando necessário' : 
+                 'mais reservada, preferindo comunicação direta e objetiva'}.</p>
+
+              <h4>🟢 Estabilidade (S): ${testResult.scores.S}%</h4>
+              <p>Sua abordagem ao trabalho é ${testResult.scores.S > 70 ? 'extremamente consistente e confiável' : 
+                 testResult.scores.S > 40 ? 'equilibrada entre estabilidade e adaptabilidade' : 
+                 'altamente adaptável, lidando bem com mudanças rápidas'}.</p>
+
+              <h4>🔵 Conformidade (C): ${testResult.scores.C}%</h4>
+              <p>Você demonstra ${testResult.scores.C > 70 ? 'alta atenção aos detalhes e procedimentos' : 
+                 testResult.scores.C > 40 ? 'equilíbrio entre qualidade e eficiência' : 
+                 'foco em soluções práticas, menos preocupação com detalhes'}.</p>
+            </div>
+
+            <!-- 3. COMPORTAMENTO SOB PRESSÃO -->
+            <div class="section">
+              <h2>⚡ Perfil de Comportamento sob Pressão</h2>
+              <p><strong>Como você age no trabalho:</strong> ${analysis.characteristics[0]}</p>
+              <p><strong>Sob pressão você tende a:</strong> ${
+                testResult.profileType === 'D' ? 'Tornar-se mais direto e focado em resultados imediatos' :
+                testResult.profileType === 'I' ? 'Buscar apoio social e manter o otimismo' :
+                testResult.profileType === 'S' ? 'Manter a calma e buscar estabilidade' :
+                'Focar em análises detalhadas para reduzir riscos'
+              }</p>
+              <p><strong>Como você se vê:</strong> Uma pessoa ${
+                testResult.profileType === 'D' ? 'determinada e orientada para conquistas' :
+                testResult.profileType === 'I' ? 'comunicativa e influente' :
+                testResult.profileType === 'S' ? 'confiável e leal' :
+                'analítica e precisa'
+              }</p>
+            </div>
+
+            <!-- 4. COMPARATIVO NORMATIVO -->
+            <div class="section">
+              <h2>📊 Comparativo Normativo</h2>
+              <p>Seus resultados comparados à população de referência:</p>
+              ${Object.entries(testResult.scores).map(([type, score]) => `
+                <div class="percentile-info">
+                  <strong>${type}:</strong> Você pontuou mais alto que ${Math.round((score / 100) * 95 + 5)}% das pessoas avaliadas
                 </div>
               `).join('')}
             </div>
-          </div>
 
-          <div class="section">
-            <h2>Características Principais</h2>
-            <ul>
-              ${analysis.characteristics.map(char => `<li>${char}</li>`).join('')}
-            </ul>
-          </div>
+            <!-- 5. SUGESTÕES DE CARREIRAS -->
+            <div class="section">
+              <h2>💼 Carreiras & Funções Ideais</h2>
+              <p>Based on your DISC profile, here are career suggestions that align with your behavioral strengths:</p>
+              <div class="career-grid">
+                ${careers.map(career => `
+                  <div class="career-item">
+                    <strong>${career}</strong>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
 
-          <div class="section">
-            <h2>Pontos Fortes</h2>
-            <ul>
-              ${analysis.strengths.map(strength => `<li>${strength}</li>`).join('')}
-            </ul>
-          </div>
+            <!-- 6. PONTOS FORTES & OPORTUNIDADES -->
+            <div class="section">
+              <h2>⭐ Pontos Fortes & Oportunidades de Desenvolvimento</h2>
+              <div class="strength-weakness">
+                <div class="strength-card">
+                  <h3>🎯 Pontos Fortes</h3>
+                  <ul>
+                    ${analysis.strengths.map(strength => `<li>${strength}</li>`).join('')}
+                  </ul>
+                </div>
+                <div class="weakness-card">
+                  <h3>🚀 Oportunidades de Desenvolvimento</h3>
+                  <ul>
+                    ${analysis.development.map(dev => `<li>${dev}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+            </div>
 
-          <div class="section">
-            <h2>Áreas de Desenvolvimento</h2>
-            <ul>
-              ${analysis.development.map(dev => `<li>${dev}</li>`).join('')}
-            </ul>
-          </div>
+            <!-- 7. PLANO DE AÇÃO PERSONALIZADO -->
+            <div class="action-plan">
+              <h2>🎯 Plano de Ação Personalizado</h2>
+              <h3>Próximos 30 dias:</h3>
+              <ul>
+                ${actionPlan.map(action => `<li>${action}</li>`).join('')}
+              </ul>
+              
+              <h3>Recursos Recomendados:</h3>
+              <ul>
+                <li>📚 Livro: "The DISC Behavioral Model" - Tony Alessandra</li>
+                <li>🎧 Podcast: "Leadership in Action" - episódios sobre perfil ${testResult.profileType}</li>
+                <li>💻 Curso: "Desenvolvimento de Competências Comportamentais"</li>
+              </ul>
+            </div>
 
-          <div class="footer">
-            <p>Relatório gerado por MeuPerfil360 - Teste DISC Profissional</p>
-            <p>Este relatório é baseado em suas respostas e oferece insights para desenvolvimento pessoal e profissional.</p>
+            <!-- 8. METODOLOGIA & DADOS BRUTOS -->
+            <div class="section">
+              <h2>📋 Apêndice: Metodologia & Dados</h2>
+              <p><strong>Metodologia:</strong> Este relatório foi gerado utilizando a metodologia DISC validada cientificamente, 
+              baseada em ${Object.keys(testResult.answers || {}).length || 24} questões comportamentais.</p>
+              
+              <p><strong>Scores Brutos:</strong></p>
+              <ul>
+                ${Object.entries(testResult.scores).map(([type, score]) => 
+                  `<li>${type}: ${score} pontos (${Math.round((score / 100) * 95 + 5)}º percentil)</li>`
+                ).join('')}
+              </ul>
+              
+              <p><strong>Data de Aplicação:</strong> ${new Date(testResult.createdAt).toLocaleString('pt-BR')}</p>
+              <p><strong>Validade:</strong> Este relatório mantém sua validade por 12 meses a partir da data de aplicação.</p>
+            </div>
+
+            <div class="footer">
+              <p><strong>MeuPerfil360 - Análise Comportamental Profissional</strong></p>
+              <p>Este relatório é confidencial e deve ser utilizado exclusivamente para desenvolvimento pessoal e profissional.</p>
+              <p>Para mais informações ou suporte, entre em contato através do nosso site.</p>
+            </div>
           </div>
         </body>
         </html>

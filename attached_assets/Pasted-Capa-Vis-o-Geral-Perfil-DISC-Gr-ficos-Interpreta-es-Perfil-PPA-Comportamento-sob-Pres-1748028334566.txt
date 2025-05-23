@@ -1,0 +1,111 @@
+Capa & Visão Geral
+
+Perfil DISC – Gráficos & Interpretações
+
+Perfil PPA – Comportamento sob Pressão e Autoimagem
+
+Comparativo Normativo
+
+Sugestões de Carreiras & Funções Ideais
+
+Exemplos Práticos & Cenários
+
+Pontos Fortes & Oportunidades de Desenvolvimento
+
+Plano de Ação Personalizado
+
+Recursos & Próximos Passos
+
+Apêndice: Dados Brutos & Metodologia
+
+1. Capa & Visão Geral
+Título: “Relatório Completo Perfil360 – DISC & PPA”
+
+Dados do Avaliado: nome, data, ID do assessment, foto opcional.
+
+Resumo Executivo: 3–4 frases destacando o perfil dominante e propósito do relatório.
+
+2. Perfil DISC – Gráficos & Interpretações
+a) Radar Chart (4 Dimensões)
+Plote os T-scores de D, I, S, C em gráfico radar colorido.
+
+b) Bar Chart
+Barras horizontais mostrando raw vs. percentil normativo.
+
+c) Interpretação Detalhada
+Para cada dimensão, com subtítulos:
+
+D – Dominância: “Você tende a…”, “No trabalho, você se comporta…”
+
+I – Influência, S – Estabilidade, C – Conformidade.
+
+Use ícones e bullets.
+
+3. Perfil PPA – Pressão & Autoimagem
+Gráfico I: Comportamento no Trabalho
+
+Gráfico II: Sob Pressão
+
+Gráfico III: Como Você Se Vê
+
+Para cada, um breve parágrafo explicando diferenças entre “sob pressão” e “autoimagem”.
+
+4. Comparativo Normativo
+Box-plot ou Violin chart comparando seu θ (traço latente) com a população de referência.
+
+Tabelas de percentis.
+
+5. Sugestões de Carreiras & Funções Ideais
+Baseado nas 4 dimensões e PPA, sugira de 5 a 8 profissões, por exemplo:
+
+Dimensão Alta	Profissões Sugeridas
+Alta D	Gerente de Projetos, Executivo de Vendas
+Alta I	Relações Públicas, Treinador de Equipes
+Alta S	Analista de Suporte, Coordenador de RH
+Alta C	Controladoria, Auditor Interno
+
+Mistura de perfis (ex: D elevado & I médio) → Gestor Comercial.
+
+6. Exemplos Práticos & Cenários
+Para 2 ou 3 profissões-chaves, crie mini-case studies:
+
+Case: Gerente de Projetos
+“Em um sprint apertado, você usaria sua assertividade (D) para … e sua organização (C) para …”
+
+Use histórias curtas para engajar.
+
+7. Pontos Fortes & Oportunidades de Desenvolvimento
+Tabela ou Cards:
+
+Pontos Fortes (ex: “Tomada de Decisão Rápida”)
+
+Oportunidades (ex: “Gerenciar Tensão em Equipe”)
+
+Inclua sugestões de coaching.
+
+8. Plano de Ação Personalizado
+3 etapas:
+
+Exercícios de Autoconsciência (diário de comportamentos)
+
+Treinamento de Soft Skills (ex: liderança situacional)
+
+Feedback 360° com colegas
+
+9. Recursos & Próximos Passos
+Livros, podcasts, cursos recomendados.
+
+Ferramentas de acompanhamento (apps, planilhas).
+
+10. Apêndice
+Dados Brutos: respostas MA/ME e scores.
+
+Metodologia: Cálculos CTT/IRT usados.
+
+Dicas Visuais
+
+Paleta de cores pastel (use sua paleta psicanálise).
+
+Ícones minimalistas para cada seção.
+
+Design responsivo para PDF e versão web.
