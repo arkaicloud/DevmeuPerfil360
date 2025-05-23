@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 18% 98%; /* #F8FAFC */
+  --foreground: 215 25% 20%; /* #334155 */
+  --muted: 240 5% 96%; /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%; /* #64748B */
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 25% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 25% 20%;
+  --border: 215 28% 88%; /* #CBD5E1 */
+  --input: 215 28% 88%;
+  --primary: 207 90% 54%; /* #4A90B8 - Psychology Blue */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 28% 65%; /* #6B73A3 - Psychology Purple */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 152 55% 60%; /* #5BA88A - Psychology Green */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 207 90% 54%;
+  --radius: 0.75rem;
+  
+  /* Custom psychology colors */
+  --psychology-blue: 207 90% 54%; /* #4A90B8 */
+  --psychology-purple: 240 28% 65%; /* #6B73A3 */
+  --psychology-green: 152 55% 60%; /* #5BA88A */
+}
+
+.dark {
+  --background: 215 28% 7%; /* #0F172A */
+  --foreground: 213 31% 91%; /* #E2E8F0 */
+  --muted: 215 28% 12%; /* #1E293B */
+  --muted-foreground: 215 20% 65%; /* #94A3B8 */
+  --popover: 215 28% 7%;
+  --popover-foreground: 213 31% 91%;
+  --card: 215 28% 7%;
+  --card-foreground: 213 31% 91%;
+  --border: 215 28% 18%; /* #334155 */
+  --input: 215 28% 18%;
+  --primary: 207 90% 54%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 28% 65%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 152 55% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 207 90% 54%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Mobile-first responsive container */
+  .mobile-container {
+    @apply max-w-md mx-auto bg-card min-h-screen shadow-xl relative;
+  }
+
+  /* Psychology theme utilities */
+  .psychology-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary;
+  }
+
+  .psychology-blue {
+    color: hsl(var(--psychology-blue));
+  }
+
+  .psychology-purple {
+    color: hsl(var(--psychology-purple));
+  }
+
+  .psychology-green {
+    color: hsl(var(--psychology-green));
+  }
+
+  .bg-psychology-blue {
+    background-color: hsl(var(--psychology-blue));
+  }
+
+  .bg-psychology-purple {
+    background-color: hsl(var(--psychology-purple));
+  }
+
+  .bg-psychology-green {
+    background-color: hsl(var(--psychology-green));
+  }
+
+  .border-psychology-blue {
+    border-color: hsl(var(--psychology-blue));
+  }
+
+  .border-psychology-purple {
+    border-color: hsl(var(--psychology-purple));
+  }
+
+  .border-psychology-green {
+    border-color: hsl(var(--psychology-green));
+  }
+
+  /* Smooth transitions for better UX */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Button hover effects */
+  .btn-hover-lift {
+    @apply transition-smooth hover:shadow-lg hover:scale-[1.02];
+  }
+
+  /* Form focus styles */
+  .input-focus {
+    @apply focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+  }
+
+  /* Progress bar animations */
+  .progress-animate {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  /* Modal animations */
+  .modal-enter {
+    @apply animate-in fade-in-0 zoom-in-95 duration-300;
+  }
+
+  .modal-exit {
+    @apply animate-out fade-out-0 zoom-out-95 duration-200;
+  }
+
+  /* DISC profile colors */
+  .disc-d {
+    @apply bg-red-100 text-red-700 border-red-200;
+  }
+
+  .disc-i {
+    @apply bg-yellow-100 text-yellow-700 border-yellow-200;
+  }
+
+  .disc-s {
+    @apply bg-green-100 text-green-700 border-green-200;
+  }
+
+  .disc-c {
+    @apply bg-blue-100 text-blue-700 border-blue-200;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    @apply animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full;
+  }
+
+  /* Safe area for mobile devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Custom scrollbar for better mobile experience */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
+
+/* Touch-friendly button sizing */
+@media (max-width: 640px) {
+  button {
+    @apply min-h-[44px];
+  }
+  
+  input, select, textarea {
+    @apply min-h-[44px];
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 215 25% 60%;
+    --ring: 215 25% 40%;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .transition-smooth,
+  .progress-animate,
+  .btn-hover-lift {
+    @apply transition-none;
+  }
+  
+  .modal-enter,
+  .modal-exit {
+    @apply animate-none;
+  }
+}

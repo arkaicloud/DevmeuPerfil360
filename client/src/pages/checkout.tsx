@@ -1,0 +1,286 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+// Make sure to call `loadStripe` outside of a component's render to avoid
+// recreating the `Stripe` object on every render.
+if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+}
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+const CheckoutForm = ({ testId }: { testId: string }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const { toast } = useToast();
+  const [, navigate] = useLocation();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/results/${testId}?payment=success`,
+      },
+    });
+
+    setIsProcessing(false);
+
+    if (error) {
+      toast({
+        title: "Falha no Pagamento",
+        description: error.message || "Ocorreu um erro ao processar o pagamento.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Pagamento Realizado com Sucesso!",
+        description: "Obrigado pela sua compra! Redirecionando...",
+      });
+      
+      // Redirect will happen automatically via return_url
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5 psychology-blue" />
+            Dados do Pagamento
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PaymentElement 
+            options={{
+              layout: 'tabs',
+              paymentMethodOrder: ['card', 'ideal', 'sepa_debit']
+            }}
+          />
+        </CardContent>
+      </Card>
+
+      <Button 
+        type="submit"
+        disabled={!stripe || !elements || isProcessing}
+        className="w-full psychology-gradient btn-hover-lift"
+        size="lg"
+      >
+        {isProcessing ? (
+          <div className="spinner" />
+        ) : (
+          <>
+            <Shield className="w-4 h-4 mr-2" />
+            Finalizar Pagamento - R$ 47,00
+          </>
+        )}
+      </Button>
+
+      <p className="text-center text-xs text-muted-foreground">
+        🔒 Pagamento 100% seguro processado pela Stripe
+      </p>
+    </form>
+  );
+};
+
+export default function Checkout() {
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const [testId, setTestId] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    const id = path.split('/').pop();
+    if (id) {
+      setTestId(id);
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!testId) return;
+
+    // Create PaymentIntent as soon as the page loads
+    const createPaymentIntent = async () => {
+      try {
+        setIsLoading(true);
+        const response = await apiRequest("POST", "/api/create-payment-intent", { 
+          testResultId: parseInt(testId) 
+        });
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+      } catch (error: any) {
+        toast({
+          title: "Erro ao inicializar pagamento",
+          description: error.message || "Não foi possível inicializar o pagamento.",
+          variant: "destructive",
+        });
+        navigate(`/results/${testId}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    createPaymentIntent();
+  }, [testId, toast, navigate]);
+
+  if (isLoading || !clientSecret) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+        {/* Header */}
+        <header className="psychology-gradient text-white p-4 safe-area-top">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold">MeuPerfil360</h1>
+                <p className="text-xs opacity-90">Finalizando Compra</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="spinner mx-auto mb-4" />
+            <p className="text-muted-foreground">Preparando pagamento...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Make SURE to wrap the form in <Elements> which provides the stripe context.
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+      {/* Header */}
+      <header className="psychology-gradient text-white p-4 safe-area-top">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 mr-2"
+              onClick={() => navigate(`/results/${testId}`)}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">MeuPerfil360</h1>
+              <p className="text-xs opacity-90">Finalizar Compra</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="p-6">
+        {/* Order Summary */}
+        <Card className="mb-6 bg-gradient-to-br from-secondary/10 to-primary/10 border-secondary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="w-5 h-5 psychology-purple" />
+              Resumo do Pedido
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Relatório DISC Completo</span>
+              <span className="font-medium">R$ 97,00</span>
+            </div>
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>Desconto aplicado (52%)</span>
+              <span className="text-accent">-R$ 50,00</span>
+            </div>
+            <div className="border-t pt-3 flex items-center justify-between">
+              <span className="font-bold text-foreground">Total</span>
+              <div className="text-right">
+                <div className="font-bold text-xl psychology-purple">R$ 47,00</div>
+                <Badge variant="secondary" className="bg-accent text-white text-xs">
+                  52% OFF - Oferta Limitada
+                </Badge>
+              </div>
+            </div>
+
+            {/* Benefits included */}
+            <div className="pt-3 border-t">
+              <h4 className="font-medium text-foreground mb-3">Incluído no seu relatório:</h4>
+              <div className="space-y-2">
+                {[
+                  "Análise detalhada de 15+ páginas",
+                  "Dicas personalizadas de desenvolvimento",
+                  "Export em PDF profissional",
+                  "Comparação com outros perfis"
+                ].map((benefit, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 psychology-green flex-shrink-0" />
+                    <span className="text-xs text-muted-foreground">{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Payment Form */}
+        <Elements 
+          stripe={stripePromise} 
+          options={{ 
+            clientSecret,
+            appearance: {
+              theme: 'stripe',
+              variables: {
+                colorPrimary: 'hsl(207, 90%, 54%)',
+                colorBackground: 'hsl(0, 0%, 100%)',
+                colorText: 'hsl(215, 25%, 20%)',
+                colorDanger: 'hsl(0, 84%, 60%)',
+                borderRadius: '12px',
+              },
+            },
+          }}
+        >
+          <CheckoutForm testId={testId!} />
+        </Elements>
+
+        {/* Security Notice */}
+        <Card className="mt-6 bg-primary/5 border-primary/20">
+          <CardContent className="p-4">
+            <div className="flex items-start space-x-3">
+              <Shield className="w-5 h-5 psychology-blue mt-1 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium text-foreground text-sm mb-1">Pagamento Seguro</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Seus dados estão protegidos com criptografia de nível bancário. 
+                  Não armazenamos informações do seu cartão.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
