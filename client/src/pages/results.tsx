@@ -144,6 +144,52 @@ export default function Results() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!testResult || !testResult.isPremium) {
+      toast({
+        title: "Acesso Negado",
+        description: "O relatório em PDF está disponível apenas para testes premium.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      toast({
+        title: "Gerando PDF...",
+        description: "Seu relatório está sendo preparado. Aguarde um momento.",
+      });
+
+      const response = await fetch(`/api/test/result/${testResult.id}/pdf`);
+      
+      if (!response.ok) {
+        throw new Error("Erro ao gerar PDF");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `MeuPerfil360-${testResult.profileType}-${testResult.guestName}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "PDF Baixado!",
+        description: "Seu relatório completo foi baixado com sucesso.",
+      });
+    } catch (error) {
+      console.error("Erro ao baixar PDF:", error);
+      toast({
+        title: "Erro no Download",
+        description: "Não foi possível baixar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -326,6 +372,7 @@ export default function Results() {
             <Button 
               variant="outline"
               className="w-full"
+              onClick={() => handleDownloadPDF()}
             >
               <FileText className="w-4 h-4 mr-2" />
               Baixar PDF

@@ -329,6 +329,215 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate PDF report for premium test results
+  app.get("/api/test/result/:id/pdf", async (req, res) => {
+    try {
+      const testId = parseInt(req.params.id);
+      const testResult = await storage.getTestResult(testId);
+
+      if (!testResult) {
+        return res.status(404).json({ message: "Teste não encontrado" });
+      }
+
+      if (!testResult.isPremium) {
+        return res.status(403).json({ message: "PDF disponível apenas para testes premium" });
+      }
+
+      // Gerar conteúdo do PDF com base no perfil DISC
+      const getDetailedAnalysis = (profileType: string) => {
+        const analyses = {
+          D: {
+            title: "Perfil Dominante (D)",
+            characteristics: [
+              "Orientado para resultados e conquistas",
+              "Líder natural com tendência à tomada de decisões rápidas",
+              "Direto na comunicação e prefere eficiência",
+              "Competitivo e aceita desafios com facilidade",
+              "Foca em objetivos e metas de longo prazo"
+            ],
+            strengths: [
+              "Capacidade de liderança e direcionamento",
+              "Determinação para superar obstáculos",
+              "Visão estratégica e foco em resultados",
+              "Confiança para tomar decisões difíceis",
+              "Energia para iniciar novos projetos"
+            ],
+            development: [
+              "Desenvolver paciência e escuta ativa",
+              "Praticar delegação e trabalho em equipe",
+              "Equilibrar assertividade com empatia",
+              "Considerar mais detalhes antes de decidir",
+              "Valorizar opiniões e contribuições dos outros"
+            ]
+          },
+          I: {
+            title: "Perfil Influente (I)",
+            characteristics: [
+              "Comunicativo e extrovertido por natureza",
+              "Otimista e entusiasmado com novas ideias",
+              "Habilidade natural para influenciar pessoas",
+              "Flexível e adaptável a mudanças",
+              "Valoriza relacionamentos e conexões sociais"
+            ],
+            strengths: [
+              "Excelente comunicação e persuasão",
+              "Capacidade de motivar e inspirar outros",
+              "Criatividade e pensamento inovador",
+              "Networking e construção de relacionamentos",
+              "Energia positiva e entusiasmo contagiante"
+            ],
+            development: [
+              "Focar mais em detalhes e follow-up",
+              "Desenvolver organização e planejamento",
+              "Equilibrar socialização com produtividade",
+              "Praticar escuta ativa sem interrupções",
+              "Ser mais realista em prazos e compromissos"
+            ]
+          },
+          S: {
+            title: "Perfil Estável (S)",
+            characteristics: [
+              "Paciente e confiável em suas ações",
+              "Leal e dedicado às pessoas e organizações",
+              "Prefere ambientes estáveis e previsíveis",
+              "Bom ouvinte e mediador natural",
+              "Valoriza harmonia e cooperação"
+            ],
+            strengths: [
+              "Confiabilidade e consistência",
+              "Capacidade de trabalhar em equipe",
+              "Paciência para processos longos",
+              "Habilidade de mediar conflitos",
+              "Lealdade e comprometimento"
+            ],
+            development: [
+              "Ser mais assertivo quando necessário",
+              "Aceitar mudanças com mais facilidade",
+              "Expressar opiniões e necessidades",
+              "Tomar iniciativa em situações novas",
+              "Desenvolver tolerância a conflitos construtivos"
+            ]
+          },
+          C: {
+            title: "Perfil Conscencioso (C)",
+            characteristics: [
+              "Analítico e orientado por dados",
+              "Preciso e atento aos detalhes",
+              "Busca qualidade e excelência",
+              "Prefere seguir procedimentos estabelecidos",
+              "Cauteloso na tomada de decisões"
+            ],
+            strengths: [
+              "Análise detalhada e pensamento crítico",
+              "Qualidade e precisão no trabalho",
+              "Planejamento e organização sistemática",
+              "Capacidade de resolver problemas complexos",
+              "Confiabilidade em entregas e prazos"
+            ],
+            development: [
+              "Ser mais flexível com mudanças",
+              "Aceitar soluções 'boas o suficiente'",
+              "Melhorar comunicação interpessoal",
+              "Tomar decisões mais rapidamente",
+              "Equilibrar perfeccionismo com produtividade"
+            ]
+          }
+        };
+        return analyses[profileType as keyof typeof analyses] || analyses.D;
+      };
+
+      const analysis = getDetailedAnalysis(testResult.profileType);
+
+      // Criar conteúdo HTML para conversão em PDF
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Relatório DISC - ${testResult.guestName}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; }
+            .profile-badge { display: inline-block; width: 80px; height: 80px; border-radius: 50%; background: #3b82f6; color: white; font-size: 36px; font-weight: bold; line-height: 80px; text-align: center; margin: 20px 0; }
+            .section { margin: 30px 0; }
+            .section h2 { color: #1e40af; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+            .scores { display: flex; justify-content: space-between; margin: 20px 0; }
+            .score-item { text-align: center; flex: 1; }
+            .score-bar { width: 100%; height: 20px; background: #e5e7eb; border-radius: 10px; margin: 10px 0; }
+            .score-fill { height: 100%; border-radius: 10px; }
+            .score-d { background: #ef4444; }
+            .score-i { background: #eab308; }
+            .score-s { background: #22c55e; }
+            .score-c { background: #3b82f6; }
+            ul { padding-left: 20px; }
+            li { margin: 8px 0; }
+            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #6b7280; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Relatório Completo DISC</h1>
+            <h2>${testResult.guestName}</h2>
+            <div class="profile-badge">${testResult.profileType}</div>
+            <h3>${analysis.title}</h3>
+            <p>Data: ${new Date(testResult.createdAt).toLocaleDateString('pt-BR')}</p>
+          </div>
+
+          <div class="section">
+            <h2>Pontuações DISC</h2>
+            <div class="scores">
+              ${Object.entries(testResult.scores).map(([type, score]) => `
+                <div class="score-item">
+                  <strong>${type}</strong>
+                  <div class="score-bar">
+                    <div class="score-fill score-${type.toLowerCase()}" style="width: ${score}%"></div>
+                  </div>
+                  <span>${score}%</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>Características Principais</h2>
+            <ul>
+              ${analysis.characteristics.map(char => `<li>${char}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Pontos Fortes</h2>
+            <ul>
+              ${analysis.strengths.map(strength => `<li>${strength}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Áreas de Desenvolvimento</h2>
+            <ul>
+              ${analysis.development.map(dev => `<li>${dev}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="footer">
+            <p>Relatório gerado por MeuPerfil360 - Teste DISC Profissional</p>
+            <p>Este relatório é baseado em suas respostas e oferece insights para desenvolvimento pessoal e profissional.</p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Por enquanto, retornamos o HTML. Em produção, você usaria uma biblioteca como puppeteer para gerar PDF real
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-disc-${testResult.guestName}.html"`);
+      res.send(htmlContent);
+
+    } catch (error: any) {
+      console.error("Erro ao gerar PDF:", error);
+      res.status(500).json({ message: "Erro ao gerar relatório PDF" });
+    }
+  });
+
   // Get user dashboard data
   app.get("/api/user/:userId/dashboard", async (req, res) => {
     try {

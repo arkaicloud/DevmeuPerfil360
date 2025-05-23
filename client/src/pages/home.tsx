@@ -293,13 +293,23 @@ export default function Home() {
             ✓ 100% Gratuito ✓ Resultado Imediato ✓ Baseado em Ciência
           </p>
           
-          <Button 
-            variant="link" 
-            className="w-full text-sm psychology-blue"
-            onClick={() => navigate("/find-results")}
-          >
-            Já fez o teste? Recupere seus resultados aqui
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              variant="link" 
+              className="w-full text-sm psychology-blue"
+              onClick={() => navigate("/find-results")}
+            >
+              Já fez o teste? Recupere seus resultados aqui
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full text-sm"
+              onClick={() => navigate("/login")}
+            >
+              Entrar na minha conta
+            </Button>
+          </div>
         </div>
       </div>
     </div>
