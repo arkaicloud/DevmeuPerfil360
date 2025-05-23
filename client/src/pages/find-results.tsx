@@ -32,7 +32,14 @@ export default function FindResults() {
 
   const findResultMutation = useMutation({
     mutationFn: async (data: FindResultFormData) => {
-      const response = await apiRequest("POST", "/api/test/find", data);
+      const response = await fetch("/api/test/find", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+      }
       return response.json();
     },
     onSuccess: (data) => {

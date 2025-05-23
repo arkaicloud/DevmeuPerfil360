@@ -89,20 +89,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email ou WhatsApp é obrigatório" });
       }
       
+      console.log("Buscando teste para identificador:", identifier);
+      
       // Try to find by email first
       let testResult = await storage.getTestResultByGuest(identifier);
       
       // If not found by email, try to find by WhatsApp
       if (!testResult) {
-        // Use getTestResultByWhatsApp if you have implemented that method
-        // or you can modify getTestResultByGuest to search by either field
+        console.log("Não encontrado por email, tentando WhatsApp");
         testResult = await storage.getTestResultByWhatsApp(identifier);
       }
       
+      // If not found, try to find by name
       if (!testResult) {
-        return res.json({ message: "Nenhum teste encontrado" });
+        console.log("Não encontrado por WhatsApp, tentando nome");
+        const testsByName = await storage.getTestResultsByName(identifier);
+        if (testsByName && testsByName.length > 0) {
+          testResult = testsByName[0]; // Get the most recent test
+        }
       }
       
+      if (!testResult) {
+        console.log("Nenhum teste encontrado para:", identifier);
+        return res.status(404).json({ 
+          message: "Nenhum teste encontrado com esses dados" 
+        });
+      }
+      
+      console.log("Teste encontrado:", testResult.id);
       res.json({ 
         testResultId: testResult.id,
         message: "Teste encontrado com sucesso"
