@@ -15,7 +15,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-04-30.basil",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -127,6 +127,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upgrade test to premium after successful payment
+  app.post("/api/test/upgrade/:testId", async (req, res) => {
+    try {
+      const testId = parseInt(req.params.testId);
+      const { paymentIntentId } = req.body;
+      
+      if (!testId || !paymentIntentId) {
+        return res.status(400).json({ message: "TestId e PaymentIntentId são obrigatórios" });
+      }
+      
+      console.log(`Atualizando teste ${testId} para premium com pagamento ${paymentIntentId}`);
+      
+      // Verify test result exists
+      const testResult = await storage.getTestResult(testId);
+      if (!testResult) {
+        return res.status(404).json({ message: "Teste não encontrado" });
+      }
+      
+      // Update test to premium
+      const updatedTest = await storage.updateTestResultPremium(testId, paymentIntentId);
+      
+      // Update payment status
+      const payment = await storage.getPaymentByIntentId(paymentIntentId);
+      if (payment) {
+        await storage.updatePaymentStatus(payment.id, 'completed');
+      } else {
+        // Create payment record if it doesn't exist
+        await storage.createPayment({
+          testResultId: testId,
+          stripePaymentIntentId: paymentIntentId,
+          amount: 4700, // R$ 47,00 in cents
+          currency: "brl",
+          status: "completed",
+        });
+      }
+      
+      console.log(`Teste ${testId} atualizado para premium com sucesso`);
+      res.json({ 
+        success: true, 
+        message: "Teste atualizado para premium com sucesso",
+        isPremium: true,
+        testResultId: testId
+      });
+    } catch (error: any) {
+      console.error("Erro ao atualizar teste para premium:", error);
+      res.status(500).json({ 
+        message: "Erro ao atualizar teste para premium", 
+        error: error.message 
+      });
+    }
+  });
+  
   // Create payment intent for premium upgrade
   app.post("/api/create-payment-intent", async (req, res) => {
     try {

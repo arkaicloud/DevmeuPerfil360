@@ -38,10 +38,34 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
       redirect: 'if_required',
     });
     
-    // Se bem-sucedido e não redirecionar, fazemos a navegação manualmente
+    // Se bem-sucedido e não redirecionar, atualizamos o status premium e fazemos a navegação manualmente
     if (paymentIntent && paymentIntent.status === 'succeeded') {
-      navigate(`/results/${testId}?payment=success`);
-      return;
+      // Atualizar o status premium do teste
+      try {
+        await fetch(`/api/test/upgrade/${testId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            paymentIntentId: paymentIntent.id 
+          })
+        });
+        
+        toast({
+          title: "Pagamento Aprovado!",
+          description: "Seu relatório premium foi liberado com sucesso!",
+        });
+        
+        // Redirecionar para a página de resultados com status atualizado
+        navigate(`/results/${testId}?payment=success`);
+        return;
+      } catch (err) {
+        console.error("Erro ao atualizar status premium:", err);
+        toast({
+          title: "Erro ao atualizar relatório",
+          description: "O pagamento foi aprovado, mas houve um erro ao liberar seu relatório premium.",
+          variant: "destructive",
+        });
+      }
     }
 
     setIsProcessing(false);

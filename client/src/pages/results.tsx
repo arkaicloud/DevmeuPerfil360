@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -40,10 +41,36 @@ export default function Results() {
     }
   }, [navigate]);
 
-  const { data: testResult, isLoading, error } = useQuery<TestResult>({
-    queryKey: [`/api/test/result/${testId}`],
+  const queryKey = [`/api/test/result/${testId}`];
+  const { data: testResult, isLoading, error, refetch } = useQuery<TestResult>({
+    queryKey,
     enabled: !!testId,
   });
+  
+  // Verificar status de pagamento quando retorna da página de pagamento
+  const params = new URLSearchParams(window.location.search);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const checkPaymentStatus = async () => {
+      if (params.get('payment') === 'success') {
+        // Atualizar dados do teste após pagamento
+        await refetch();
+        
+        if (testResult && !testResult.isPremium) {
+          console.log("Atualizando status do teste após pagamento");
+        } else {
+          // Toast de confirmação
+          toast({
+            title: "Pagamento Aprovado!",
+            description: "Seu relatório premium foi liberado com sucesso!",
+          });
+        }
+      }
+    };
+    
+    checkPaymentStatus();
+  }, [params, testId, testResult, refetch, toast]);
 
   const getProfileInfo = (profileType: string) => {
     switch (profileType) {
