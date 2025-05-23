@@ -156,35 +156,23 @@ export default function Results() {
 
     try {
       toast({
-        title: "Gerando PDF...",
-        description: "Seu relatório está sendo preparado. Aguarde um momento.",
+        title: "Abrindo Relatório...",
+        description: "Seu relatório será aberto em uma nova aba para impressão em PDF.",
       });
 
-      const response = await fetch(`/api/test/result/${testResult.id}/pdf`);
-      
-      if (!response.ok) {
-        throw new Error("Erro ao gerar PDF");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `MeuPerfil360-${testResult.profileType}-${testResult.guestName}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      // Abrir o relatório em uma nova aba para que o usuário possa imprimir como PDF
+      const url = `/api/test/result/${testResult.id}/pdf`;
+      window.open(url, '_blank');
 
       toast({
-        title: "PDF Baixado!",
-        description: "Seu relatório completo foi baixado com sucesso.",
+        title: "Relatório Aberto!",
+        description: "Use Ctrl+P (ou Cmd+P no Mac) para salvar como PDF.",
       });
     } catch (error) {
-      console.error("Erro ao baixar PDF:", error);
+      console.error("Erro ao abrir relatório:", error);
       toast({
-        title: "Erro no Download",
-        description: "Não foi possível baixar o PDF. Tente novamente.",
+        title: "Erro ao Abrir",
+        description: "Não foi possível abrir o relatório. Tente novamente.",
         variant: "destructive",
       });
     }

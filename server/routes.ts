@@ -817,9 +817,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         </html>
       `;
 
-      // Por enquanto, retornamos o HTML. Em produção, você usaria uma biblioteca como puppeteer para gerar PDF real
+      // Retornar como HTML para download e impressão em PDF
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="relatorio-disc-${testResult.guestName}.html"`);
+      res.setHeader('Content-Disposition', `inline; filename="relatorio-disc-${testResult.guestName.replace(/\s+/g, '-')}.html"`);
       res.send(htmlContent);
 
     } catch (error: any) {
