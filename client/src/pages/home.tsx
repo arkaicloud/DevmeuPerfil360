@@ -56,6 +56,14 @@ export default function Home() {
                 <p className="text-xs opacity-90">Descubra seu perfil comportamental</p>
               </div>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20"
+              onClick={() => navigate("/login")}
+            >
+              Fazer Login
+            </Button>
           </div>
         </header>
 
