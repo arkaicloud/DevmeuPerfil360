@@ -37,6 +37,7 @@ export default function Dashboard() {
       try {
         const user = JSON.parse(storedUser);
         console.log("Usuário encontrado no localStorage:", user);
+        console.log("ID do usuário:", user.id, "Tipo:", typeof user.id);
         setUserId(user.id.toString());
       } catch (error) {
         console.error("Erro ao processar dados do usuário:", error);
@@ -57,15 +58,18 @@ export default function Dashboard() {
     }
   }, [navigate]);
 
+  // Log da query status
+  useEffect(() => {
+    if (userId) {
+      console.log("Query status:", { userId, isLoading, error: !!error, dataExists: !!dashboardData });
+    }
+  }, [userId, isLoading, error, dashboardData]);
+
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
     queryKey: [`/api/user/${userId}/dashboard`],
     enabled: !!userId,
-    onSuccess: (data) => {
-      console.log("Dashboard data loaded:", data);
-    },
-    onError: (error) => {
-      console.error("Dashboard loading error:", error);
-    },
+    retry: 1,
+    staleTime: 30000, // 30 seconds
   });
 
   const getProfileBadgeVariant = (profileType: string) => {
@@ -166,16 +170,16 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5" />
-              Bem-vindo, {dashboardData.user.username}
+              Bem-vindo, {dashboardData?.user?.username || "Usuário"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                <strong>Email:</strong> {dashboardData.user.email}
+                <strong>Email:</strong> {dashboardData?.user?.email || "N/A"}
               </p>
               <p className="text-sm text-muted-foreground">
-                <strong>Testes realizados:</strong> {dashboardData.testResults.length}
+                <strong>Testes realizados:</strong> {dashboardData?.testResults?.length || 0}
               </p>
             </div>
           </CardContent>
