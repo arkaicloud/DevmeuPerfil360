@@ -19,7 +19,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId?: string): Promise<User>;
-  
+
   // Test result operations
   createTestResult(testResult: InsertTestResult): Promise<TestResult>;
   getTestResult(id: number): Promise<TestResult | undefined>;
@@ -28,7 +28,7 @@ export interface IStorage {
   getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined>;
   getTestResultsByName(name: string): Promise<TestResult[]>;
   updateTestResultPremium(id: number, paymentId: string): Promise<TestResult>;
-  
+
   // Payment operations
   createPayment(payment: InsertPayment): Promise<Payment>;
   getPaymentByIntentId(intentId: string): Promise<Payment | undefined>;
@@ -102,7 +102,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(testResults.createdAt));
     return result || undefined;
   }
-  
+
   async getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined> {
     const [result] = await db
       .select()
@@ -111,7 +111,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(testResults.createdAt));
     return result || undefined;
   }
-  
+
   async getTestResultsByName(name: string): Promise<TestResult[]> {
     const results = await db
       .select()
@@ -129,6 +129,18 @@ export class DatabaseStorage implements IStorage {
         paymentId: paymentId 
       })
       .where(eq(testResults.id, id))
+      .returning();
+    return result;
+  }
+
+  async updateUserPassword(userId: number, hashedPassword: string) {
+    const [result] = await db
+      .update(users)
+      .set({ 
+        password: hashedPassword,
+        updatedAt: new Date() 
+      })
+      .where(eq(users.id, userId))
       .returning();
     return result;
   }

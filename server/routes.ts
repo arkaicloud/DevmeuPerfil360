@@ -329,6 +329,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user password
+  app.post("/api/auth/update-password", async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+
+      if (!email || !newPassword) {
+        return res.status(400).json({ message: "Email e nova senha são obrigatórios" });
+      }
+
+      console.log(`Atualizando senha para usuário: ${email}`);
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update user password
+      await storage.updateUserPassword(user.id, hashedPassword);
+
+      console.log(`Senha atualizada com sucesso para usuário: ${email}`);
+
+      res.json({
+        message: "Senha atualizada com sucesso",
+      });
+    } catch (error: any) {
+      console.error("Erro ao atualizar senha:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Generate PDF report for premium test results
   app.get("/api/test/result/:id/pdf", async (req, res) => {
     try {
