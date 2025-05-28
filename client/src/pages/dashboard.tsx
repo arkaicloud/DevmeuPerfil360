@@ -58,19 +58,19 @@ export default function Dashboard() {
     }
   }, [navigate]);
 
-  // Log da query status
-  useEffect(() => {
-    if (userId) {
-      console.log("Query status:", { userId, isLoading, error: !!error, dataExists: !!dashboardData });
-    }
-  }, [userId, isLoading, error, dashboardData]);
-
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
     queryKey: [`/api/user/${userId}/dashboard`],
     enabled: !!userId,
     retry: 1,
     staleTime: 30000, // 30 seconds
   });
+
+  // Log da query status
+  useEffect(() => {
+    if (userId) {
+      console.log("Query status:", { userId, isLoading, error: !!error, dataExists: !!dashboardData });
+    }
+  }, [userId, isLoading, error, dashboardData]);
 
   const getProfileBadgeVariant = (profileType: string) => {
     switch (profileType) {
