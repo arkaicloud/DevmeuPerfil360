@@ -40,7 +40,27 @@ export default function Test() {
 
   const submitTestMutation = useMutation({
     mutationFn: async (data: { guestData: GuestTestData; answers: DiscAnswer[] }) => {
-      const response = await apiRequest("POST", "/api/test/submit", data);
+      // Check if user is logged in
+      const currentUser = localStorage.getItem("currentUser");
+      let endpoint = "/api/test/submit";
+      let payload = data;
+
+      if (currentUser) {
+        try {
+          const userData = JSON.parse(currentUser);
+          endpoint = "/api/test/submit-user";
+          payload = {
+            userId: userData.id,
+            answers: data.answers,
+          };
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+          // Fallback to guest submission
+        }
+      }
+
+      const response = await apiRequest("POST", endpoint, payload);
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -75,13 +95,13 @@ export default function Test() {
 
     const updatedAnswers = [...answers];
     const existingIndex = updatedAnswers.findIndex(a => a.questionId === currentQuestion.id);
-    
+
     if (existingIndex >= 0) {
       updatedAnswers[existingIndex] = newAnswer;
     } else {
       updatedAnswers.push(newAnswer);
     }
-    
+
     setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
@@ -95,11 +115,11 @@ export default function Test() {
     } else {
       // Go to next question
       setCurrentQuestionIndex(prev => prev + 1);
-      
+
       // Load existing answer if available
       const nextQuestion = discQuestions[currentQuestionIndex + 1];
       const existingAnswer = updatedAnswers.find(a => a.questionId === nextQuestion.id);
-      
+
       if (existingAnswer) {
         setCurrentAnswer({
           most: existingAnswer.most,
@@ -114,11 +134,11 @@ export default function Test() {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
-      
+
       // Load previous answer
       const prevQuestion = discQuestions[currentQuestionIndex - 1];
       const existingAnswer = answers.find(a => a.questionId === prevQuestion.id);
-      
+
       if (existingAnswer) {
         setCurrentAnswer({
           most: existingAnswer.most,
@@ -215,7 +235,7 @@ export default function Test() {
               </>
             )}
           </Button>
-          
+
           {currentQuestionIndex > 0 && (
             <Button 
               onClick={handlePrevious}

@@ -57,6 +57,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Submit DISC test for registered users
+  app.post("/api/test/submit-user", async (req, res) => {
+    try {
+      const { userId, answers } = req.body;
+
+      if (!userId || !answers) {
+        return res.status(400).json({ message: "UserId e answers são obrigatórios" });
+      }
+
+      console.log(`Criando teste para usuário registrado ID: ${userId}`);
+
+      // Verify user exists
+      const user = await storage.getUser(parseInt(userId));
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Calculate DISC profile
+      const discResults = calculateDiscProfile(answers);
+
+      // Create test result linked to user
+      const testResult = await storage.createTestResult({
+        userId: parseInt(userId),
+        guestEmail: null,
+        guestName: user.username,
+        guestWhatsapp: null,
+        testType: 'DISC',
+        answers: answers,
+        scores: discResults.scores,
+        profileType: discResults.profileType,
+        isPremium: false,
+        paymentId: null,
+      });
+
+      console.log(`Teste criado com sucesso para usuário ${userId}: ${testResult.id}`);
+
+      res.json({
+        testResultId: testResult.id,
+        profile: discResults,
+        isPremium: false,
+      });
+    } catch (error: any) {
+      console.error('User test submission error:', error);
+      res.status(400).json({ 
+        message: "Erro ao processar teste",
+        error: error.message 
+      });
+    }
+  });
+
   // Get test result
   app.get("/api/test/result/:id", async (req, res) => {
     try {
