@@ -870,15 +870,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/:userId/dashboard", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
+      console.log(`Carregando dashboard para usuário ID: ${userId}`);
+      
       const user = await storage.getUser(userId);
       
       if (!user) {
+        console.log(`Usuário ${userId} não encontrado`);
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
 
+      console.log(`Usuário encontrado: ${user.username} (${user.email})`);
       const testResults = await storage.getTestResultsByUser(userId);
+      console.log(`Testes encontrados para usuário ${userId}:`, testResults.length);
 
-      res.json({
+      const dashboardData = {
         user: {
           id: user.id,
           username: user.username,
@@ -892,9 +897,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isPremium: result.isPremium,
           createdAt: result.createdAt,
         })),
+      };
+
+      console.log(`Retornando dashboard data:`, {
+        userId: dashboardData.user.id,
+        testCount: dashboardData.testResults.length
       });
+
+      res.json(dashboardData);
     } catch (error: any) {
-      res.status(500).json({ message: "Erro ao carregar dashboard" });
+      console.error("Erro ao carregar dashboard:", error);
+      res.status(500).json({ message: "Erro ao carregar dashboard", error: error.message });
     }
   });
 

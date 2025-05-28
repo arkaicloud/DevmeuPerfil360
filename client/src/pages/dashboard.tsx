@@ -34,15 +34,24 @@ export default function Dashboard() {
     // Try to get user from localStorage first (from login)
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserId(user.id.toString());
+      try {
+        const user = JSON.parse(storedUser);
+        console.log("Usuário encontrado no localStorage:", user);
+        setUserId(user.id.toString());
+      } catch (error) {
+        console.error("Erro ao processar dados do usuário:", error);
+        localStorage.removeItem("currentUser");
+        navigate("/login");
+      }
     } else {
       // Fallback: try to extract from URL path
       const path = window.location.pathname;
       const id = path.split('/').pop();
       if (id && !isNaN(Number(id))) {
+        console.log("ID do usuário extraído da URL:", id);
         setUserId(id);
       } else {
+        console.log("Redirecionando para login - usuário não encontrado");
         navigate("/login");
       }
     }
@@ -51,6 +60,12 @@ export default function Dashboard() {
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
     queryKey: [`/api/user/${userId}/dashboard`],
     enabled: !!userId,
+    onSuccess: (data) => {
+      console.log("Dashboard data loaded:", data);
+    },
+    onError: (error) => {
+      console.error("Dashboard loading error:", error);
+    },
   });
 
   const getProfileBadgeVariant = (profileType: string) => {
@@ -81,15 +96,25 @@ export default function Dashboard() {
     );
   }
 
-  if (error || !dashboardData) {
+  if (error || (!dashboardData && !isLoading && userId)) {
+    console.error("Dashboard error details:", error);
+    console.log("Current userId:", userId);
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-destructive">Erro ao carregar dashboard.</p>
-            <Button onClick={() => navigate("/")} className="mt-4">
-              Voltar ao Início
-            </Button>
+            <p className="text-sm text-muted-foreground mt-2">
+              {error ? `Erro: ${error.message}` : "Dados não encontrados"}
+            </p>
+            <div className="mt-4 space-x-2">
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Tentar Novamente
+              </Button>
+              <Button onClick={() => navigate("/")} className="mt-4">
+                Voltar ao Início
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -161,11 +186,16 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Histórico de Testes ({dashboardData.testResults.length})
+              Histórico de Testes ({dashboardData?.testResults?.length || 0})
             </CardTitle>
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-xs text-muted-foreground">
+                Debug: UserID={userId}, Tests={JSON.stringify(dashboardData?.testResults?.map(t => t.id) || [])}
+              </div>
+            )}
           </CardHeader>
           <CardContent>
-            {dashboardData.testResults.length === 0 ? (
+            {!dashboardData?.testResults || dashboardData.testResults.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Brain className="w-10 h-10 text-primary" />
@@ -229,7 +259,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Statistics */}
-        {dashboardData.testResults.length > 0 && (
+        {dashboardData?.testResults && dashboardData.testResults.length > 0 && (
           <Card className="mt-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
