@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, User, Calendar, FileText, Plus, Crown } from "lucide-react";
+import { Brain, User, Calendar, FileText, Plus, Crown, ChartPie } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -31,17 +31,25 @@ export default function Dashboard() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const path = window.location.pathname;
-    const id = path.split('/').pop();
-    if (id) {
-      setUserId(id);
+    // Try to get user from localStorage first (from login)
+    const storedUser = localStorage.getItem("currentUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserId(user.id.toString());
     } else {
-      navigate("/");
+      // Fallback: try to extract from URL path
+      const path = window.location.pathname;
+      const id = path.split('/').pop();
+      if (id && !isNaN(Number(id))) {
+        setUserId(id);
+      } else {
+        navigate("/login");
+      }
     }
   }, [navigate]);
 
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
-    queryKey: ["/api/user", userId, "dashboard"],
+    queryKey: [`/api/user/${userId}/dashboard`],
     enabled: !!userId,
   });
 
@@ -102,15 +110,28 @@ export default function Dashboard() {
               <p className="text-xs opacity-90">Dashboard</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20"
-            onClick={() => navigate("/")}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Teste
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20"
+              onClick={() => navigate("/")}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Teste
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20"
+              onClick={() => {
+                localStorage.removeItem("currentUser");
+                navigate("/login");
+              }}
+            >
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -140,20 +161,28 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Histórico de Testes
+              Histórico de Testes ({dashboardData.testResults.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             {dashboardData.testResults.length === 0 ? (
-              <div className="text-center py-8">
-                <Brain className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">Nenhum teste realizado</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Comece fazendo seu primeiro teste DISC gratuito
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Brain className="w-10 h-10 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-3">Nenhum teste realizado ainda</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Descubra seu perfil comportamental e potencialize seu desenvolvimento pessoal e profissional com nosso teste DISC.
                 </p>
-                <Button onClick={() => navigate("/")} className="psychology-gradient">
-                  Fazer Teste DISC
-                </Button>
+                <div className="space-y-3">
+                  <Button onClick={() => navigate("/")} className="psychology-gradient" size="lg">
+                    <Brain className="w-4 h-4 mr-2" />
+                    Fazer Primeiro Teste DISC
+                  </Button>
+                  <div className="text-xs text-muted-foreground">
+                    ✓ Teste gratuito • ✓ Resultado imediato • ✓ Relatório premium disponível
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -203,21 +232,36 @@ export default function Dashboard() {
         {dashboardData.testResults.length > 0 && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Estatísticas</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <ChartPie className="w-5 h-5" />
+                Suas Estatísticas
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
                   <div className="text-2xl font-bold psychology-blue">
                     {dashboardData.testResults.length}
                   </div>
                   <div className="text-sm text-muted-foreground">Testes Realizados</div>
                 </div>
-                <div className="text-center">
+                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
                   <div className="text-2xl font-bold psychology-purple">
                     {dashboardData.testResults.filter(r => r.isPremium).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Relatórios Premium</div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    {new Set(dashboardData.testResults.map(r => r.profileType)).size}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Perfis Descobertos</div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg">
+                  <div className="text-2xl font-bold text-amber-600">
+                    {Math.round((Date.now() - new Date(dashboardData.testResults[0]?.createdAt || Date.now()).getTime()) / (1000 * 60 * 60 * 24)) || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Dias desde primeiro teste</div>
                 </div>
               </div>
             </CardContent>
