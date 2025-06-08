@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Trophy, Crown, CheckCircle, Share, UserPlus, FileText, BarChart3, Target, Users, Lightbulb } from "lucide-react";
+import { Brain, Trophy, Crown, CheckCircle, Share, UserPlus, FileText, BarChart3, Target, Users, Lightbulb, Zap, Heart, Shield, Cog } from "lucide-react";
 import PaymentModal from "@/components/payment-modal";
 import RegistrationModal from "@/components/registration-modal";
 import { generatePremiumPDF, generateWeeklyActionPlan, generateReflectiveQuestions } from "@/lib/pdf-generator";
@@ -120,6 +120,16 @@ export default function Results() {
       case "S": return "bg-green-500";
       case "C": return "bg-blue-500";
       default: return "bg-gray-500";
+    }
+  };
+
+  const getDiscIcon = (type: string) => {
+    switch (type) {
+      case "D": return Zap; // Dominância - Energia/Poder
+      case "I": return Users; // Influência - Pessoas/Relacionamentos
+      case "S": return Heart; // Estabilidade - Harmonia/Cuidado
+      case "C": return Cog; // Conformidade - Precisão/Processos
+      default: return Brain;
     }
   };
 
@@ -257,14 +267,20 @@ export default function Results() {
             <CardContent className="mobile-card">
               <h3 className="mobile-subtitle font-bold text-foreground mb-4 text-center">Seu Perfil DISC</h3>
               
-              {/* Profile Type */}
+              {/* Profile Type with Custom Icon */}
               <div className="text-center mb-6">
                 <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4 border-2 ${getDiscColor(testResult.profileType)}`}>
-                  <span className="text-2xl sm:text-3xl font-bold">
+                  {(() => {
+                    const IconComponent = getDiscIcon(testResult.profileType);
+                    return <IconComponent className="w-10 h-10 sm:w-12 sm:h-12" />;
+                  })()}
+                </div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className={`px-3 py-1 rounded-full text-lg font-bold ${getDiscColor(testResult.profileType)}`}>
                     {testResult.profileType}
                   </span>
+                  <h4 className="mobile-subtitle font-bold text-foreground">{profileInfo.name}</h4>
                 </div>
-                <h4 className="mobile-subtitle font-bold text-foreground mb-2">{profileInfo.name}</h4>
                 <p className="mobile-text text-muted-foreground">
                   {profileInfo.description}
                 </p>
@@ -273,12 +289,16 @@ export default function Results() {
               {/* Enhanced DISC Scores with Visual Chart */}
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(testResult.scores).map(([type, score]) => (
-                    <div key={type} className="text-center p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg">
-                      <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center border-2 ${getDiscColor(type)}`}>
-                        <span className="font-bold text-lg">{type}</span>
-                      </div>
-                      <div className="mt-3">
+                  {Object.entries(testResult.scores).map(([type, score]) => {
+                    const IconComponent = getDiscIcon(type);
+                    return (
+                      <div key={type} className="text-center p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg hover:shadow-md transition-all duration-300">
+                        <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center border-2 ${getDiscColor(type)} mb-2`}>
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <div className={`inline-block px-2 py-1 rounded text-sm font-bold mb-2 ${getDiscColor(type)}`}>
+                          {type}
+                        </div>
                         <div className="text-xl font-bold">{score}%</div>
                         <Progress value={score} className="mt-2 h-2" />
                         <div className="text-xs text-muted-foreground mt-1">
@@ -287,8 +307,8 @@ export default function Results() {
                            type === 'S' ? 'Estabilidade' : 'Conformidade'}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Radar Chart Visualization */}
@@ -332,33 +352,35 @@ export default function Results() {
                   </div>
                 </div>
 
-                {/* Original DISC Scores List for Mobile */}
+                {/* Enhanced DISC Scores List for Mobile */}
                 <div className="sm:hidden mobile-stack">
-                  {Object.entries(testResult.scores).map(([type, score]) => (
-                    <div key={type} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 sm:space-x-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${getDiscColor(type)}`}>
-                          <span className="font-bold text-xs sm:text-sm">{type}</span>
+                  {Object.entries(testResult.scores).map(([type, score]) => {
+                    const IconComponent = getDiscIcon(type);
+                    return (
+                      <div key={type} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${getDiscColor(type)}`}>
+                            <IconComponent className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="mobile-text font-medium text-foreground">
+                            {type === "D" && "Dominância"}
+                            {type === "I" && "Influência"}
+                            {type === "S" && "Estabilidade"}
+                            {type === "C" && "Conformidade"}
+                          </span>
                         </div>
-                      <span className="mobile-text font-medium text-foreground">
-                        {type === "D" && "Dominância"}
-                        {type === "I" && "Influência"}
-                        {type === "S" && "Estabilidade"}
-                        {type === "C" && "Conformidade"}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-16 sm:w-20 bg-muted rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${getScoreColor(type)} transition-all duration-500`}
-                          style={{ width: `${score}%` }}
-                        />
+                        <div className="flex items-center space-x-2">
+                          <div className="w-16 sm:w-20 bg-muted rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full ${getScoreColor(type)} transition-all duration-500`}
+                              style={{ width: `${score}%` }}
+                            />
+                          </div>
+                          <span className="text-xs sm:text-sm font-medium text-foreground w-8 sm:w-10 text-right">{score}%</span>
+                        </div>
                       </div>
-                      <span className="text-xs sm:text-sm font-medium text-foreground w-8 sm:w-10 text-right">{score}%</span>
-                    </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </CardContent>
