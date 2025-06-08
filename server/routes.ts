@@ -631,7 +631,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         <html>
         <head>
           <meta charset="UTF-8">
-          <title>Relatório Completo Perfil360 - ${testResult.guestName}</title>
+          <title>Relatório Premium DISC - ${testResult.guestName || 'Usuário'}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             * { box-sizing: border-box; }
             body { 
@@ -828,70 +829,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           </style>
         </head>
-        <body>
-          <div class="container">
-            <!-- 1. CAPA & VISÃO GERAL -->
-            <div class="header">
-              <h1>🌟 Relatório Premium MeuPerfil360</h1>
-              <h2>Análise Comportamental DISC Personalizada</h2>
-              <div class="profile-badge">${testResult.profileType}</div>
-              <h3>✨ ${testResult.guestName || 'Usuário'}</h3>
-              <p><strong>Perfil Dominante:</strong> ${analysis.title}</p>
-              <p>📅 Data: ${testResult.createdAt ? new Date(testResult.createdAt as Date).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')} | 📧 Email: ${testResult.guestEmail || 'Não informado'}</p>
-              
-              <div class="quote-box" style="margin-top: 25px; background: rgba(255,255,255,0.1); border-left: 5px solid #ffffff;">
-                <p style="color: white; margin: 0; font-size: 16px; font-style: italic;">
-                  "Cada pessoa é única e valiosa. Este relatório é sua bússola para descobrir seus talentos naturais e transformar desafios em oportunidades de crescimento."
-                </p>
-              </div>
+        <body style="margin: 0; padding: 0; font-family: 'Arial', sans-serif; background: #f5f7fa;">
+          <!-- HEADER -->
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 40px 20px;">
+            <h1 style="margin: 0; font-size: 32px; font-weight: bold;">🌟 RELATÓRIO DISC PREMIUM</h1>
+            <h2 style="margin: 10px 0; font-size: 18px; opacity: 0.9;">Análise Comportamental Personalizada</h2>
+            
+            <div style="display: inline-block; width: 100px; height: 100px; background: rgba(255,255,255,0.2); border-radius: 50%; border: 3px solid white; margin: 20px 0; font-size: 48px; font-weight: bold; line-height: 94px; color: white;">
+              ${testResult.profileType}
             </div>
+            
+            <h3 style="margin: 15px 0; font-size: 24px; color: #ffffff;">${testResult.guestName || 'Usuário'}</h3>
+            <p style="margin: 5px 0; font-size: 16px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+            <p style="margin: 5px 0; font-size: 14px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 20px; margin-top: 25px; border-radius: 8px; border-left: 5px solid white;">
+              <p style="margin: 0; font-size: 16px; font-style: italic; color: white;">
+                "Cada pessoa é única e valiosa. Este relatório é sua bússola para descobrir seus talentos naturais e transformar desafios em oportunidades de crescimento."
+              </p>
+            </div>
+          </div>
 
-            <div class="content">
+          <!-- CONTENT -->
+          <div style="max-width: 800px; margin: 0 auto; padding: 30px 20px; background: white;">
 
-            <div class="summary-box">
-              <h3>Resumo Executivo</h3>
-              <p><strong>Perfil Dominante:</strong> ${analysis.title}</p>
-              <p>Este relatório oferece uma análise completa do seu perfil comportamental baseado na metodologia DISC, 
+            <!-- RESUMO EXECUTIVO -->
+            <div style="background: #fef3c7; padding: 20px; margin: 30px 0; border-radius: 8px; border-left: 5px solid #f59e0b;">
+              <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 20px;">Resumo Executivo</h3>
+              <p style="margin: 10px 0; color: #374151;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+              <p style="margin: 10px 0; color: #374151;">Este relatório oferece uma análise completa do seu perfil comportamental baseado na metodologia DISC, 
               fornecendo insights profundos para desenvolvimento pessoal e profissional.</p>
             </div>
 
-            <!-- 2. PERFIL DISC - GRÁFICOS & INTERPRETAÇÕES -->
-            <div class="section">
-              <h2><span class="section-icon">📊</span>Análise Visual do Perfil DISC</h2>
+            <!-- PERFIL DISC - GRÁFICOS -->
+            <div style="background: #f8fafc; padding: 30px; margin: 30px 0; border-radius: 12px; border-left: 5px solid #667eea;">
+              <h2 style="margin: 0 0 25px 0; color: #1a202c; font-size: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                📊 Análise Visual do Perfil DISC
+              </h2>
               
-              <div class="chart-container">
-                <div class="chart-wrapper">
-                  <h3>📈 Gráfico de Barras - Intensidade dos Fatores</h3>
-                  <div class="bar-chart">
-                    ${Object.entries(normalizedScores).map(([type, score]) => `
-                      <div class="bar-item">
-                        <div class="bar-label">${type === 'D' ? 'Dom.' : type === 'I' ? 'Infl.' : type === 'S' ? 'Estab.' : 'Conf.'}</div>
-                        <div class="bar-container">
-                          <div class="bar-fill bar-${type.toLowerCase()}" style="width: ${score}%">
-                            <span class="bar-percentage">${score}%</span>
-                          </div>
+              <!-- Gráfico de Barras -->
+              <div style="background: white; padding: 25px; border-radius: 12px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0 0 20px 0; color: #374151;">📈 Intensidade dos Fatores DISC</h3>
+                
+                ${Object.entries(normalizedScores).map(([type, score]) => {
+                  const colors = {
+                    D: '#ef4444',
+                    I: '#eab308', 
+                    S: '#22c55e',
+                    C: '#3b82f6'
+                  };
+                  const names = {
+                    D: 'Dominância',
+                    I: 'Influência',
+                    S: 'Estabilidade', 
+                    C: 'Conformidade'
+                  };
+                  return `
+                    <div style="display: flex; align-items: center; margin: 15px 0;">
+                      <div style="width: 100px; font-weight: bold; color: #4a5568;">${names[type as keyof typeof names]}</div>
+                      <div style="flex: 1; height: 30px; background: #f1f5f9; border-radius: 15px; overflow: hidden; margin: 0 15px; position: relative;">
+                        <div style="height: 100%; background: ${colors[type as keyof typeof colors]}; width: ${score}%; border-radius: 15px; position: relative;">
+                          <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: bold; font-size: 14px;">${score}%</span>
                         </div>
                       </div>
-                    `).join('')}
-                  </div>
-                </div>
-                
-                <div class="chart-wrapper">
-                  <h3>🎯 Radar Visual - Mapeamento Comportamental</h3>
-                  <div class="radar-chart">
-                    <div class="radar-point point-d" style="top: ${15 + (85 - normalizedScores.D) * 0.7}%; left: 50%;"></div>
-                    <div class="radar-point point-i" style="top: 50%; left: ${15 + normalizedScores.I * 0.7}%;"></div>
-                    <div class="radar-point point-s" style="top: ${85 - normalizedScores.S * 0.7}%; left: 50%;"></div>
-                    <div class="radar-point point-c" style="top: 50%; left: ${85 - normalizedScores.C * 0.7}%;"></div>
-                  </div>
-                  <div style="text-align: center; margin-top: 15px;">
-                    <small style="color: #6b7280;">D=${normalizedScores.D}% | I=${normalizedScores.I}% | S=${normalizedScores.S}% | C=${normalizedScores.C}%</small>
-                  </div>
-                </div>
+                      <div style="width: 50px; text-align: center; font-weight: bold; color: ${colors[type as keyof typeof colors]};">${type}</div>
+                    </div>
+                  `;
+                }).join('')}
               </div>
 
-              <div class="quote-box">
-                "Seu perfil ${testResult.profileType} revela uma personalidade única com potencial extraordinário. Cada dimensão conta uma parte da sua história de sucesso."
+              <!-- Pontuações em Círculos -->
+              <div style="display: flex; flex-wrap: wrap; gap: 20px; margin: 30px 0; justify-content: center;">
+                ${Object.entries(normalizedScores).map(([type, score]) => {
+                  const colors = {
+                    D: '#ef4444',
+                    I: '#eab308',
+                    S: '#22c55e', 
+                    C: '#3b82f6'
+                  };
+                  const names = {
+                    D: 'Dominância',
+                    I: 'Influência',
+                    S: 'Estabilidade',
+                    C: 'Conformidade'
+                  };
+                  return `
+                    <div style="text-align: center; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 150px;">
+                      <div style="width: 80px; height: 80px; border-radius: 50%; background: ${colors[type as keyof typeof colors]}; color: white; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                        ${score}%
+                      </div>
+                      <h4 style="margin: 10px 0 5px; color: #1a202c; font-size: 16px;">${names[type as keyof typeof names]}</h4>
+                      <div style="background: ${colors[type as keyof typeof colors]}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 14px; font-weight: bold; display: inline-block;">
+                        ${type}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-left: 5px solid #6366f1; padding: 20px; margin: 25px 0; border-radius: 8px; color: #3730a3;">
+                <p style="margin: 0; font-style: italic; font-size: 16px;">
+                  "Seu perfil ${testResult.profileType} revela uma personalidade única com potencial extraordinário. Cada dimensão conta uma parte da sua história de sucesso."
+                </p>
               </div>
 
               <h3>Interpretação por Dimensão</h3>
@@ -946,17 +985,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
               `).join('')}
             </div>
 
-            <!-- 5. SUGESTÕES DE CARREIRAS -->
-            <div class="section">
-              <h2><span class="section-icon">💼</span>Carreiras & Funções Ideais</h2>
-              <p>Com base no seu perfil DISC, estas são as carreiras que mais se alinham com seus pontos fortes naturais:</p>
+            <!-- CARREIRAS -->
+            <div style="background: #f8fafc; padding: 30px; margin: 30px 0; border-radius: 12px; border-left: 5px solid #667eea;">
+              <h2 style="margin: 0 0 25px 0; color: #1a202c; font-size: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                💼 Carreiras & Funções Ideais
+              </h2>
+              <p style="margin: 15px 0; color: #374151;">Com base no seu perfil DISC, estas são as carreiras que mais se alinham com seus pontos fortes naturais:</p>
               
-              <div class="icon-grid">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0;">
                 ${careers.map((career, index) => `
-                  <div class="icon-card">
-                    <div class="card-icon">${index % 4 === 0 ? '🎯' : index % 4 === 1 ? '🚀' : index % 4 === 2 ? '💡' : '⭐'}</div>
+                  <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #667eea; display: flex; align-items: flex-start; gap: 15px;">
+                    <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                      ${index % 4 === 0 ? '🎯' : index % 4 === 1 ? '🚀' : index % 4 === 2 ? '💡' : '⭐'}
+                    </div>
                     <div>
-                      <h4 style="margin: 0 0 8px 0; color: #1a202c;">${career}</h4>
+                      <h4 style="margin: 0 0 8px 0; color: #1a202c; font-size: 16px;">${career}</h4>
                       <p style="margin: 0; font-size: 14px; color: #6b7280;">
                         ${testResult.profileType === 'D' ? 'Ambiente de liderança e tomada de decisões' :
                           testResult.profileType === 'I' ? 'Interação social e comunicação' :
@@ -968,8 +1011,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 `).join('')}
               </div>
 
-              <div class="quote-box">
-                "Sua carreira ideal não é apenas sobre o que você pode fazer, mas sobre onde você pode brilhar naturalmente e fazer a diferença."
+              <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-left: 5px solid #6366f1; padding: 20px; margin: 25px 0; border-radius: 8px; color: #3730a3;">
+                <p style="margin: 0; font-style: italic; font-size: 16px;">
+                  "Sua carreira ideal não é apenas sobre o que você pode fazer, mas sobre onde você pode brilhar naturalmente e fazer a diferença."
+                </p>
               </div>
             </div>
 
@@ -992,97 +1037,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </div>
             </div>
 
-            <!-- 7. PLANO DE AÇÃO PERSONALIZADO -->
-            <div class="section">
-              <h2><span class="section-icon">🎯</span>Plano de Ação de 4 Semanas</h2>
+            <!-- PLANO DE AÇÃO -->
+            <div style="background: #f8fafc; padding: 30px; margin: 30px 0; border-radius: 12px; border-left: 5px solid #667eea;">
+              <h2 style="margin: 0 0 25px 0; color: #1a202c; font-size: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                🎯 Plano de Ação de 4 Semanas
+              </h2>
               
-              <table class="action-table">
+              <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                 <thead>
-                  <tr>
-                    <th>Semana</th>
-                    <th>Foco Principal</th>
-                    <th>Ações Específicas</th>
+                  <tr style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                    <th style="padding: 15px; text-align: left; font-weight: 600; border: none;">Semana</th>
+                    <th style="padding: 15px; text-align: left; font-weight: 600; border: none;">Foco Principal</th>
+                    <th style="padding: 15px; text-align: left; font-weight: 600; border: none;">Ações Específicas</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${actionPlan.map((action, index) => `
-                    <tr>
-                      <td><span class="week-badge">Semana ${index + 1}</span></td>
-                      <td>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                      <td style="padding: 12px 15px; border: none;">
+                        <span style="background: #667eea; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                          Semana ${index + 1}
+                        </span>
+                      </td>
+                      <td style="padding: 12px 15px; border: none; font-weight: 600; color: #374151;">
                         ${index === 0 ? 'Autoconhecimento' : 
                           index === 1 ? 'Desenvolvimento' : 
                           index === 2 ? 'Aplicação Prática' : 'Consolidação'}
                       </td>
-                      <td>${action}</td>
+                      <td style="padding: 12px 15px; border: none; color: #6b7280;">${action}</td>
                     </tr>
                   `).join('')}
                 </tbody>
               </table>
 
-              <div class="quote-box">
-                "A transformação acontece um passo de cada vez. Seu plano personalizado é o mapa para alcançar sua melhor versão."
+              <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-left: 5px solid #6366f1; padding: 20px; margin: 25px 0; border-radius: 8px; color: #3730a3;">
+                <p style="margin: 0; font-style: italic; font-size: 16px;">
+                  "A transformação acontece um passo de cada vez. Seu plano personalizado é o mapa para alcançar sua melhor versão."
+                </p>
               </div>
             </div>
 
-            <!-- 8. RECURSOS RECOMENDADOS -->
-            <div class="section">
-              <h2><span class="section-icon">📚</span>Recursos Personalizados para seu Perfil ${testResult.profileType}</h2>
+            <!-- RECURSOS RECOMENDADOS -->
+            <div style="background: #f8fafc; padding: 30px; margin: 30px 0; border-radius: 12px; border-left: 5px solid #667eea;">
+              <h2 style="margin: 0 0 25px 0; color: #1a202c; font-size: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                📚 Recursos Personalizados para seu Perfil ${testResult.profileType}
+              </h2>
               
-              <div class="resource-grid">
-                <div class="resource-card">
-                  <div class="resource-icon book-icon">📚</div>
-                  <h3>Livros Recomendados</h3>
-                  <ul style="padding-left: 20px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0;">
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); border-top: 4px solid #10b981;">
+                  <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;">📚</div>
+                  <h3 style="margin: 0 0 15px 0; color: #1a202c; font-size: 18px;">Livros Recomendados</h3>
+                  <ul style="padding-left: 20px; margin: 0; color: #374151;">
                     ${testResult.profileType === 'D' ? 
-                      '<li>"O Executivo Eficaz" - Peter Drucker</li><li>"Liderança na Era Digital" - Harvard Business Review</li><li>"Mindset: A Nova Psicologia do Sucesso" - Carol Dweck</li>' :
+                      '<li style="margin: 8px 0;">"O Executivo Eficaz" - Peter Drucker</li><li style="margin: 8px 0;">"Liderança na Era Digital" - Harvard Business Review</li><li style="margin: 8px 0;">"Mindset: A Nova Psicologia do Sucesso" - Carol Dweck</li>' :
                       testResult.profileType === 'I' ? 
-                      '<li>"Como Fazer Amigos e Influenciar Pessoas" - Dale Carnegie</li><li>"O Poder da Comunicação" - Chris Anderson</li><li>"Inteligência Emocional" - Daniel Goleman</li>' :
+                      '<li style="margin: 8px 0;">"Como Fazer Amigos e Influenciar Pessoas" - Dale Carnegie</li><li style="margin: 8px 0;">"O Poder da Comunicação" - Chris Anderson</li><li style="margin: 8px 0;">"Inteligência Emocional" - Daniel Goleman</li>' :
                       testResult.profileType === 'S' ?
-                      '<li>"A Coragem de Ser Imperfeito" - Brené Brown</li><li>"Comunicação Não-Violenta" - Marshall Rosenberg</li><li>"O Poder do Hábito" - Charles Duhigg</li>' :
-                      '<li>"Pensamento Rápido e Devagar" - Daniel Kahneman</li><li>"A Arte de Resolver Problemas" - Russell Ackoff</li><li>"O Cisne Negro" - Nassim Taleb</li>'
+                      '<li style="margin: 8px 0;">"A Coragem de Ser Imperfeito" - Brené Brown</li><li style="margin: 8px 0;">"Comunicação Não-Violenta" - Marshall Rosenberg</li><li style="margin: 8px 0;">"O Poder do Hábito" - Charles Duhigg</li>' :
+                      '<li style="margin: 8px 0;">"Pensamento Rápido e Devagar" - Daniel Kahneman</li><li style="margin: 8px 0;">"A Arte de Resolver Problemas" - Russell Ackoff</li><li style="margin: 8px 0;">"O Cisne Negro" - Nassim Taleb</li>'
                     }
                   </ul>
                 </div>
 
-                <div class="resource-card">
-                  <div class="resource-icon podcast-icon">🎧</div>
-                  <h3>Podcasts Brasileiros</h3>
-                  <ul style="padding-left: 20px;">
-                    <li>"Mundo DISC" - Episódios sobre perfil ${testResult.profileType}</li>
-                    <li>"PodPeople" - Desenvolvimento comportamental</li>
-                    <li>"Café Brasil" - Carreira e liderança</li>
-                    <li>"Flow Podcast" - Entrevistas inspiradoras</li>
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); border-top: 4px solid #8b5cf6;">
+                  <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;">🎧</div>
+                  <h3 style="margin: 0 0 15px 0; color: #1a202c; font-size: 18px;">Podcasts Brasileiros</h3>
+                  <ul style="padding-left: 20px; margin: 0; color: #374151;">
+                    <li style="margin: 8px 0;">"Mundo DISC" - Episódios sobre perfil ${testResult.profileType}</li>
+                    <li style="margin: 8px 0;">"PodPeople" - Desenvolvimento comportamental</li>
+                    <li style="margin: 8px 0;">"Café Brasil" - Carreira e liderança</li>
+                    <li style="margin: 8px 0;">"Flow Podcast" - Entrevistas inspiradoras</li>
                   </ul>
                 </div>
 
-                <div class="resource-card">
-                  <div class="resource-icon course-icon">💻</div>
-                  <h3>Cursos e Capacitações</h3>
-                  <ul style="padding-left: 20px;">
-                    <li>Fundação Dom Cabral - Liderança DISC</li>
-                    <li>HSM University - Inteligência Comportamental</li>
-                    <li>Conquer - Soft Skills para ${testResult.profileType}</li>
-                    <li>LinkedIn Learning - Perfil DISC na Prática</li>
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); border-top: 4px solid #f59e0b;">
+                  <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;">💻</div>
+                  <h3 style="margin: 0 0 15px 0; color: #1a202c; font-size: 18px;">Cursos e Capacitações</h3>
+                  <ul style="padding-left: 20px; margin: 0; color: #374151;">
+                    <li style="margin: 8px 0;">Fundação Dom Cabral - Liderança DISC</li>
+                    <li style="margin: 8px 0;">HSM University - Inteligência Comportamental</li>
+                    <li style="margin: 8px 0;">Conquer - Soft Skills para ${testResult.profileType}</li>
+                    <li style="margin: 8px 0;">LinkedIn Learning - Perfil DISC na Prática</li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            <!-- 9. SABOTADORES INCONSCIENTES -->
-            <div class="saboteur-box">
-              <div class="saboteur-title">
-                <span>⚠️</span>
+            <!-- SABOTADORES INCONSCIENTES -->
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 25px; margin: 30px 0; position: relative;">
+              <div style="color: #92400e; font-weight: 700; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">⚠️</span>
                 Padrões Sabotadores a Observar
               </div>
-              <p><strong>Atenção especial para seu perfil ${testResult.profileType}:</strong></p>
-              <ul style="margin: 15px 0; padding-left: 25px;">
+              <p style="margin: 15px 0; color: #92400e;"><strong>Atenção especial para seu perfil ${testResult.profileType}:</strong></p>
+              <ul style="margin: 15px 0; padding-left: 25px; color: #92400e;">
                 ${testResult.profileType === 'D' ? 
-                  '<li>Impaciência excessiva com processos longos</li><li>Tendência a tomar decisões sem consultar a equipe</li><li>Dificuldade em aceitar feedback construtivo</li><li>Pressão excessiva sobre si mesmo e outros</li>' :
+                  '<li style="margin: 8px 0;">Impaciência excessiva com processos longos</li><li style="margin: 8px 0;">Tendência a tomar decisões sem consultar a equipe</li><li style="margin: 8px 0;">Dificuldade em aceitar feedback construtivo</li><li style="margin: 8px 0;">Pressão excessiva sobre si mesmo e outros</li>' :
                   testResult.profileType === 'I' ? 
-                  '<li>Dispersão em conversas e reuniões</li><li>Promessas excessivas sem planejamento adequado</li><li>Evitar confrontos necessários</li><li>Superficialidade na análise de problemas</li>' :
+                  '<li style="margin: 8px 0;">Dispersão em conversas e reuniões</li><li style="margin: 8px 0;">Promessas excessivas sem planejamento adequado</li><li style="margin: 8px 0;">Evitar confrontos necessários</li><li style="margin: 8px 0;">Superficialidade na análise de problemas</li>' :
                   testResult.profileType === 'S' ?
-                  '<li>Resistência excessiva a mudanças</li><li>Dificuldade em expressar opiniões contrárias</li><li>Sobrecarga por não saber dizer "não"</li><li>Procrastinação em decisões difíceis</li>' :
-                  '<li>Paralisia por análise excessiva</li><li>Perfeccionismo que atrasa entregas</li><li>Evitar riscos necessários para crescimento</li><li>Crítica excessiva a ideias novas</li>'
+                  '<li style="margin: 8px 0;">Resistência excessiva a mudanças</li><li style="margin: 8px 0;">Dificuldade em expressar opiniões contrárias</li><li style="margin: 8px 0;">Sobrecarga por não saber dizer "não"</li><li style="margin: 8px 0;">Procrastinação em decisões difíceis</li>' :
+                  '<li style="margin: 8px 0;">Paralisia por análise excessiva</li><li style="margin: 8px 0;">Perfeccionismo que atrasa entregas</li><li style="margin: 8px 0;">Evitar riscos necessários para crescimento</li><li style="margin: 8px 0;">Crítica excessiva a ideias novas</li>'
                 }
               </ul>
               <p style="margin-top: 15px; font-style: italic; color: #92400e;">
