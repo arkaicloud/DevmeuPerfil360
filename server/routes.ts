@@ -595,8 +595,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return plans[profileType] || plans.D;
       };
 
+      const getReflectiveQuestions = (profileType: string) => {
+        const questions: { [key: string]: string[] } = {
+          D: [
+            "Em quais situações deixei de ouvir outras opiniões antes de decidir?",
+            "Como posso equilibrar minha assertividade com mais colaboração?",
+            "Que impacto minhas decisões rápidas tiveram na equipe?",
+            "Quais momentos preciso demonstrar mais paciência?"
+          ],
+          I: [
+            "Em quais conversas perdi o foco do objetivo principal?",
+            "Como posso organizar melhor minhas ideias antes de apresentá-las?",
+            "Que compromissos assumi sem planejamento adequado?",
+            "Quando evitei conversas difíceis que eram necessárias?"
+          ],
+          S: [
+            "Em quais situações deixei de expressar minha opinião quando deveria?",
+            "Como posso equilibrar melhor ajudar outros com cuidar de mim mesmo?",
+            "Que mudanças enfrentei esta semana e como me adaptei?",
+            "Quais limites preciso estabelecer para ser mais efetivo?"
+          ],
+          C: [
+            "Quando minha busca por perfeição atrasou resultados importantes?",
+            "Em quais momentos posso acelerar decisões sem comprometer a qualidade?",
+            "Como posso comunicar análises complexas de forma mais simples?",
+            "Que riscos calculados posso tomar para crescer?"
+          ]
+        };
+        return questions[profileType] || questions.D;
+      };
+
       const careers = getCareerSuggestions(testResult.profileType, testResult.scores);
       const actionPlan = getActionPlan(testResult.profileType);
+      const reflectiveQuestions = getReflectiveQuestions(testResult.profileType);
       
       // Ensure scores are properly formatted for PDF generation
       const normalizedScores: Record<string, number> = {};
@@ -850,39 +881,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
           </div>
 
           <!-- CONTAINER PRINCIPAL -->
-          <div style="max-width: 100%; background: white; padding: 0;">
+          <div style="max-width: 100%; background: #f8fafc; padding: 20px;">
 
-            <!-- RESUMO EXECUTIVO -->
-            <div style="background: #fef3c7; padding: 20px; margin: 30px 0; border-radius: 8px; border-left: 5px solid #f59e0b;">
-              <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 20px;">Resumo Executivo</h3>
-              <p style="margin: 10px 0; color: #374151;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
-              <p style="margin: 10px 0; color: #374151;">Este relatório oferece uma análise completa do seu perfil comportamental baseado na metodologia DISC, 
-              fornecendo insights profundos para desenvolvimento pessoal e profissional.</p>
+            <!-- RESUMO EXECUTIVO MODERNO -->
+            <div style="background: linear-gradient(135deg, #ebf8ff 0%, #dbeafe 100%); border-left: 6px solid #3b82f6; padding: 30px; margin: 0 0 30px 0; border-radius: 15px; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15); border: 1px solid #bfdbfe;">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">📋</div>
+                <h3 style="margin: 0; color: #1e40af; font-size: 26px; font-weight: 700;">Resumo Executivo</h3>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+                <p style="margin: 0 0 10px 0; color: #1e40af; font-size: 16px; font-weight: 600;"><span style="color: #3b82f6;">🎯 Perfil Dominante:</span> ${analysis.title}</p>
+                <p style="margin: 0; color: #374151; font-size: 15px; line-height: 1.7;">Este relatório oferece uma análise completa e personalizada do seu perfil comportamental DISC, incluindo gráficos visuais, plano de ação estruturado e recomendações específicas para seu desenvolvimento pessoal e profissional.</p>
+              </div>
+              
+              <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 12px 18px; border-radius: 25px; border: 2px solid #10b981;">
+                  <span style="color: #047857; font-weight: 600; font-size: 14px;">✅ Análise Completa</span>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 12px 18px; border-radius: 25px; border: 2px solid #f59e0b;">
+                  <span style="color: #d97706; font-weight: 600; font-size: 14px;">🎯 Plano de Ação</span>
+                </div>
+                <div style="background: rgba(139, 92, 246, 0.1); padding: 12px 18px; border-radius: 25px; border: 2px solid #8b5cf6;">
+                  <span style="color: #7c3aed; font-weight: 600; font-size: 14px;">📚 Recursos Personalizados</span>
+                </div>
+              </div>
             </div>
 
-            <!-- PERFIL DISC - GRÁFICOS -->
-            <div style="background: #f8fafc; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 5px solid #667eea; page-break-inside: avoid;">
-              <h2 style="margin: 0 0 20px 0; color: #1a202c; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-                📊 Análise Visual do Perfil DISC
-              </h2>
+            <!-- ANÁLISE VISUAL DISC PREMIUM -->
+            <div style="background: white; margin: 30px 0; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; page-break-inside: avoid;">
               
-              <!-- Pontuações DISC Simples -->
-              <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                <thead>
-                  <tr style="background: #667eea; color: white;">
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Fator</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Nome</th>
-                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Pontuação</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Nível</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <!-- Cabeçalho da Seção -->
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 20px 20px; opacity: 0.3;"></div>
+                <div style="position: relative; z-index: 2;">
+                  <h2 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">📊 Análise Visual DISC</h2>
+                  <p style="margin: 0; font-size: 16px; opacity: 0.9; font-weight: 300;">Gráficos e Interpretação Detalhada do seu Perfil</p>
+                </div>
+              </div>
+              
+              <!-- Conteúdo da Análise -->
+              <div style="padding: 40px 30px;">
+                
+                <!-- Tabela Premium DISC -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 40px 0; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+                  <thead>
+                    <tr style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white;">
+                      <th style="padding: 20px; text-align: center; font-weight: 700; font-size: 16px; border: none;">Fator</th>
+                      <th style="padding: 20px; text-align: left; font-weight: 700; font-size: 16px; border: none;">Dimensão Comportamental</th>
+                      <th style="padding: 20px; text-align: center; font-weight: 700; font-size: 16px; border: none;">Pontuação</th>
+                      <th style="padding: 20px; text-align: center; font-weight: 700; font-size: 16px; border: none;">Classificação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${['D', 'I', 'S', 'C'].map((type, index) => {
+                      const score = normalizedScores[type] || 0;
+                      const colors = {
+                        D: '#ef4444',
+                        I: '#f59e0b', 
+                        S: '#10b981',
+                        C: '#3b82f6'
+                      };
+                      const names = {
+                        D: 'Dominância',
+                        I: 'Influência',
+                        S: 'Estabilidade',
+                        C: 'Conformidade'
+                      };
+                      const descriptions = {
+                        D: 'Assertividade e Controle',
+                        I: 'Interação e Persuasão',
+                        S: 'Paciência e Cooperação',
+                        C: 'Precisão e Análise'
+                      };
+                      const nivel = score >= 70 ? 'ALTO' : score >= 40 ? 'MÉDIO' : 'BAIXO';
+                      const nivelColor = score >= 70 ? '#059669' : score >= 40 ? '#d97706' : '#dc2626';
+                      const bgColor = index % 2 === 0 ? '#f8fafc' : 'white';
+                      
+                      return `
+                        <tr style="background: ${bgColor}; border-bottom: 1px solid #e2e8f0;">
+                          <td style="padding: 20px; text-align: center; vertical-align: middle;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, ${colors[type as keyof typeof colors]}, ${colors[type as keyof typeof colors]}dd); border-radius: 15px; color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto; text-shadow: 0 2px 4px rgba(0,0,0,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">${type}</div>
+                          </td>
+                          <td style="padding: 20px; vertical-align: middle;">
+                            <div style="font-weight: 700; font-size: 18px; color: #1a202c; margin-bottom: 4px;">${names[type as keyof typeof names]}</div>
+                            <div style="font-size: 14px; color: #6b7280; font-style: italic;">${descriptions[type as keyof typeof descriptions]}</div>
+                          </td>
+                          <td style="padding: 20px; text-align: center; vertical-align: middle;">
+                            <div style="font-size: 24px; font-weight: 800; color: ${colors[type as keyof typeof colors]}; margin-bottom: 4px;">${score}%</div>
+                            <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px; margin: 0 auto; overflow: hidden;">
+                              <div style="width: ${score}%; height: 100%; background: ${colors[type as keyof typeof colors]}; border-radius: 4px;"></div>
+                            </div>
+                          </td>
+                          <td style="padding: 20px; text-align: center; vertical-align: middle;">
+                            <span style="background: ${nivelColor}; color: white; padding: 8px 16px; border-radius: 25px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">${nivel}</span>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+
+                <!-- Gráfico de Barras Premium -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 30px; border-radius: 15px; margin: 40px 0; border: 1px solid #cbd5e0;">
+                  <h3 style="margin: 0 0 25px 0; color: #374151; font-size: 20px; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <span style="font-size: 24px;">📈</span>
+                    Intensidade Visual dos Fatores DISC
+                  </h3>
+                  
                   ${['D', 'I', 'S', 'C'].map((type) => {
                     const score = normalizedScores[type] || 0;
                     const colors = {
                       D: '#ef4444',
-                      I: '#eab308',
-                      S: '#22c55e',
+                      I: '#f59e0b',
+                      S: '#10b981', 
                       C: '#3b82f6'
                     };
                     const names = {
@@ -891,55 +1003,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       S: 'Estabilidade',
                       C: 'Conformidade'
                     };
-                    const nivel = score >= 70 ? 'Alto' : score >= 40 ? 'Médio' : 'Baixo';
                     return `
-                      <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 12px; border: 1px solid #ddd; background: ${colors[type as keyof typeof colors]}; color: white; font-weight: bold; text-align: center;">${type}</td>
-                        <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">${names[type as keyof typeof names]}</td>
-                        <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-size: 18px; font-weight: bold; color: ${colors[type as keyof typeof colors]};">${score}%</td>
-                        <td style="padding: 12px; border: 1px solid #ddd;">${nivel}</td>
-                      </tr>
+                      <div style="margin: 25px 0; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border-left: 5px solid ${colors[type as keyof typeof colors]};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                          <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, ${colors[type as keyof typeof colors]}, ${colors[type as keyof typeof colors]}dd); border-radius: 10px; color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); box-shadow: 0 3px 8px rgba(0,0,0,0.2);">${type}</div>
+                            <div>
+                              <div style="font-weight: 700; font-size: 16px; color: #374151;">${names[type as keyof typeof names]}</div>
+                              <div style="font-size: 13px; color: #6b7280;">Nível de intensidade comportamental</div>
+                            </div>
+                          </div>
+                          <div style="text-align: right;">
+                            <div style="font-weight: 800; color: ${colors[type as keyof typeof colors]}; font-size: 20px;">${score}%</div>
+                            <div style="font-size: 12px; color: #6b7280;">${score >= 70 ? 'Alto' : score >= 40 ? 'Médio' : 'Baixo'}</div>
+                          </div>
+                        </div>
+                        <div style="width: 100%; height: 35px; background: #f1f5f9; border-radius: 18px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                          <div style="width: ${score}%; height: 100%; background: linear-gradient(90deg, ${colors[type as keyof typeof colors]} 0%, ${colors[type as keyof typeof colors]}cc 100%); border-radius: 18px; position: relative; transition: width 0.6s ease;">
+                            <div style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); color: white; font-weight: 800; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">${score}%</div>
+                          </div>
+                        </div>
+                      </div>
                     `;
                   }).join('')}
-                </tbody>
-              </table>
+                </div>
 
-              <!-- Barras Simples -->
-              <div style="margin: 30px 0;">
-                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 16px;">Intensidade dos Fatores</h3>
-                ${['D', 'I', 'S', 'C'].map((type) => {
-                  const score = normalizedScores[type] || 0;
-                  const colors = {
-                    D: '#ef4444',
-                    I: '#eab308',
-                    S: '#22c55e',
-                    C: '#3b82f6'
-                  };
-                  const names = {
-                    D: 'Dominância',
-                    I: 'Influência',
-                    S: 'Estabilidade',
-                    C: 'Conformidade'
-                  };
-                  return `
-                    <div style="margin: 10px 0; padding: 8px; background: white; border-radius: 5px;">
-                      <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                        <span style="width: 20px; height: 20px; background: ${colors[type as keyof typeof colors]}; color: white; text-align: center; line-height: 20px; font-weight: bold; margin-right: 10px; border-radius: 3px;">${type}</span>
-                        <span style="font-weight: bold; margin-right: 10px;">${names[type as keyof typeof names]}</span>
-                        <span style="font-weight: bold; color: ${colors[type as keyof typeof colors]};">${score}%</span>
-                      </div>
-                      <div style="width: 100%; height: 20px; background: #f1f5f9; border-radius: 10px; overflow: hidden;">
-                        <div style="width: ${score}%; height: 100%; background: ${colors[type as keyof typeof colors]}; border-radius: 10px;"></div>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-
-              <div style="background: #e0e7ff; border-left: 5px solid #6366f1; padding: 15px; margin: 20px 0; border-radius: 5px; color: #3730a3;">
-                <p style="margin: 0; font-style: italic; font-size: 14px;">
-                  "Seu perfil ${testResult.profileType} revela uma personalidade única com potencial extraordinário. Cada dimensão conta uma parte da sua história de sucesso."
-                </p>
+                <!-- Citação Inspiracional -->
+                <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-left: 6px solid #6366f1; padding: 30px; border-radius: 15px; color: #3730a3; position: relative; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15); margin: 40px 0;">
+                  <div style="position: absolute; top: 15px; left: 25px; font-size: 60px; color: #6366f1; opacity: 0.2; font-family: serif; line-height: 1;">"</div>
+                  <p style="margin: 0; font-style: italic; font-size: 18px; font-weight: 600; padding-left: 50px; line-height: 1.6; text-align: center;">
+                    Seu perfil <strong style="color: #4338ca;">${testResult.profileType}</strong> revela uma personalidade única com potencial extraordinário. Cada dimensão DISC conta uma parte importante da sua história de sucesso e crescimento contínuo.
+                  </p>
+                </div>
               </div>
 
               <h3>Interpretação por Dimensão</h3>
@@ -1049,39 +1144,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </div>
             </div>
 
-            <!-- PLANO DE AÇÃO -->
-            <div style="background: #f8fafc; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 5px solid #667eea; page-break-inside: avoid;">
-              <h2 style="margin: 0 0 20px 0; color: #1a202c; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-                🎯 Plano de Ação de 4 Semanas
-              </h2>
+            <!-- PLANO DE AÇÃO PREMIUM -->
+            <div style="background: white; margin: 30px 0; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; page-break-inside: avoid;">
               
-              <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                <thead>
-                  <tr style="background: #667eea; color: white;">
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Semana</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Foco</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Ações Específicas</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${actionPlan.map((action, index) => `
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                      <td style="padding: 12px; border: 1px solid #ddd; background: #667eea; color: white; font-weight: bold; text-align: center;">${index + 1}</td>
-                      <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600; color: #374151;">
-                        ${index === 0 ? 'Autoconhecimento' : 
-                          index === 1 ? 'Desenvolvimento' : 
-                          index === 2 ? 'Aplicação Prática' : 'Consolidação'}
-                      </td>
-                      <td style="padding: 12px; border: 1px solid #ddd; color: #6b7280;">${action}</td>
+              <!-- Cabeçalho da Seção -->
+              <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; color: white; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 25px 25px; opacity: 0.4;"></div>
+                <div style="position: relative; z-index: 2;">
+                  <h2 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">🎯 Plano de Ação Personalizado</h2>
+                  <p style="margin: 0; font-size: 16px; opacity: 0.9; font-weight: 300;">Estratégia de Desenvolvimento em 4 Semanas</p>
+                </div>
+              </div>
+              
+              <!-- Conteúdo do Plano -->
+              <div style="padding: 40px 30px;">
+                
+                <!-- Tabela do Plano de Ação -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 40px 0; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+                  <thead>
+                    <tr style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                      <th style="padding: 20px; text-align: center; font-weight: 700; font-size: 16px; border: none;">Semana</th>
+                      <th style="padding: 20px; text-align: left; font-weight: 700; font-size: 16px; border: none;">Foco de Desenvolvimento</th>
+                      <th style="padding: 20px; text-align: left; font-weight: 700; font-size: 16px; border: none;">Ações Estratégicas</th>
                     </tr>
-                  `).join('')}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    ${actionPlan.map((action, index) => {
+                      const focusAreas = ['Autoconhecimento', 'Desenvolvimento', 'Aplicação Prática', 'Consolidação'];
+                      const focusColors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
+                      const focusIcons = ['🧠', '🚀', '💡', '⭐'];
+                      const bgColor = index % 2 === 0 ? '#f8fafc' : 'white';
+                      
+                      return `
+                        <tr style="background: ${bgColor}; border-bottom: 1px solid #e2e8f0;">
+                          <td style="padding: 20px; text-align: center; vertical-align: middle;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, ${focusColors[index]}, ${focusColors[index]}dd); border-radius: 15px; color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto; text-shadow: 0 2px 4px rgba(0,0,0,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">${index + 1}</div>
+                          </td>
+                          <td style="padding: 20px; vertical-align: middle;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                              <span style="font-size: 24px;">${focusIcons[index]}</span>
+                              <div>
+                                <div style="font-weight: 700; font-size: 18px; color: #1a202c; margin-bottom: 4px;">${focusAreas[index]}</div>
+                                <div style="font-size: 13px; color: #6b7280;">Semana ${index + 1} • Desenvolvimento Comportamental</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="padding: 20px; vertical-align: middle; color: #374151; font-size: 15px; line-height: 1.6;">${action}</td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
 
-              <div style="background: #e0e7ff; border-left: 5px solid #6366f1; padding: 15px; margin: 20px 0; border-radius: 5px; color: #3730a3;">
-                <p style="margin: 0; font-style: italic; font-size: 14px;">
-                  "A transformação acontece um passo de cada vez. Seu plano personalizado é o mapa para alcançar sua melhor versão."
-                </p>
+                <!-- Perguntas Reflexivas -->
+                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); padding: 30px; border-radius: 15px; margin: 40px 0; border-left: 6px solid #f59e0b; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.15);">
+                  <h3 style="margin: 0 0 25px 0; color: #92400e; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 24px;">💭</span>
+                    Perguntas para Reflexão Semanal
+                  </h3>
+                  
+                  ${reflectiveQuestions.map((question, index) => `
+                    <div style="margin: 20px 0; padding: 20px; background: rgba(255, 255, 255, 0.8); border-radius: 12px; border-left: 4px solid #d97706;">
+                      <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <div style="width: 35px; height: 35px; background: #f59e0b; border-radius: 10px; color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">${index + 1}</div>
+                        <div>
+                          <div style="font-weight: 600; color: #92400e; font-size: 14px; margin-bottom: 6px;">SEMANA ${index + 1}</div>
+                          <div style="color: #374151; font-size: 15px; line-height: 1.6;">${question}</div>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <!-- Citação Motivacional -->
+                <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-left: 6px solid #10b981; padding: 30px; border-radius: 15px; color: #047857; position: relative; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);">
+                  <div style="position: absolute; top: 15px; left: 25px; font-size: 60px; color: #10b981; opacity: 0.2; font-family: serif; line-height: 1;">"</div>
+                  <p style="margin: 0; font-style: italic; font-size: 18px; font-weight: 600; padding-left: 50px; line-height: 1.6; text-align: center;">
+                    A transformação acontece um passo de cada vez. Seu plano personalizado é o mapa estratégico para alcançar sua melhor versão e maximizar seu potencial único.
+                  </p>
+                </div>
               </div>
             </div>
 
