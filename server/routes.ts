@@ -810,28 +810,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .action-table { 
               width: 100%; 
               border-collapse: collapse; 
-              margin: 15px 0; 
+              margin: 20px 0; 
               background: white; 
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             }
             .action-table th { 
-              background: #10b981; 
+              background: linear-gradient(135deg, #667eea, #764ba2); 
               color: white; 
-              padding: 12px; 
-              font-weight: bold; 
-              border: 1px solid white; 
+              padding: 18px; 
+              font-weight: 700; 
+              font-size: 16px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              border: none;
             }
             .action-table td { 
-              padding: 12px; 
-              border: 1px solid #ddd; 
+              padding: 18px; 
+              border: none;
+              border-bottom: 1px solid #f1f5f9;
               vertical-align: top; 
+              line-height: 1.6;
+            }
+            .action-table tbody tr:nth-child(even) {
+              background: #f8fafc;
+            }
+            .action-table tbody tr:hover {
+              background: #e2e8f0;
             }
             .week-badge { 
-              background: #f59e0b; 
+              background: linear-gradient(135deg, #f59e0b, #d97706); 
               color: white; 
-              padding: 8px 12px; 
-              border-radius: 15px; 
-              font-weight: bold; 
+              padding: 10px 16px; 
+              border-radius: 20px; 
+              font-weight: 700; 
               display: inline-block; 
+              box-shadow: 0 3px 10px rgba(245,158,11,0.3);
+              font-size: 14px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
             }
             .warning-box { 
               background: #fef3c7; 
@@ -842,11 +860,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
               color: #92400e; 
             }
             .resource-card { 
-              background: white; 
-              border: 2px solid #e2e8f0; 
-              border-radius: 8px; 
-              padding: 15px; 
-              margin: 10px 0; 
+              background: linear-gradient(135deg, #fefefe, #f9fafb); 
+              border: 1px solid #e2e8f0; 
+              border-radius: 12px; 
+              padding: 25px; 
+              margin: 20px 0; 
+              box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+              position: relative;
+            }
+            .resource-card::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 4px;
+              height: 100%;
+              background: linear-gradient(135deg, #667eea, #764ba2);
+              border-radius: 2px 0 0 2px;
             }
             .books { border-left: 5px solid #10b981; }
             .podcasts { border-left: 5px solid #8b5cf6; }
@@ -1463,10 +1493,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               text-align: center; 
               font-size: 12px;
             }
-            .disc-d { background: #ef4444 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .disc-i { background: #f59e0b !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .disc-s { background: #10b981 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .disc-c { background: #3b82f6 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-d { background: linear-gradient(135deg, #e53e3e, #c53030) !important; color: white !important; font-weight: 700 !important; box-shadow: 0 4px 15px rgba(229,62,62,0.3) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-i { background: linear-gradient(135deg, #dd6b20, #c05621) !important; color: white !important; font-weight: 700 !important; box-shadow: 0 4px 15px rgba(221,107,32,0.3) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-s { background: linear-gradient(135deg, #38a169, #2f855a) !important; color: white !important; font-weight: 700 !important; box-shadow: 0 4px 15px rgba(56,161,105,0.3) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-c { background: linear-gradient(135deg, #3182ce, #2c5aa0) !important; color: white !important; font-weight: 700 !important; box-shadow: 0 4px 15px rgba(49,130,206,0.3) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .progress-container { 
               margin: 12px 0; 
               background: white !important; 
