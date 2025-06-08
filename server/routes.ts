@@ -742,9 +742,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             <div class="section">
               <h2>📊 Comparativo Normativo</h2>
               <p>Seus resultados comparados à população de referência:</p>
-              ${Object.entries(scores as Record<string, number>).map(([type, score]) => `
+              ${Object.entries(normalizedScores).map(([type, score]) => `
                 <div class="percentile-info">
-                  <strong>${type}:</strong> Você pontuou mais alto que ${Math.round((Number(score) / 100) * 95 + 5)}% das pessoas avaliadas
+                  <strong>${type}:</strong> Você pontuou mais alto que ${Math.round((score / 100) * 95 + 5)}% das pessoas avaliadas
                 </div>
               `).join('')}
             </div>
@@ -805,8 +805,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               <p><strong>Scores Brutos:</strong></p>
               <ul>
-                ${Object.entries(scores).map(([type, score]) => 
-                  `<li>${type}: ${Number(score)} pontos (${Math.round((Number(score) / 100) * 95 + 5)}º percentil)</li>`
+                ${Object.entries(normalizedScores).map(([type, score]) => 
+                  `<li>${type}: ${score} pontos (${Math.round((score / 100) * 95 + 5)}º percentil)</li>`
                 ).join('')}
               </ul>
               
