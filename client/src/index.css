@@ -218,6 +218,78 @@
     @apply focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
   }
 
+  /* Performance optimizations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Loading state */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+/* Enhanced Media Queries for Perfect Responsiveness */
+@media (max-width: 480px) {
+  .responsive-title {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  .responsive-container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .features-grid {
+    gap: 1rem !important;
+  }
+
+  .responsive-button-primary {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(1, 1fr) !important;
+    gap: 1.5rem !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2rem !important;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 2.5rem !important;
+  }
+}
+
+@media (min-width: 1441px) {
+  .responsive-container {
+    max-width: 1600px !important;
+  }
+  
+  .responsive-title {
+    font-size: 4rem !important;
+  }
+  
+  .responsive-subtitle {
+    font-size: 2.25rem !important;
+  }
+
+  .features-grid {
+    gap: 3rem !important;
+  }
+}
+
   /* Progress bar animations */
   .progress-animate {
     @apply transition-all duration-500 ease-out;
@@ -262,7 +334,6 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
-}
 
 /* Custom scrollbar for better mobile experience */
 ::-webkit-scrollbar {

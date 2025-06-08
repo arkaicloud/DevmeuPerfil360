@@ -278,54 +278,54 @@ export default function Home() {
 
             {/* Features Grid */}
             <div className="features-grid">
-            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
-              <CardContent className="p-6 lg:p-8 xl:p-10">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
-                  <ChartPie className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-blue-600 dark:text-blue-300" />
-                </div>
-                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Análise Completa</h3>
-                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">Descubra seus padrões comportamentais detalhados</p>
-              </CardContent>
-            </Card>
+              <Card className="responsive-card border-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
+                <CardContent className="responsive-card-content">
+                  <div className="responsive-icon-container bg-blue-100 dark:bg-blue-800">
+                    <ChartPie className="responsive-icon text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <h3 className="responsive-heading">Análise Completa</h3>
+                  <p className="responsive-text text-muted-foreground">Descubra seus padrões comportamentais detalhados</p>
+                </CardContent>
+              </Card>
 
-            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-              <CardContent className="p-6 lg:p-8 xl:p-10">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
-                  <FileText className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-green-600 dark:text-green-300" />
-                </div>
-                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Relatório Premium</h3>
-                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">PDF completo com insights personalizados</p>
-              </CardContent>
-            </Card>
+              <Card className="responsive-card border-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+                <CardContent className="responsive-card-content">
+                  <div className="responsive-icon-container bg-green-100 dark:bg-green-800">
+                    <FileText className="responsive-icon text-green-600 dark:text-green-300" />
+                  </div>
+                  <h3 className="responsive-heading">Relatório Premium</h3>
+                  <p className="responsive-text text-muted-foreground">PDF completo com insights personalizados</p>
+                </CardContent>
+              </Card>
 
-            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
-              <CardContent className="p-6 lg:p-8 xl:p-10">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
-                  <Brain className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-purple-600 dark:text-purple-300" />
-                </div>
-                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Baseado em Ciência</h3>
-                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">Metodologia DISC validada cientificamente</p>
-              </CardContent>
-            </Card>
+              <Card className="responsive-card border-none bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
+                <CardContent className="responsive-card-content">
+                  <div className="responsive-icon-container bg-purple-100 dark:bg-purple-800">
+                    <Brain className="responsive-icon text-purple-600 dark:text-purple-300" />
+                  </div>
+                  <h3 className="responsive-heading">Baseado em Ciência</h3>
+                  <p className="responsive-text text-muted-foreground">Metodologia DISC validada cientificamente</p>
+                </CardContent>
+              </Card>
 
-            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
-              <CardContent className="p-6 lg:p-8 xl:p-10">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
-                  <Gift className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-orange-600 dark:text-orange-300" />
-                </div>
-                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Teste Gratuito</h3>
-                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">Comece agora sem compromisso</p>
-              </CardContent>
-            </Card>
-          </div>
+              <Card className="responsive-card border-none bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
+                <CardContent className="responsive-card-content">
+                  <div className="responsive-icon-container bg-orange-100 dark:bg-orange-800">
+                    <Gift className="responsive-icon text-orange-600 dark:text-orange-300" />
+                  </div>
+                  <h3 className="responsive-heading">Teste Gratuito</h3>
+                  <p className="responsive-text text-muted-foreground">Comece agora sem compromisso</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="bg-muted/30 px-4 sm:px-6 lg:px-8 xl:px-16 py-8 lg:py-16 xl:py-20">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-base lg:text-xl xl:text-2xl text-muted-foreground font-medium">
+      <div className="bg-muted/30 responsive-section">
+        <div className="responsive-container text-center">
+          <p className="responsive-text text-muted-foreground font-medium">
             Já usado por mais de 10.000 pessoas para descobrir seu perfil comportamental
           </p>
         </div>
