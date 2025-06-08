@@ -1219,6 +1219,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             </div>
           </div>
 
+          <!-- Footer -->
+          <div class="footer">
+            <div class="footer-logo">MeuPerfil360</div>
+            <div class="contact-info">
+              <p>Este relatório DISC Premium foi gerado exclusivamente para o uso individual e intransferível do usuário do MeuPerfil360. Recomendamos que a análise DISC seja atualizada a cada 6 meses, garantindo a precisão e a relevância dos dados para o seu desenvolvimento contínuo.</p>
+              
+              <p>O conteúdo deste documento é protegido por direitos autorais e não deve ser reproduzido ou distribuído sem autorização expressa. Todas as informações têm caráter orientativo e visam apoiar o autoconhecimento e a evolução profissional, sem substituir aconselhamento profissional ou psicológico individualizado.</p>
+              
+              <p>Para mais informações ou suporte, acesse: <strong>www.meuperfil360.com.br</strong></p>
+            </div>
+          </div>
+
         </body>
         </html>`;
 
