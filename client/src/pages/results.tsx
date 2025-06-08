@@ -41,36 +41,31 @@ export default function Results() {
     }
   }, [navigate]);
 
-  const queryKey = [`/api/test/result/${testId}`];
   const { data: testResult, isLoading, error, refetch } = useQuery<TestResult>({
-    queryKey,
+    queryKey: ['/api/test/result', testId],
     enabled: !!testId,
   });
   
-  // Verificar status de pagamento quando retorna da página de pagamento
-  const params = new URLSearchParams(window.location.search);
   const { toast } = useToast();
   
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
     const checkPaymentStatus = async () => {
       if (params.get('payment') === 'success') {
         // Atualizar dados do teste após pagamento
         await refetch();
         
-        if (testResult && !testResult.isPremium) {
-          console.log("Atualizando status do teste após pagamento");
-        } else {
-          // Toast de confirmação
-          toast({
-            title: "Pagamento Aprovado!",
-            description: "Seu relatório premium foi liberado com sucesso!",
-          });
-        }
+        toast({
+          title: "Pagamento Aprovado!",
+          description: "Seu relatório premium foi liberado com sucesso!",
+        });
       }
     };
     
-    checkPaymentStatus();
-  }, [params, testId, testResult, refetch, toast]);
+    if (testId) {
+      checkPaymentStatus();
+    }
+  }, [testId, refetch, toast]);
 
   const getProfileInfo = (profileType: string) => {
     switch (profileType) {

@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -37,6 +38,26 @@ export const payments = pgTable("payments", {
   status: text("status").notNull(), // 'pending', 'completed', 'failed'
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  testResults: many(testResults),
+}));
+
+export const testResultsRelations = relations(testResults, ({ one, many }) => ({
+  user: one(users, {
+    fields: [testResults.userId],
+    references: [users.id],
+  }),
+  payments: many(payments),
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  testResult: one(testResults, {
+    fields: [payments.testResultId],
+    references: [testResults.id],
+  }),
+}));
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
