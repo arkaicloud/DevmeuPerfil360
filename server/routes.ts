@@ -9,6 +9,7 @@ import {
 } from "@shared/schema";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
 import bcrypt from "bcrypt";
+import puppeteer from "puppeteer";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -1237,6 +1238,512 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(500).json({ error: 'Falha ao gerar PDF' });
       }
     });
+
+  // Download PDF route - converts HTML to actual PDF
+  app.get("/api/test/result/:id/download", async (req, res) => {
+    try {
+      const testId = parseInt(req.params.id);
+      const testResult = await storage.getTestResult(testId);
+
+      if (!testResult) {
+        return res.status(404).json({ error: 'Teste não encontrado' });
+      }
+
+      if (!testResult.isPremium) {
+        return res.status(403).json({ error: 'PDF premium requerido' });
+      }
+
+      // Generate the HTML content (reuse the same logic from /pdf route)
+      const normalizedScores = {
+        D: Math.round(((testResult.scores as any).D / 4) * 100),
+        I: Math.round(((testResult.scores as any).I / 4) * 100), 
+        S: Math.round(((testResult.scores as any).S / 4) * 100),
+        C: Math.round(((testResult.scores as any).C / 4) * 100)
+      };
+
+      const analysis = {
+        title: testResult.profileType === 'D' ? 'Dominante - Líder Natural' :
+               testResult.profileType === 'I' ? 'Influente - Comunicador Nato' :
+               testResult.profileType === 'S' ? 'Estável - Colaborador Confiável' :
+               'Cauteloso - Analista Preciso'
+      };
+
+      const actionPlan = [
+        'Identifique seus pontos fortes dominantes e como aplicá-los no trabalho',
+        'Desenvolva habilidades complementares para equilibrar seu perfil',
+        'Pratique novas estratégias de comunicação baseadas em seu estilo DISC',
+        'Consolide os aprendizados e crie um plano de desenvolvimento contínuo'
+      ];
+
+      const reflectiveQuestions = [
+        'Como meu perfil DISC influencia minhas decisões diárias?',
+        'Quais situações desafiam mais meu estilo comportamental?',
+        'Como posso usar meus pontos fortes para superar limitações?',
+        'Que mudanças implementarei baseadas nesta análise?'
+      ];
+
+      const careers = testResult.profileType === 'D' ? 
+        ['CEO/Diretor Executivo', 'Gerente de Projetos', 'Empreendedor', 'Consultor Estratégico'] :
+        testResult.profileType === 'I' ?
+        ['Vendas', 'Marketing', 'Relações Públicas', 'Treinamento e Desenvolvimento'] :
+        testResult.profileType === 'S' ?
+        ['Recursos Humanos', 'Atendimento ao Cliente', 'Enfermagem', 'Educação'] :
+        ['Analista de Dados', 'Controle de Qualidade', 'Pesquisa', 'Auditoria'];
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Relatório Premium DISC - ${testResult.guestName || 'Usuário'}</title>
+          <style>
+            @page { size: A4; margin: 15mm; }
+            * { 
+              -webkit-print-color-adjust: exact !important; 
+              color-adjust: exact !important; 
+              print-color-adjust: exact !important; 
+              box-sizing: border-box; 
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              line-height: 1.5; 
+              color: #333; 
+              margin: 0; 
+              padding: 0; 
+              background: white; 
+            }
+            .header { 
+              background: #4f46e5 !important; 
+              color: white !important; 
+              padding: 30px; 
+              text-align: center; 
+              margin-bottom: 20px; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .title { 
+              font-size: 32px; 
+              font-weight: bold; 
+              margin-bottom: 10px; 
+            }
+            .subtitle { 
+              font-size: 18px; 
+              margin-bottom: 20px; 
+            }
+            .profile-circle { 
+              width: 100px; 
+              height: 100px; 
+              background: rgba(255,255,255,0.2) !important; 
+              border: 3px solid white; 
+              border-radius: 50%; 
+              display: inline-flex; 
+              align-items: center; 
+              justify-content: center; 
+              font-size: 48px; 
+              font-weight: bold; 
+              margin: 20px auto; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .section { 
+              background: #f8fafc !important; 
+              border: 2px solid #e2e8f0; 
+              border-radius: 8px; 
+              padding: 20px; 
+              margin: 20px 0; 
+              page-break-inside: avoid; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .section-title { 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: #1a202c; 
+              margin-bottom: 15px; 
+              padding-bottom: 10px; 
+              border-bottom: 3px solid #4f46e5; 
+            }
+            .disc-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              background: white !important; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .disc-table th { 
+              background: #4f46e5 !important; 
+              color: white !important; 
+              padding: 12px; 
+              font-weight: bold; 
+              border: 1px solid white; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .disc-table td { 
+              padding: 12px; 
+              border: 1px solid #ddd; 
+              text-align: center; 
+            }
+            .disc-d { background: #ef4444 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-i { background: #f59e0b !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-s { background: #10b981 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .disc-c { background: #3b82f6 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .progress-container { 
+              margin: 15px 0; 
+              background: white !important; 
+              padding: 15px; 
+              border-radius: 5px; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .progress-label { 
+              font-weight: bold; 
+              margin-bottom: 8px; 
+              display: flex; 
+              justify-content: space-between; 
+            }
+            .progress-bar { 
+              height: 30px; 
+              background: #e5e7eb !important; 
+              border-radius: 15px; 
+              overflow: hidden; 
+              position: relative; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .progress-fill { 
+              height: 100%; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              color: white !important; 
+              font-weight: bold; 
+              font-size: 14px; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .fill-d { background: #ef4444 !important; }
+            .fill-i { background: #f59e0b !important; }
+            .fill-s { background: #10b981 !important; }
+            .fill-c { background: #3b82f6 !important; }
+            .quote-box { 
+              background: #eff6ff !important; 
+              border-left: 4px solid #3b82f6; 
+              padding: 20px; 
+              margin: 15px 0; 
+              border-radius: 0 8px 8px 0; 
+              font-style: italic; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .action-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              background: white !important; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .action-table th { 
+              background: #f3f4f6 !important; 
+              padding: 12px; 
+              border: 1px solid #d1d5db; 
+              font-weight: bold; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .action-table td { 
+              padding: 12px; 
+              border: 1px solid #d1d5db; 
+              vertical-align: top; 
+            }
+            .week-badge { 
+              background: #4f46e5 !important; 
+              color: white !important; 
+              padding: 5px 10px; 
+              border-radius: 50%; 
+              font-weight: bold; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .warning-box { 
+              background: #fef3c7 !important; 
+              border: 2px solid #f59e0b; 
+              border-radius: 8px; 
+              padding: 20px; 
+              margin: 15px 0; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .resource-card { 
+              background: white !important; 
+              border-left: 4px solid #10b981; 
+              padding: 20px; 
+              margin: 15px 0; 
+              border-radius: 0 8px 8px 0; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .resource-card.books { border-left-color: #ef4444; }
+            .resource-card.podcasts { border-left-color: #f59e0b; }
+            .resource-card.courses { border-left-color: #3b82f6; }
+            .resource-card h4 { 
+              margin-top: 0; 
+              color: #1f2937; 
+              font-size: 18px; 
+            }
+            .resource-card ul { 
+              margin: 10px 0; 
+              padding-left: 20px; 
+            }
+            .resource-card li { 
+              margin: 8px 0; 
+              line-height: 1.4; 
+            }
+          </style>
+        </head>
+        <body>
+          <!-- HEADER -->
+          <div class="header">
+            <div class="title">✨ RELATÓRIO DISC PREMIUM</div>
+            <div class="subtitle">Análise Comportamental Personalizada</div>
+            <div class="profile-circle">${testResult.profileType}</div>
+            <h3 style="margin: 15px 0; font-size: 24px;">${testResult.guestName || 'Usuário'}</h3>
+            <p style="margin: 5px 0; font-size: 16px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+            <p style="margin: 5px 0; font-size: 14px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
+          </div>
+
+          <!-- RESUMO EXECUTIVO -->
+          <div class="section">
+            <div class="section-title">📋 Resumo Executivo</div>
+            <div class="quote-box">
+              <p><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+              <p>Este relatório oferece uma análise completa do seu perfil comportamental DISC, incluindo gráficos visuais, plano de ação estruturado e recomendações personalizadas para desenvolvimento.</p>
+            </div>
+          </div>
+
+          <!-- ANÁLISE DISC -->
+          <div class="section">
+            <div class="section-title">📊 Análise Visual do Perfil DISC</div>
+            
+            <table class="disc-table">
+              <thead>
+                <tr>
+                  <th>Fator</th>
+                  <th>Dimensão</th>
+                  <th>Pontuação</th>
+                  <th>Nível</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${['D', 'I', 'S', 'C'].map((type) => {
+                  const score = normalizedScores[type] || 0;
+                  const names = {
+                    D: 'Dominância',
+                    I: 'Influência',
+                    S: 'Estabilidade',
+                    C: 'Conformidade'
+                  };
+                  const nivel = score >= 70 ? 'ALTO' : score >= 40 ? 'MÉDIO' : 'BAIXO';
+                  return `
+                    <tr>
+                      <td class="disc-${type.toLowerCase()}">${type}</td>
+                      <td><strong>${names[type as keyof typeof names]}</strong></td>
+                      <td><strong style="font-size: 18px;">${score}%</strong></td>
+                      <td><strong>${nivel}</strong></td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+
+            <h3>📈 Intensidade Visual dos Fatores</h3>
+            ${['D', 'I', 'S', 'C'].map((type) => {
+              const score = normalizedScores[type] || 0;
+              const names = {
+                D: 'Dominância',
+                I: 'Influência',
+                S: 'Estabilidade',
+                C: 'Conformidade'
+              };
+              return `
+                <div class="progress-container">
+                  <div class="progress-label">
+                    <span><strong>${type} - ${names[type as keyof typeof names]}</strong></span>
+                    <span><strong>${score}%</strong></span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill fill-${type.toLowerCase()}" style="width: ${score}%;">${score}%</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+
+            <div class="quote-box">
+              <p><strong>Interpretação:</strong> Seu perfil ${testResult.profileType} revela uma personalidade única com potencial extraordinário. Cada dimensão DISC contribui para sua história de sucesso e crescimento pessoal.</p>
+            </div>
+          </div>
+
+          <!-- PLANO DE AÇÃO -->
+          <div class="section">
+            <div class="section-title">🎯 Plano de Ação de 4 Semanas</div>
+            
+            <table class="action-table">
+              <thead>
+                <tr>
+                  <th>Semana</th>
+                  <th>Foco</th>
+                  <th>Ação Estratégica</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${actionPlan.map((action, index) => {
+                  const focusAreas = ['Autoconhecimento', 'Desenvolvimento', 'Aplicação', 'Consolidação'];
+                  return `
+                    <tr>
+                      <td><span class="week-badge">${index + 1}</span></td>
+                      <td><strong>${focusAreas[index]}</strong></td>
+                      <td>${action}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+
+            <div class="warning-box">
+              <h4>💭 Perguntas para Reflexão Semanal</h4>
+              ${reflectiveQuestions.map((question, index) => `
+                <p><strong>Semana ${index + 1}:</strong> ${question}</p>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- RECURSOS PERSONALIZADOS -->
+          <div class="section">
+            <div class="section-title">📚 Recursos Personalizados</div>
+            
+            <div class="resource-card books">
+              <h4>📚 Livros Recomendados</h4>
+              <ul>
+                ${testResult.profileType === 'D' ? 
+                  '<li>"O Executivo Eficaz" - Peter Drucker</li><li>"Liderança na Era Digital" - Harvard Business Review</li><li>"Mindset: A Nova Psicologia do Sucesso" - Carol Dweck</li>' :
+                  testResult.profileType === 'I' ? 
+                  '<li>"Como Fazer Amigos e Influenciar Pessoas" - Dale Carnegie</li><li>"O Poder da Comunicação" - Chris Anderson</li><li>"Inteligência Emocional" - Daniel Goleman</li>' :
+                  testResult.profileType === 'S' ?
+                  '<li>"A Coragem de Ser Imperfeito" - Brené Brown</li><li>"Comunicação Não-Violenta" - Marshall Rosenberg</li><li>"O Poder do Hábito" - Charles Duhigg</li>' :
+                  '<li>"Pensamento Rápido e Devagar" - Daniel Kahneman</li><li>"A Arte de Resolver Problemas" - Russell Ackoff</li><li>"O Cisne Negro" - Nassim Taleb</li>'
+                }
+              </ul>
+            </div>
+
+            <div class="resource-card podcasts">
+              <h4>🎧 Podcasts Brasileiros</h4>
+              <ul>
+                <li>"Mundo DISC" - Episódios sobre perfil ${testResult.profileType}</li>
+                <li>"PodPeople" - Desenvolvimento comportamental</li>
+                <li>"Café Brasil" - Carreira e liderança</li>
+                <li>"Flow Podcast" - Entrevistas inspiradoras</li>
+              </ul>
+            </div>
+
+            <div class="resource-card courses">
+              <h4>💻 Cursos e Capacitações</h4>
+              <ul>
+                <li>Fundação Dom Cabral - Liderança DISC</li>
+                <li>HSM University - Inteligência Comportamental</li>
+                <li>Conquer - Soft Skills para ${testResult.profileType}</li>
+                <li>LinkedIn Learning - Perfil DISC na Prática</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SABOTADORES -->
+          <div class="section">
+            <div class="warning-box">
+              <div class="section-title">⚠️ Padrões Sabotadores a Observar</div>
+              <p><strong>Atenção especial para seu perfil ${testResult.profileType}:</strong></p>
+              <ul>
+                ${testResult.profileType === 'D' ? 
+                  '<li>Impaciência excessiva com processos longos</li><li>Tendência a tomar decisões sem consultar a equipe</li><li>Dificuldade em aceitar feedback construtivo</li>' :
+                  testResult.profileType === 'I' ? 
+                  '<li>Dispersão em conversas e reuniões</li><li>Promessas excessivas sem planejamento adequado</li><li>Evitar confrontos necessários</li>' :
+                  testResult.profileType === 'S' ?
+                  '<li>Resistência excessiva a mudanças</li><li>Dificuldade em expressar opiniões contrárias</li><li>Sobrecarga por não saber dizer "não"</li>' :
+                  '<li>Paralisia por análise excessiva</li><li>Perfeccionismo que atrasa entregas</li><li>Evitar riscos necessários para crescimento</li>'
+                }
+              </ul>
+              <p><strong>Lembre-se:</strong> Reconhecer esses padrões é o primeiro passo para transformá-los em pontos de crescimento.</p>
+            </div>
+          </div>
+
+          <!-- CAREERS SECTION -->
+          <div class="section">
+            <div class="section-title">💼 Carreiras Ideais</div>
+            <div class="resource-card">
+              <p>Com base no seu perfil ${testResult.profileType}, estas são as carreiras que mais se alinham com seus pontos fortes:</p>
+              <ul>
+                ${careers.map(career => `<li>${career}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+
+        </body>
+        </html>`;
+
+      console.log('Launching Puppeteer for PDF generation...');
+      
+      // Launch Puppeteer and generate PDF
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox', 
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--disable-gpu'
+        ]
+      });
+      
+      try {
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { 
+          waitUntil: 'networkidle0',
+          timeout: 30000 
+        });
+        
+        console.log('Generating PDF...');
+        const pdfBuffer = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          preferCSSPageSize: false,
+          margin: {
+            top: '15mm',
+            right: '15mm',
+            bottom: '15mm',
+            left: '15mm'
+          }
+        });
+        
+        console.log('PDF generated successfully, size:', pdfBuffer.length);
+
+        // Set headers for PDF download
+        const fileName = `relatorio-disc-${testResult.guestName?.replace(/[^a-zA-Z0-9]/g, '') || 'usuario'}-${Date.now()}.pdf`;
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.setHeader('Content-Length', pdfBuffer.length);
+        
+        res.send(pdfBuffer);
+        
+      } finally {
+        await browser.close();
+      }
+
+    } catch (error) {
+      console.error('PDF download error:', error);
+      res.status(500).json({ error: 'Falha ao gerar PDF para download' });
+    }
+  });
 
   // Admin route to create test user and data
   app.post('/api/admin/setup', async (req, res) => {
