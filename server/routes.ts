@@ -890,10 +890,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .disc-i { background: #f59e0b !important; color: white !important; }
               .disc-s { background: #10b981 !important; color: white !important; }
               .disc-c { background: #3b82f6 !important; color: white !important; }
-              .fill-d { background: #ef4444 !important; }
-              .fill-i { background: #f59e0b !important; }
-              .fill-s { background: #10b981 !important; }
-              .fill-c { background: #3b82f6 !important; }
+              .fill-d { background: linear-gradient(135deg, #e53e3e, #c53030) !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important; }
+              .fill-i { background: linear-gradient(135deg, #dd6b20, #c05621) !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important; }
+              .fill-s { background: linear-gradient(135deg, #38a169, #2f855a) !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important; }
+              .fill-c { background: linear-gradient(135deg, #3182ce, #2c5aa0) !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important; }
               .disc-table th { background: #4f46e5 !important; color: white !important; }
               .action-table th { background: #10b981 !important; color: white !important; }
               .week-badge { background: #f59e0b !important; color: white !important; }
@@ -1097,21 +1097,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
               font-size: 16px; padding-top: 15px; border-top: 1px solid rgba(0,102,204,0.2);
             }
             
+            /* Profile-specific header colors */
+            .profile-d .header { background: linear-gradient(135deg, #e53e3e, #c53030); }
+            .profile-i .header { background: linear-gradient(135deg, #dd6b20, #c05621); }
+            .profile-s .header { background: linear-gradient(135deg, #38a169, #2f855a); }
+            .profile-c .header { background: linear-gradient(135deg, #3182ce, #2c5aa0); }
+            
+            /* Enhanced typography */
+            .report-title {
+              font-size: 32px; font-weight: 800; text-transform: uppercase;
+              letter-spacing: 1.5px; margin-bottom: 10px;
+            }
+            .report-subtitle {
+              font-size: 18px; font-weight: 500; opacity: 0.9;
+              margin-bottom: 25px;
+            }
+            .name-title {
+              font-size: 28px; font-weight: 700; margin: 20px 0 10px;
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            /* Enhanced section cards */
+            .enhanced-section {
+              background: white; border-radius: 16px; padding: 30px;
+              margin: 25px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+              border-top: 4px solid #667eea; position: relative;
+              overflow: hidden;
+            }
+            .enhanced-section::before {
+              content: ''; position: absolute; top: 0; right: 0;
+              width: 100px; height: 100px; background: linear-gradient(135deg, rgba(102,126,234,0.1), transparent);
+              border-radius: 50%; transform: translate(30px, -30px);
+            }
+            
             /* Print Optimizations */
             @media print {
               body { background: white; }
               .container { box-shadow: none; }
               .section { break-inside: avoid; }
+              .enhanced-section { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
             }
           </style>
         </head>
-        <body>
+        <body class="profile-${testResult.profileType.toLowerCase()}">
           <!-- HEADER -->
           <div class="header">
-            <div class="title">✨ RELATÓRIO DISC PREMIUM</div>
-            <div class="subtitle">Análise Comportamental Personalizada</div>
+            <div class="report-title">✨ RELATÓRIO DISC PREMIUM</div>
+            <div class="report-subtitle">Análise Comportamental Personalizada</div>
             <div class="profile-circle">${testResult.profileType}</div>
-            <h3 style="margin: 15px 0; font-size: 24px;">${testResult.guestName || 'Usuário'}</h3>
+            <h3 class="name-title">${testResult.guestName || 'Usuário'}</h3>
             <p style="margin: 5px 0; font-size: 16px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
             <p style="margin: 5px 0; font-size: 14px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
           </div>
