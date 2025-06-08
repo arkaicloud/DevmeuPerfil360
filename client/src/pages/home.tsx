@@ -177,28 +177,30 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white mobile-padding py-4 md:py-8">
-        <div className="responsive-container">
+      <header className="psychology-gradient text-white px-4 sm:px-6 lg:px-8 xl:px-16 py-6 lg:py-12">
+        <div className="max-w-7xl mx-auto">
           {/* Top Navigation - Only on larger screens */}
-          <div className="hidden md:flex justify-between items-center mb-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Brain className="w-5 h-5 text-white" />
+          <div className="hidden lg:flex justify-between items-center mb-12 xl:mb-16">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 xl:w-14 xl:h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <Brain className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
               </div>
-              <span className="font-semibold text-lg">MeuPerfil360</span>
+              <span className="font-semibold text-xl xl:text-2xl">MeuPerfil360</span>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <Button
                 variant="ghost"
+                size="lg"
                 onClick={() => navigate("/find-results")}
-                className="text-white hover:bg-white/20 touch-button"
+                className="text-white hover:bg-white/20 touch-button text-base xl:text-lg px-6 py-3"
               >
                 Recuperar Resultados
               </Button>
               <Button
                 variant="ghost"
+                size="lg"
                 onClick={() => navigate("/login")}
-                className="text-white hover:bg-white/20 touch-button"
+                className="text-white hover:bg-white/20 touch-button text-base xl:text-lg px-6 py-3"
               >
                 Login
               </Button>
@@ -235,26 +237,26 @@ export default function Home() {
 
           {/* Main Header Content */}
           <div className="text-center">
-            <div className="flex justify-center mb-4 md:mb-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
-                <Brain className="w-6 h-6 md:w-8 md:h-8 text-white" />
+            <div className="flex justify-center mb-6 lg:mb-10">
+              <div className="w-16 h-16 lg:w-24 lg:h-24 xl:w-28 xl:h-28 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
+                <Brain className="w-8 h-8 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-white" />
               </div>
             </div>
             <div>
-              <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-2">MeuPerfil360</h1>
-              <p className="text-sm md:text-base lg:text-lg opacity-90">Descubra seu perfil comportamental DISC</p>
+              <h1 className="text-2xl lg:text-5xl xl:text-6xl font-bold mb-3 lg:mb-6">MeuPerfil360</h1>
+              <p className="text-base lg:text-xl xl:text-2xl opacity-90">Descubra seu perfil comportamental DISC</p>
             </div>
           </div>
         </div>
       </header>
       
       {/* Main Content */}
-      <div className="responsive-container py-6 md:py-12">
-        <div className="text-center max-w-4xl mx-auto">
-          <h2 className="text-lg md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-psychology-blue">
+      <div className="px-4 sm:px-6 lg:px-8 xl:px-16 py-12 lg:py-20 xl:py-24">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold mb-6 lg:mb-10 text-psychology-blue">
             Descubra seu Perfil Comportamental
           </h2>
-          <p className="text-sm md:text-base lg:text-lg text-muted-foreground mb-6 md:mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base lg:text-xl xl:text-2xl text-muted-foreground mb-10 lg:mb-16 max-w-4xl mx-auto leading-relaxed">
             O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, 
             ajudando você a entender como se relaciona, comunica e toma decisões.
           </p>
@@ -262,52 +264,52 @@ export default function Home() {
           {/* Main CTA Button */}
           <Button
             onClick={() => setShowDataForm(true)}
-            className="psychology-gradient mobile-button touch-button shadow-xl mb-8 md:mb-16 text-sm md:text-base px-6 md:px-8 py-3 md:py-4"
+            className="psychology-gradient w-auto px-8 lg:px-12 py-4 lg:py-6 text-base lg:text-xl xl:text-2xl touch-button shadow-xl mb-16 lg:mb-24 font-semibold"
             size="lg"
           >
-            <Brain className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+            <Brain className="w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 mr-3" />
             Iniciar Teste Gratuito
           </Button>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-8 md:mb-16">
-            <Card className="text-center hover:shadow-lg transition-all duration-300 border-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
-              <CardContent className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <ChartPie className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-300" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 xl:gap-12 mb-16 lg:mb-24">
+            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
+              <CardContent className="p-6 lg:p-8 xl:p-10">
+                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
+                  <ChartPie className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-blue-600 dark:text-blue-300" />
                 </div>
-                <h3 className="font-semibold mb-2 text-sm md:text-base">Análise Completa</h3>
-                <p className="text-xs md:text-sm text-muted-foreground">Descubra seus padrões comportamentais detalhados</p>
+                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Análise Completa</h3>
+                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">Descubra seus padrões comportamentais detalhados</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all duration-300 border-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-              <CardContent className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <FileText className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-300" />
+            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+              <CardContent className="p-6 lg:p-8 xl:p-10">
+                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
+                  <FileText className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-green-600 dark:text-green-300" />
                 </div>
-                <h3 className="font-semibold mb-2 text-sm md:text-base">Relatório Premium</h3>
-                <p className="text-xs md:text-sm text-muted-foreground">PDF completo com insights personalizados</p>
+                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Relatório Premium</h3>
+                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">PDF completo com insights personalizados</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all duration-300 border-none bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
-              <CardContent className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <Brain className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-300" />
+            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
+              <CardContent className="p-6 lg:p-8 xl:p-10">
+                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
+                  <Brain className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-purple-600 dark:text-purple-300" />
                 </div>
-                <h3 className="font-semibold mb-2 text-sm md:text-base">Baseado em Ciência</h3>
-                <p className="text-xs md:text-sm text-muted-foreground">Metodologia DISC validada cientificamente</p>
+                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Baseado em Ciência</h3>
+                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">Metodologia DISC validada cientificamente</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all duration-300 border-none bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
-              <CardContent className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <Gift className="w-5 h-5 md:w-6 md:h-6 text-orange-600 dark:text-orange-300" />
+            <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
+              <CardContent className="p-6 lg:p-8 xl:p-10">
+                <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
+                  <Gift className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-orange-600 dark:text-orange-300" />
                 </div>
-                <h3 className="font-semibold mb-2 text-sm md:text-base">Teste Gratuito</h3>
-                <p className="text-xs md:text-sm text-muted-foreground">Comece agora sem compromisso</p>
+                <h3 className="font-semibold mb-3 lg:mb-4 text-base lg:text-lg xl:text-xl">Teste Gratuito</h3>
+                <p className="text-sm lg:text-base xl:text-lg text-muted-foreground leading-relaxed">Comece agora sem compromisso</p>
               </CardContent>
             </Card>
           </div>
@@ -317,9 +319,9 @@ export default function Home() {
       </div>
 
       {/* Bottom Section */}
-      <div className="bg-muted/30 mobile-padding py-6 md:py-12 mt-8 md:mt-20">
-        <div className="responsive-container text-center">
-          <p className="text-sm md:text-base text-muted-foreground">
+      <div className="bg-muted/30 px-4 sm:px-6 lg:px-8 xl:px-16 py-8 lg:py-16 xl:py-20">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-base lg:text-xl xl:text-2xl text-muted-foreground font-medium">
             Já usado por mais de 10.000 pessoas para descobrir seu perfil comportamental
           </p>
         </div>
