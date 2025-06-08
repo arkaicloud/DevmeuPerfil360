@@ -192,13 +192,55 @@ export default function Results() {
   }
 
   if (error || !testResult) {
+    console.error("Erro ao carregar teste:", error);
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card>
+        <Card className="max-w-md mx-auto">
           <CardContent className="p-6 text-center">
-            <p className="text-destructive">Erro ao carregar resultados do teste.</p>
-            <Button onClick={() => navigate("/")} className="mt-4">
-              Voltar ao Início
+            <Brain className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">Resultado não encontrado</h3>
+            <p className="text-muted-foreground mb-4">
+              Não foi possível carregar os resultados do teste. O teste pode ter sido removido ou o link pode estar incorreto.
+            </p>
+            <div className="space-y-2">
+              <Button 
+                onClick={() => navigate("/find-results")} 
+                className="w-full"
+                variant="default"
+              >
+                Buscar Meus Resultados
+              </Button>
+              <Button 
+                onClick={() => navigate("/")} 
+                variant="outline"
+                className="w-full"
+              >
+                Fazer Novo Teste
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Defensive programming - ensure data integrity
+  if (!testResult.scores || typeof testResult.scores !== 'object') {
+    console.error("Dados de pontuação inválidos:", testResult);
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="p-6 text-center">
+            <Brain className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">Dados corrompidos</h3>
+            <p className="text-muted-foreground mb-4">
+              Os dados do teste estão corrompidos. Por favor, refaça o teste.
+            </p>
+            <Button 
+              onClick={() => navigate("/")} 
+              className="w-full"
+            >
+              Fazer Novo Teste
             </Button>
           </CardContent>
         </Card>
@@ -245,7 +287,7 @@ export default function Results() {
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
-            <h2 className="mobile-title font-bold text-foreground mb-2">Parabéns, {testResult.guestName}!</h2>
+            <h2 className="mobile-title font-bold text-foreground mb-2">Parabéns, {testResult.guestName || 'Usuário'}!</h2>
             <p className="mobile-text text-muted-foreground">Seu teste foi concluído com sucesso</p>
           </div>
         </div>

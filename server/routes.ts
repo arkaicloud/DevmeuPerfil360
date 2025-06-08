@@ -117,13 +117,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Teste não encontrado" });
       }
 
+      // Ensure scores are properly formatted
+      let scores = testResult.scores;
+      if (typeof scores === 'string') {
+        try {
+          scores = JSON.parse(scores);
+        } catch (e) {
+          console.error('Error parsing scores:', e);
+          scores = { D: 0, I: 0, S: 0, C: 0 };
+        }
+      }
+      
+      // Validate scores structure
+      if (!scores || typeof scores !== 'object') {
+        scores = { D: 0, I: 0, S: 0, C: 0 };
+      }
+
       res.json({
         id: testResult.id,
-        profileType: testResult.profileType,
-        scores: testResult.scores,
-        isPremium: testResult.isPremium,
+        profileType: testResult.profileType || 'S',
+        scores: scores,
+        isPremium: testResult.isPremium || false,
         createdAt: testResult.createdAt,
-        guestName: testResult.guestName,
+        guestName: testResult.guestName || 'Usuário',
       });
     } catch (error: any) {
       res.status(500).json({ message: "Erro ao buscar resultado" });
@@ -699,9 +715,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             <div class="section">
               <h2>📊 Comparativo Normativo</h2>
               <p>Seus resultados comparados à população de referência:</p>
-              ${Object.entries(testResult.scores).map(([type, score]) => `
+              ${Object.entries(testResult.scores as Record<string, number>).map(([type, score]) => `
                 <div class="percentile-info">
-                  <strong>${type}:</strong> Você pontuou mais alto que ${Math.round((score / 100) * 95 + 5)}% das pessoas avaliadas
+                  <strong>${type}:</strong> Você pontuou mais alto que ${Math.round((Number(score) / 100) * 95 + 5)}% das pessoas avaliadas
                 </div>
               `).join('')}
             </div>
@@ -762,8 +778,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               <p><strong>Scores Brutos:</strong></p>
               <ul>
-                ${Object.entries(testResult.scores).map(([type, score]) => 
-                  `<li>${type}: ${score} pontos (${Math.round((score / 100) * 95 + 5)}º percentil)</li>`
+                ${Object.entries(testResult.scores as Record<string, number>).map(([type, score]) => 
+                  `<li>${type}: ${Number(score)} pontos (${Math.round((Number(score) / 100) * 95 + 5)}º percentil)</li>`
                 ).join('')}
               </ul>
               
