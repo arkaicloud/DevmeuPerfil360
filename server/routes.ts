@@ -1564,6 +1564,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
               margin: 6px 0; 
               line-height: 1.3; 
             }
+            
+            /* Footer */
+            .footer { 
+              margin-top: 50px; padding: 40px 30px; background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); 
+              color: #e2e8f0; text-align: center; border-top: 3px solid #0066cc;
+            }
+            .footer-logo {
+              font-size: 28px; font-weight: 800; color: #0066cc; margin-bottom: 25px;
+              text-shadow: 0 2px 4px rgba(0,102,204,0.3);
+            }
+            .contact-info {
+              background: rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; 
+              margin: 25px auto; border: 1px solid rgba(0,102,204,0.2);
+              box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 800px;
+            }
+            .contact-info p {
+              margin-bottom: 20px; line-height: 1.6; color: #cbd5e0; text-align: justify;
+              font-size: 14px;
+            }
+            .contact-info p:last-child {
+              margin-bottom: 0; font-weight: 600; color: #0066cc; text-align: center;
+              font-size: 16px; padding-top: 15px; border-top: 1px solid rgba(0,102,204,0.2);
+            }
           </style>
           <script>
             function printPDF() {
