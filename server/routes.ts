@@ -829,23 +829,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           </style>
         </head>
-        <body style="margin: 0; padding: 20px; font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #333; background: #ffffff;">
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #2d3748; background: #ffffff; font-size: 14px;">
           
-          <!-- HEADER -->
-          <div style="background: #667eea; color: white; text-align: center; padding: 30px; margin-bottom: 30px; border-radius: 10px;">
-            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: bold;">🌟 RELATÓRIO DISC PREMIUM</h1>
-            <h2 style="margin: 0 0 20px 0; font-size: 16px; font-weight: normal;">Análise Comportamental Personalizada</h2>
+          <!-- HEADER MODERNO -->
+          <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%); color: white; text-align: center; padding: 40px 20px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 30px 30px; opacity: 0.4;"></div>
             
-            <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; border: 2px solid white; margin: 20px auto; font-size: 36px; font-weight: bold; line-height: 76px; color: white; display: inline-block;">
-              ${testResult.profileType}
+            <div style="position: relative; z-index: 2;">
+              <h1 style="font-size: 32px; font-weight: 800; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">✨ RELATÓRIO DISC PREMIUM</h1>
+              <h2 style="font-size: 18px; opacity: 0.9; margin: 0 0 25px 0; font-weight: 300;">Análise Comportamental Personalizada & Plano de Desenvolvimento</h2>
+              
+              <div style="width: 120px; height: 120px; background: rgba(255,255,255,0.15); border: 4px solid rgba(255,255,255,0.8); border-radius: 50%; margin: 25px auto; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; color: white; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
+                ${testResult.profileType}
+              </div>
+              
+              <h3 style="font-size: 26px; font-weight: 600; margin: 20px 0 10px; color: #ffffff;">${testResult.guestName || 'Usuário'}</h3>
+              <p style="font-size: 16px; margin: 8px 0; opacity: 0.95;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+              <p style="font-size: 14px; margin: 8px 0; opacity: 0.9;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
             </div>
-            
-            <h3 style="margin: 15px 0 10px 0; font-size: 20px; color: #ffffff;">${testResult.guestName || 'Usuário'}</h3>
-            <p style="margin: 5px 0; font-size: 14px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
-            <p style="margin: 5px 0; font-size: 12px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
           </div>
 
-          <!-- CONTENT -->
+          <!-- CONTAINER PRINCIPAL -->
           <div style="max-width: 100%; background: white; padding: 0;">
 
             <!-- RESUMO EXECUTIVO -->
