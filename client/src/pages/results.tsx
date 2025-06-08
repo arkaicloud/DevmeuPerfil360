@@ -320,7 +320,8 @@ export default function Results() {
               {/* Enhanced DISC Scores with Visual Chart */}
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(testResult.scores).map(([type, score]) => {
+                  {(['D', 'I', 'S', 'C'] as const).map((type) => {
+                    const score = (testResult.scores as any)[type] || 0;
                     const IconComponent = getDiscIcon(type);
                     return (
                       <div key={type} className="text-center p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg hover:shadow-md transition-all duration-300">
@@ -385,7 +386,8 @@ export default function Results() {
 
                 {/* Enhanced DISC Scores List for Mobile */}
                 <div className="sm:hidden mobile-stack">
-                  {Object.entries(testResult.scores).map(([type, score]) => {
+                  {(['D', 'I', 'S', 'C'] as const).map((type) => {
+                    const score = (testResult.scores as any)[type] || 0;
                     const IconComponent = getDiscIcon(type);
                     return (
                       <div key={type} className="flex items-center justify-between">
