@@ -201,39 +201,43 @@ export default function Results() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white p-4 safe-area-top">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">MeuPerfil360</h1>
-              <p className="text-xs opacity-90">Seus Resultados</p>
+      <header className="psychology-gradient text-white mobile-padding">
+        <div className="responsive-container">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="mobile-subtitle font-bold">MeuPerfil360</h1>
+                <p className="text-xs sm:text-sm opacity-90">Seus Resultados</p>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="p-6">
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium psychology-blue">Passo 3 de 3</span>
-            <span className="text-sm text-muted-foreground">Resultados</span>
+      <div className="mobile-padding">
+        <div className="responsive-container">
+          {/* Progress Bar */}
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium psychology-blue">Passo 3 de 3</span>
+              <span className="text-sm text-muted-foreground">Resultados</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2">
+              <div className="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style={{ width: "100%" }} />
+            </div>
           </div>
-          <div className="w-full bg-muted rounded-full h-2">
-            <div className="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style={{ width: "100%" }} />
-          </div>
-        </div>
 
-        {/* Results Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-            <Trophy className="w-8 h-8 text-white" />
+          {/* Results Header */}
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            </div>
+            <h2 className="mobile-title font-bold text-foreground mb-2">Parabéns, {testResult.guestName}!</h2>
+            <p className="mobile-text text-muted-foreground">Seu teste foi concluído com sucesso</p>
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Parabéns, {testResult.guestName}!</h2>
-          <p className="text-muted-foreground text-sm">Seu teste foi concluído com sucesso</p>
         </div>
 
         {/* DISC Profile Results */}
