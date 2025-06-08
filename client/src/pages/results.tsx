@@ -496,7 +496,7 @@ export default function Results() {
               variant="outline"
               className="w-full sm:w-auto"
               size="default"
-              onClick={() => handleDownloadPDF()}
+              onClick={() => window.open(`/api/test/result/${testResult.id}/pdf`, '_blank')}
             >
               <FileText className="w-4 h-4 mr-2" />
               Baixar PDF
