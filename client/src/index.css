@@ -63,163 +63,68 @@
   }
 
   /* Enhanced Responsive containers */
-  .mobile-container {
-    @apply max-w-md mx-auto bg-card min-h-screen shadow-xl relative lg:max-w-4xl lg:shadow-none;
-  }
-
   .responsive-container {
-    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16;
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 100%;
   }
 
-  .responsive-grid {
-    @apply grid gap-4 sm:gap-6 lg:gap-8 xl:gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
-  }
-
-  .responsive-flex {
-    @apply flex flex-col gap-4 sm:flex-row sm:gap-6 lg:gap-8;
-  }
-
-  /* Header responsiveness */
-  .responsive-header {
-    @apply px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-12 xl:px-16 xl:py-16;
-  }
-
-  /* Content sections */
-  .responsive-section {
-    @apply px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16 xl:px-16 xl:py-20;
-  }
-
-  /* Mobile-specific utilities */
-  .mobile-padding {
-    @apply p-4 sm:p-6 lg:p-8;
-  }
-
-  /* Enhanced Typography */
-  .responsive-text {
-    @apply text-sm sm:text-base lg:text-lg xl:text-xl leading-relaxed;
-  }
-
+  /* Responsive Typography Classes */
   .responsive-title {
-    @apply text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold leading-tight;
+    @apply text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight;
+    letter-spacing: -0.025em;
   }
 
   .responsive-subtitle {
-    @apply text-lg sm:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-semibold leading-snug;
+    @apply text-lg sm:text-xl lg:text-2xl;
+    line-height: 1.6;
   }
 
-  .responsive-heading {
-    @apply text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold;
+  .responsive-body {
+    @apply text-sm sm:text-base lg:text-lg;
+    line-height: 1.7;
   }
 
-  /* Enhanced Buttons */
-  .responsive-button {
-    @apply w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-5 xl:px-12 xl:py-6 
-           text-sm sm:text-base lg:text-lg xl:text-xl font-semibold
-           min-h-[44px] sm:min-h-[48px] lg:min-h-[56px] xl:min-h-[64px]
-           touch-manipulation select-none transition-all duration-300;
-  }
-
-  .responsive-button-primary {
-    @apply responsive-button psychology-gradient text-white shadow-lg hover:shadow-xl
-           transform hover:scale-105 active:scale-95;
-  }
-
-  /* Enhanced Cards */
-  .responsive-card {
-    @apply rounded-lg sm:rounded-xl lg:rounded-2xl xl:rounded-3xl
-           p-4 sm:p-6 lg:p-8 xl:p-10 2xl:p-12
-           shadow-md hover:shadow-xl transition-all duration-300
-           transform hover:scale-105 active:scale-95;
-  }
-
-  .responsive-card-content {
-    @apply space-y-3 sm:space-y-4 lg:space-y-6 text-center;
-  }
-
-  /* Enhanced Icons */
-  .responsive-icon {
-    @apply w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20;
-  }
-
-  .responsive-icon-container {
-    @apply w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 xl:w-20 xl:h-20 2xl:w-24 2xl:h-24
-           rounded-full flex items-center justify-center mx-auto
-           transition-all duration-300;
-  }
-
-  /* Grid Layouts */
+  /* Features Grid Responsive */
   .features-grid {
-    @apply grid gap-4 sm:gap-6 lg:gap-8 xl:gap-12
-           grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
+    @apply grid gap-4 sm:gap-6 lg:gap-8;
+    grid-template-columns: 1fr;
   }
 
-  .content-stack {
-    @apply space-y-6 sm:space-y-8 lg:space-y-12 xl:space-y-16;
+  /* Button Responsive Scaling */
+  .btn-responsive {
+    @apply px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5;
+    font-size: 0.95rem;
+    min-height: 44px; /* Touch target minimum */
   }
 
-  /* Touch-friendly buttons */
-  .touch-button {
-    @apply min-h-[44px] min-w-[44px] touch-manipulation select-none;
+  /* Card Responsive */
+  .card-responsive {
+    @apply p-4 sm:p-6 lg:p-8;
+    border-radius: 0.75rem;
   }
 
-  /* Psychology theme utilities */
-  .psychology-gradient {
-    @apply bg-gradient-to-r from-primary to-secondary;
+  /* Navigation Responsive */
+  .nav-responsive {
+    @apply flex flex-col sm:flex-row gap-2 sm:gap-4 lg:gap-6;
   }
 
-  .psychology-blue {
-    color: hsl(var(--psychology-blue));
+  /* Spacing Responsive */
+  .section-spacing {
+    @apply py-8 sm:py-12 lg:py-16 xl:py-20;
   }
 
-  .psychology-purple {
-    color: hsl(var(--psychology-purple));
+  .content-spacing {
+    @apply space-y-4 sm:space-y-6 lg:space-y-8;
   }
 
-  .psychology-green {
-    color: hsl(var(--psychology-green));
+  /* Glass Effect */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/10 border border-white/20;
   }
 
-  .bg-psychology-blue {
-    background-color: hsl(var(--psychology-blue));
-  }
-
-  .bg-psychology-purple {
-    background-color: hsl(var(--psychology-purple));
-  }
-
-  .bg-psychology-green {
-    background-color: hsl(var(--psychology-green));
-  }
-
-  .border-psychology-blue {
-    border-color: hsl(var(--psychology-blue));
-  }
-
-  .border-psychology-purple {
-    border-color: hsl(var(--psychology-purple));
-  }
-
-  .border-psychology-green {
-    border-color: hsl(var(--psychology-green));
-  }
-
-  /* Smooth transitions for better UX */
-  .transition-smooth {
-    @apply transition-all duration-300 ease-in-out;
-  }
-
-  /* Button hover effects */
+  /* Hover Effects */
   .btn-hover-lift {
-    @apply transition-smooth hover:shadow-lg hover:scale-[1.02];
-  }
-
-  /* Form focus styles */
-  .input-focus {
-    @apply focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
-  }
-
-  /* Performance optimizations */
-  .gpu-accelerated {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
     transform: translateZ(0);
     will-change: transform;
   }
@@ -228,6 +133,16 @@
   .loading-skeleton {
     @apply animate-pulse bg-muted rounded;
   }
+
+  /* Safe area for mobile devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
 
 /* Enhanced Media Queries for Perfect Responsiveness */
 @media (max-width: 480px) {
@@ -242,140 +157,96 @@
   }
 
   .features-grid {
+    grid-template-columns: 1fr !important;
     gap: 1rem !important;
   }
 
-  .responsive-button-primary {
-    padding: 0.75rem 1.5rem !important;
-    font-size: 0.875rem !important;
+  .btn-responsive {
+    font-size: 0.9rem !important;
+    padding: 0.875rem 1rem !important;
+  }
+
+  .section-spacing {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
   }
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
-  .features-grid {
-    grid-template-columns: repeat(1, 1fr) !important;
-    gap: 1.5rem !important;
+@media (min-width: 481px) and (max-width: 1024px) {
+  .responsive-title {
+    font-size: 2.5rem !important;
+    line-height: 1.1 !important;
   }
-}
 
-@media (min-width: 769px) and (max-width: 1024px) {
   .features-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 2rem !important;
+    gap: 1.5rem !important;
+  }
+
+  .responsive-container {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  .btn-responsive {
+    font-size: 1rem !important;
+    padding: 1rem 1.5rem !important;
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
+  .responsive-title {
+    font-size: 3.5rem !important;
+    line-height: 1.1 !important;
+  }
+
   .features-grid {
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 2.5rem !important;
+    gap: 2rem !important;
+  }
+
+  .responsive-container {
+    max-width: 1200px !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+
+  .btn-responsive {
+    font-size: 1.1rem !important;
+    padding: 1.25rem 2rem !important;
   }
 }
 
 @media (min-width: 1441px) {
-  .responsive-container {
-    max-width: 1600px !important;
-  }
-  
   .responsive-title {
     font-size: 4rem !important;
-  }
-  
-  .responsive-subtitle {
-    font-size: 2.25rem !important;
+    line-height: 1.05 !important;
   }
 
   .features-grid {
-    gap: 3rem !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 2.5rem !important;
+  }
+
+  .responsive-container {
+    max-width: 1400px !important;
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+  }
+
+  .btn-responsive {
+    font-size: 1.2rem !important;
+    padding: 1.5rem 2.5rem !important;
+  }
+
+  .section-spacing {
+    padding-top: 6rem !important;
+    padding-bottom: 6rem !important;
   }
 }
 
-  /* Progress bar animations */
-  .progress-animate {
-    @apply transition-all duration-500 ease-out;
-  }
-
-  /* Modal animations */
-  .modal-enter {
-    @apply animate-in fade-in-0 zoom-in-95 duration-300;
-  }
-
-  .modal-exit {
-    @apply animate-out fade-out-0 zoom-out-95 duration-200;
-  }
-
-  /* DISC profile colors */
-  .disc-d {
-    @apply bg-red-100 text-red-700 border-red-200;
-  }
-
-  .disc-i {
-    @apply bg-yellow-100 text-yellow-700 border-yellow-200;
-  }
-
-  .disc-s {
-    @apply bg-green-100 text-green-700 border-green-200;
-  }
-
-  .disc-c {
-    @apply bg-blue-100 text-blue-700 border-blue-200;
-  }
-
-  /* Loading spinner */
-  .spinner {
-    @apply animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full;
-  }
-
-  /* Safe area for mobile devices */
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-/* Custom scrollbar for better mobile experience */
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border-radius: 2px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
-}
-
-/* Touch-friendly button sizing */
-@media (max-width: 640px) {
-  button {
-    @apply min-h-[44px];
-  }
-  
-  input, select, textarea {
-    @apply min-h-[44px];
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  :root {
-    --border: 215 25% 60%;
-    --ring: 215 25% 40%;
-  }
-}
-
-/* Reduced motion support */
+/* Performance optimizations for animations */
 @media (prefers-reduced-motion: reduce) {
-  .transition-smooth,
-  .progress-animate,
   .btn-hover-lift {
     @apply transition-none;
   }
@@ -384,4 +255,28 @@
   .modal-exit {
     @apply animate-none;
   }
+}
+
+/* Custom scrollbar for better mobile experience */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground));
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground)) transparent;
 }
