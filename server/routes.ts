@@ -656,15 +656,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
         normalizedScores.C = 0;
       }
 
-      // Criar conteúdo HTML otimizado para conversão em PDF
+      // Criar conteúdo HTML com design simplificado mas visualmente atrativo para PDF
       const htmlContent = `
         <!DOCTYPE html>
-        <html>
+        <html lang="pt-BR">
         <head>
           <meta charset="UTF-8">
           <title>Relatório Premium DISC - ${testResult.guestName || 'Usuário'}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
+            @page { size: A4; margin: 15mm; }
+            * { 
+              -webkit-print-color-adjust: exact !important; 
+              color-adjust: exact !important; 
+              print-color-adjust: exact !important; 
+              box-sizing: border-box; 
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              line-height: 1.5; 
+              color: #333; 
+              margin: 0; 
+              padding: 0; 
+              background: white; 
+            }
+            .header { 
+              background: #4f46e5; 
+              color: white; 
+              padding: 30px; 
+              text-align: center; 
+              margin-bottom: 20px; 
+            }
+            .title { 
+              font-size: 32px; 
+              font-weight: bold; 
+              margin-bottom: 10px; 
+            }
+            .subtitle { 
+              font-size: 18px; 
+              margin-bottom: 20px; 
+            }
+            .profile-circle { 
+              width: 100px; 
+              height: 100px; 
+              background: rgba(255,255,255,0.2); 
+              border: 3px solid white; 
+              border-radius: 50%; 
+              display: inline-flex; 
+              align-items: center; 
+              justify-content: center; 
+              font-size: 48px; 
+              font-weight: bold; 
+              margin: 20px auto; 
+            }
+            .section { 
+              background: #f8fafc; 
+              border: 2px solid #e2e8f0; 
+              border-radius: 8px; 
+              padding: 20px; 
+              margin: 20px 0; 
+              page-break-inside: avoid; 
+            }
+            .section-title { 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: #1a202c; 
+              margin-bottom: 15px; 
+              padding-bottom: 10px; 
+              border-bottom: 3px solid #4f46e5; 
+            }
+            .disc-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              background: white; 
+            }
+            .disc-table th { 
+              background: #4f46e5; 
+              color: white; 
+              padding: 12px; 
+              font-weight: bold; 
+              border: 1px solid white; 
+            }
+            .disc-table td { 
+              padding: 12px; 
+              border: 1px solid #ddd; 
+              text-align: center; 
+            }
+            .disc-d { background: #ef4444; color: white; font-weight: bold; }
+            .disc-i { background: #f59e0b; color: white; font-weight: bold; }
+            .disc-s { background: #10b981; color: white; font-weight: bold; }
+            .disc-c { background: #3b82f6; color: white; font-weight: bold; }
+            .progress-container { 
+              margin: 15px 0; 
+              background: white; 
+              padding: 15px; 
+              border-radius: 5px; 
+            }
+            .progress-label { 
+              font-weight: bold; 
+              margin-bottom: 8px; 
+              display: flex; 
+              justify-content: space-between; 
+            }
+            .progress-bar { 
+              background: #f1f5f9; 
+              height: 30px; 
+              border-radius: 15px; 
+              border: 1px solid #d1d5db; 
+              overflow: hidden; 
+            }
+            .progress-fill { 
+              height: 100%; 
+              color: white; 
+              font-weight: bold; 
+              text-align: center; 
+              line-height: 30px; 
+            }
+            .fill-d { background: #ef4444; }
+            .fill-i { background: #f59e0b; }
+            .fill-s { background: #10b981; }
+            .fill-c { background: #3b82f6; }
+            .quote-box { 
+              background: #e0e7ff; 
+              border: 2px solid #6366f1; 
+              border-radius: 8px; 
+              padding: 20px; 
+              margin: 15px 0; 
+              font-style: italic; 
+              color: #3730a3; 
+            }
+            .action-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              background: white; 
+            }
+            .action-table th { 
+              background: #10b981; 
+              color: white; 
+              padding: 12px; 
+              font-weight: bold; 
+              border: 1px solid white; 
+            }
+            .action-table td { 
+              padding: 12px; 
+              border: 1px solid #ddd; 
+              vertical-align: top; 
+            }
+            .week-badge { 
+              background: #f59e0b; 
+              color: white; 
+              padding: 8px 12px; 
+              border-radius: 15px; 
+              font-weight: bold; 
+              display: inline-block; 
+            }
+            .warning-box { 
+              background: #fef3c7; 
+              border: 2px solid #f59e0b; 
+              border-radius: 8px; 
+              padding: 20px; 
+              margin: 15px 0; 
+              color: #92400e; 
+            }
+            .resource-card { 
+              background: white; 
+              border: 2px solid #e2e8f0; 
+              border-radius: 8px; 
+              padding: 15px; 
+              margin: 10px 0; 
+            }
+            .books { border-left: 5px solid #10b981; }
+            .podcasts { border-left: 5px solid #8b5cf6; }
+            .courses { border-left: 5px solid #f59e0b; }
+            ul { padding-left: 20px; }
+            li { margin: 5px 0; }
+            @media print {
+              body { background: white !important; }
+              .header { background: #4f46e5 !important; color: white !important; }
+              .disc-d { background: #ef4444 !important; color: white !important; }
+              .disc-i { background: #f59e0b !important; color: white !important; }
+              .disc-s { background: #10b981 !important; color: white !important; }
+              .disc-c { background: #3b82f6 !important; color: white !important; }
+              .fill-d { background: #ef4444 !important; }
+              .fill-i { background: #f59e0b !important; }
+              .fill-s { background: #10b981 !important; }
+              .fill-c { background: #3b82f6 !important; }
+              .disc-table th { background: #4f46e5 !important; color: white !important; }
+              .action-table th { background: #10b981 !important; color: white !important; }
+              .week-badge { background: #f59e0b !important; color: white !important; }
+            }
             * { box-sizing: border-box; }
             body { 
               font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -860,32 +1042,193 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           </style>
         </head>
-        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #2d3748; background: #ffffff; font-size: 14px;">
-          
-          <!-- HEADER MODERNO -->
-          <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%); color: white; text-align: center; padding: 40px 20px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 30px 30px; opacity: 0.4;"></div>
-            
-            <div style="position: relative; z-index: 2;">
-              <h1 style="font-size: 32px; font-weight: 800; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">✨ RELATÓRIO DISC PREMIUM</h1>
-              <h2 style="font-size: 18px; opacity: 0.9; margin: 0 0 25px 0; font-weight: 300;">Análise Comportamental Personalizada & Plano de Desenvolvimento</h2>
-              
-              <div style="width: 120px; height: 120px; background: rgba(255,255,255,0.15); border: 4px solid rgba(255,255,255,0.8); border-radius: 50%; margin: 25px auto; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; color: white; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
-                ${testResult.profileType}
-              </div>
-              
-              <h3 style="font-size: 26px; font-weight: 600; margin: 20px 0 10px; color: #ffffff;">${testResult.guestName || 'Usuário'}</h3>
-              <p style="font-size: 16px; margin: 8px 0; opacity: 0.95;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
-              <p style="font-size: 14px; margin: 8px 0; opacity: 0.9;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
+        <body>
+          <!-- HEADER -->
+          <div class="header">
+            <div class="title">✨ RELATÓRIO DISC PREMIUM</div>
+            <div class="subtitle">Análise Comportamental Personalizada</div>
+            <div class="profile-circle">${testResult.profileType}</div>
+            <h3 style="margin: 15px 0; font-size: 24px;">${testResult.guestName || 'Usuário'}</h3>
+            <p style="margin: 5px 0; font-size: 16px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+            <p style="margin: 5px 0; font-size: 14px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
+          </div>
+
+          <!-- RESUMO EXECUTIVO -->
+          <div class="section">
+            <div class="section-title">📋 Resumo Executivo</div>
+            <div class="quote-box">
+              <p><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+              <p>Este relatório oferece uma análise completa do seu perfil comportamental DISC, incluindo gráficos visuais, plano de ação estruturado e recomendações personalizadas para desenvolvimento.</p>
             </div>
           </div>
 
-          <!-- CONTAINER PRINCIPAL -->
-          <div style="max-width: 100%; background: #f8fafc; padding: 20px;">
+          <!-- ANÁLISE DISC -->
+          <div class="section">
+            <div class="section-title">📊 Análise Visual do Perfil DISC</div>
+            
+            <table class="disc-table">
+              <thead>
+                <tr>
+                  <th>Fator</th>
+                  <th>Dimensão</th>
+                  <th>Pontuação</th>
+                  <th>Nível</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${['D', 'I', 'S', 'C'].map((type) => {
+                  const score = normalizedScores[type] || 0;
+                  const names = {
+                    D: 'Dominância',
+                    I: 'Influência',
+                    S: 'Estabilidade',
+                    C: 'Conformidade'
+                  };
+                  const nivel = score >= 70 ? 'ALTO' : score >= 40 ? 'MÉDIO' : 'BAIXO';
+                  return `
+                    <tr>
+                      <td class="disc-${type.toLowerCase()}">${type}</td>
+                      <td><strong>${names[type as keyof typeof names]}</strong></td>
+                      <td><strong style="font-size: 18px;">${score}%</strong></td>
+                      <td><strong>${nivel}</strong></td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
 
-            <!-- RESUMO EXECUTIVO MODERNO -->
-            <div style="background: linear-gradient(135deg, #ebf8ff 0%, #dbeafe 100%); border-left: 6px solid #3b82f6; padding: 30px; margin: 0 0 30px 0; border-radius: 15px; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15); border: 1px solid #bfdbfe;">
-              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <h3>📈 Intensidade Visual dos Fatores</h3>
+            ${['D', 'I', 'S', 'C'].map((type) => {
+              const score = normalizedScores[type] || 0;
+              const names = {
+                D: 'Dominância',
+                I: 'Influência',
+                S: 'Estabilidade',
+                C: 'Conformidade'
+              };
+              return `
+                <div class="progress-container">
+                  <div class="progress-label">
+                    <span><strong>${type} - ${names[type as keyof typeof names]}</strong></span>
+                    <span><strong>${score}%</strong></span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill fill-${type.toLowerCase()}" style="width: ${score}%;">${score}%</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+
+            <div class="quote-box">
+              <p><strong>Interpretação:</strong> Seu perfil ${testResult.profileType} revela uma personalidade única com potencial extraordinário. Cada dimensão DISC contribui para sua história de sucesso e crescimento pessoal.</p>
+            </div>
+          </div>
+
+          <!-- PLANO DE AÇÃO -->
+          <div class="section">
+            <div class="section-title">🎯 Plano de Ação de 4 Semanas</div>
+            
+            <table class="action-table">
+              <thead>
+                <tr>
+                  <th>Semana</th>
+                  <th>Foco</th>
+                  <th>Ação Estratégica</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${actionPlan.map((action, index) => {
+                  const focusAreas = ['Autoconhecimento', 'Desenvolvimento', 'Aplicação', 'Consolidação'];
+                  return `
+                    <tr>
+                      <td><span class="week-badge">${index + 1}</span></td>
+                      <td><strong>${focusAreas[index]}</strong></td>
+                      <td>${action}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+
+            <div class="warning-box">
+              <h4>💭 Perguntas para Reflexão Semanal</h4>
+              ${reflectiveQuestions.map((question, index) => `
+                <p><strong>Semana ${index + 1}:</strong> ${question}</p>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- RECURSOS PERSONALIZADOS -->
+          <div class="section">
+            <div class="section-title">📚 Recursos Personalizados</div>
+            
+            <div class="resource-card books">
+              <h4>📚 Livros Recomendados</h4>
+              <ul>
+                ${testResult.profileType === 'D' ? 
+                  '<li>"O Executivo Eficaz" - Peter Drucker</li><li>"Liderança na Era Digital" - Harvard Business Review</li><li>"Mindset: A Nova Psicologia do Sucesso" - Carol Dweck</li>' :
+                  testResult.profileType === 'I' ? 
+                  '<li>"Como Fazer Amigos e Influenciar Pessoas" - Dale Carnegie</li><li>"O Poder da Comunicação" - Chris Anderson</li><li>"Inteligência Emocional" - Daniel Goleman</li>' :
+                  testResult.profileType === 'S' ?
+                  '<li>"A Coragem de Ser Imperfeito" - Brené Brown</li><li>"Comunicação Não-Violenta" - Marshall Rosenberg</li><li>"O Poder do Hábito" - Charles Duhigg</li>' :
+                  '<li>"Pensamento Rápido e Devagar" - Daniel Kahneman</li><li>"A Arte de Resolver Problemas" - Russell Ackoff</li><li>"O Cisne Negro" - Nassim Taleb</li>'
+                }
+              </ul>
+            </div>
+
+            <div class="resource-card podcasts">
+              <h4>🎧 Podcasts Brasileiros</h4>
+              <ul>
+                <li>"Mundo DISC" - Episódios sobre perfil ${testResult.profileType}</li>
+                <li>"PodPeople" - Desenvolvimento comportamental</li>
+                <li>"Café Brasil" - Carreira e liderança</li>
+                <li>"Flow Podcast" - Entrevistas inspiradoras</li>
+              </ul>
+            </div>
+
+            <div class="resource-card courses">
+              <h4>💻 Cursos e Capacitações</h4>
+              <ul>
+                <li>Fundação Dom Cabral - Liderança DISC</li>
+                <li>HSM University - Inteligência Comportamental</li>
+                <li>Conquer - Soft Skills para ${testResult.profileType}</li>
+                <li>LinkedIn Learning - Perfil DISC na Prática</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SABOTADORES -->
+          <div class="section">
+            <div class="warning-box">
+              <div class="section-title">⚠️ Padrões Sabotadores a Observar</div>
+              <p><strong>Atenção especial para seu perfil ${testResult.profileType}:</strong></p>
+              <ul>
+                ${testResult.profileType === 'D' ? 
+                  '<li>Impaciência excessiva com processos longos</li><li>Tendência a tomar decisões sem consultar a equipe</li><li>Dificuldade em aceitar feedback construtivo</li>' :
+                  testResult.profileType === 'I' ? 
+                  '<li>Dispersão em conversas e reuniões</li><li>Promessas excessivas sem planejamento adequado</li><li>Evitar confrontos necessários</li>' :
+                  testResult.profileType === 'S' ?
+                  '<li>Resistência excessiva a mudanças</li><li>Dificuldade em expressar opiniões contrárias</li><li>Sobrecarga por não saber dizer "não"</li>' :
+                  '<li>Paralisia por análise excessiva</li><li>Perfeccionismo que atrasa entregas</li><li>Evitar riscos necessários para crescimento</li>'
+                }
+              </ul>
+              <p><strong>Lembre-se:</strong> Reconhecer esses padrões é o primeiro passo para transformá-los em pontos de crescimento.</p>
+            </div>
+          </div>
+
+          <!-- CAREERS SECTION -->
+          <div class="section">
+            <div class="section-title">💼 Carreiras Ideais</div>
+            <div class="resource-card">
+              <p>Com base no seu perfil ${testResult.profileType}, estas são as carreiras que mais se alinham com seus pontos fortes:</p>
+              <ul>
+                ${careers.map(career => `<li>${career}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+
+        </body>
+        </html>`;
                 <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">📋</div>
                 <h3 style="margin: 0; color: #1e40af; font-size: 26px; font-weight: 700;">Resumo Executivo</h3>
               </div>
@@ -1398,14 +1741,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         </html>
       `;
 
-      // Set proper headers for PDF-friendly HTML
+      // Headers optimized for PDF generation
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Content-Disposition', `inline; filename="relatorio-premium-disc-${(testResult.guestName || 'usuario').replace(/\s+/g, '-').toLowerCase()}.html"`);
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Pragma', 'no-cache');
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow');
       
-      // Send HTML content optimized for PDF conversion
-      res.send(htmlContent);
+      // Add PDF print optimization
+      const optimizedHtml = htmlContent.replace(
+        '</head>',
+        `<style>
+          @media print {
+            body { 
+              background: white !important; 
+              color: #000 !important; 
+              font-size: 12pt !important; 
+            }
+            * { 
+              background: transparent !important; 
+              color: #000 !important; 
+              box-shadow: none !important; 
+              text-shadow: none !important; 
+            }
+            .header-modern {
+              background: #4f46e5 !important;
+              color: white !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .disc-badge-modern {
+              background: var(--color) !important;
+              color: white !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .progress-fill-modern {
+              background: var(--color) !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            table th {
+              background: #4f46e5 !important;
+              color: white !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          }
+          @page {
+            size: A4;
+            margin: 1cm;
+          }
+        </style>
+        </head>`
+      );
+      
+      res.send(optimizedHtml);
 
     } catch (error: any) {
       console.error("Erro ao gerar PDF:", error);
