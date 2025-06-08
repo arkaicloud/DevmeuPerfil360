@@ -241,64 +241,67 @@ export default function Results() {
         </div>
 
         {/* DISC Profile Results */}
-        <Card className="shadow-lg border-0 mb-6">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-bold text-foreground mb-4 text-center">Seu Perfil DISC</h3>
-            
-            {/* Profile Type */}
-            <div className="text-center mb-6">
-              <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 border-2 ${getDiscColor(testResult.profileType)}`}>
-                <span className="text-3xl font-bold">
-                  {testResult.profileType}
-                </span>
-              </div>
-              <h4 className="text-xl font-bold text-foreground mb-2">{profileInfo.name}</h4>
-              <p className="text-sm text-muted-foreground">
-                {profileInfo.description}
-              </p>
-            </div>
-
-            {/* DISC Scores */}
-            <div className="space-y-4">
-              {Object.entries(testResult.scores).map(([type, score]) => (
-                <div key={type} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${getDiscColor(type)}`}>
-                      <span className="font-bold text-sm">{type}</span>
-                    </div>
-                    <span className="font-medium text-foreground">
-                      {type === "D" && "Dominância"}
-                      {type === "I" && "Influência"}
-                      {type === "S" && "Estabilidade"}
-                      {type === "C" && "Conformidade"}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 bg-muted rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full ${getScoreColor(type)} transition-all duration-500`}
-                        style={{ width: `${score}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-foreground w-10 text-right">{score}%</span>
-                  </div>
+        <div className="responsive-container">
+          <Card className="shadow-lg border-0 mb-6">
+            <CardContent className="mobile-card">
+              <h3 className="mobile-subtitle font-bold text-foreground mb-4 text-center">Seu Perfil DISC</h3>
+              
+              {/* Profile Type */}
+              <div className="text-center mb-6">
+                <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4 border-2 ${getDiscColor(testResult.profileType)}`}>
+                  <span className="text-2xl sm:text-3xl font-bold">
+                    {testResult.profileType}
+                  </span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Premium Upgrade Card */}
-        {!testResult.isPremium && (
-          <Card className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary/20 mb-6">
-            <CardContent className="p-6">
-              <div className="text-center mb-4">
-                <Crown className="w-12 h-12 psychology-purple mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-foreground mb-2">Desbloqueie o Relatório Completo</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Acesse análises detalhadas, dicas de desenvolvimento pessoal e export em PDF
+                <h4 className="mobile-subtitle font-bold text-foreground mb-2">{profileInfo.name}</h4>
+                <p className="mobile-text text-muted-foreground">
+                  {profileInfo.description}
                 </p>
               </div>
+
+              {/* DISC Scores */}
+              <div className="mobile-stack">
+                {Object.entries(testResult.scores).map(([type, score]) => (
+                  <div key={type} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${getDiscColor(type)}`}>
+                        <span className="font-bold text-xs sm:text-sm">{type}</span>
+                      </div>
+                      <span className="mobile-text font-medium text-foreground">
+                        {type === "D" && "Dominância"}
+                        {type === "I" && "Influência"}
+                        {type === "S" && "Estabilidade"}
+                        {type === "C" && "Conformidade"}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-16 sm:w-20 bg-muted rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${getScoreColor(type)} transition-all duration-500`}
+                          style={{ width: `${score}%` }}
+                        />
+                      </div>
+                      <span className="text-xs sm:text-sm font-medium text-foreground w-8 sm:w-10 text-right">{score}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Premium Upgrade Card */}
+        <div className="responsive-container">
+          {!testResult.isPremium && (
+            <Card className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary/20 mb-6">
+              <CardContent className="mobile-card">
+                <div className="text-center mb-4">
+                  <Crown className="w-10 h-10 sm:w-12 sm:h-12 psychology-purple mx-auto mb-3" />
+                  <h3 className="mobile-subtitle font-bold text-foreground mb-2">Desbloqueie o Relatório Completo</h3>
+                  <p className="mobile-text text-muted-foreground mb-4">
+                    Acesse análises detalhadas, dicas de desenvolvimento pessoal e export em PDF
+                  </p>
+                </div>
 
               <div className="space-y-3 mb-6">
                 {[
