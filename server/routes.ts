@@ -597,6 +597,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const careers = getCareerSuggestions(testResult.profileType, testResult.scores);
       const actionPlan = getActionPlan(testResult.profileType);
+      
+      // Ensure scores are properly formatted for PDF generation
+      const normalizedScores: Record<string, number> = {};
+      const rawScores = testResult.scores;
+      
+      if (typeof rawScores === 'string') {
+        try {
+          const parsed = JSON.parse(rawScores);
+          Object.entries(parsed).forEach(([key, value]) => {
+            normalizedScores[key] = Number(value) || 0;
+          });
+        } catch (e) {
+          normalizedScores.D = 0;
+          normalizedScores.I = 0;
+          normalizedScores.S = 0;
+          normalizedScores.C = 0;
+        }
+      } else if (rawScores && typeof rawScores === 'object') {
+        Object.entries(rawScores).forEach(([key, value]) => {
+          normalizedScores[key] = Number(value) || 0;
+        });
+      } else {
+        normalizedScores.D = 0;
+        normalizedScores.I = 0;
+        normalizedScores.S = 0;
+        normalizedScores.C = 0;
+      }
 
       // Criar conteúdo HTML otimizado para conversão em PDF
       const htmlContent = `
@@ -715,7 +742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             <div class="section">
               <h2>📊 Comparativo Normativo</h2>
               <p>Seus resultados comparados à população de referência:</p>
-              ${Object.entries(testResult.scores as Record<string, number>).map(([type, score]) => `
+              ${Object.entries(scores as Record<string, number>).map(([type, score]) => `
                 <div class="percentile-info">
                   <strong>${type}:</strong> Você pontuou mais alto que ${Math.round((Number(score) / 100) * 95 + 5)}% das pessoas avaliadas
                 </div>
@@ -778,12 +805,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               <p><strong>Scores Brutos:</strong></p>
               <ul>
-                ${Object.entries(testResult.scores as Record<string, number>).map(([type, score]) => 
+                ${Object.entries(scores).map(([type, score]) => 
                   `<li>${type}: ${Number(score)} pontos (${Math.round((Number(score) / 100) * 95 + 5)}º percentil)</li>`
                 ).join('')}
               </ul>
               
-              <p><strong>Data de Aplicação:</strong> ${new Date(testResult.createdAt).toLocaleString('pt-BR')}</p>
+              <p><strong>Data de Aplicação:</strong> ${testResult.createdAt ? new Date(testResult.createdAt).toLocaleString('pt-BR') : 'Data não disponível'}</p>
               <p><strong>Validade:</strong> Este relatório mantém sua validade por 12 meses a partir da data de aplicação.</p>
             </div>
 
@@ -799,7 +826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Retornar como HTML para download e impressão em PDF
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Content-Disposition', `inline; filename="relatorio-disc-${testResult.guestName.replace(/\s+/g, '-')}.html"`);
+      res.setHeader('Content-Disposition', `inline; filename="relatorio-disc-${(testResult.guestName || 'usuario').replace(/\s+/g, '-')}.html"`);
       res.send(htmlContent);
 
     } catch (error: any) {
