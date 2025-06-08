@@ -179,6 +179,36 @@ export default function Home() {
       {/* Header */}
       <header className="psychology-gradient text-white mobile-padding py-8">
         <div className="responsive-container">
+          {/* Top Navigation */}
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <span className="font-semibold text-base sm:text-lg">MeuPerfil360</span>
+            </div>
+            <div className="flex gap-2 sm:gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/find-results")}
+                className="text-white hover:bg-white/20 touch-button text-xs sm:text-sm px-2 sm:px-3"
+              >
+                <span className="hidden sm:inline">Recuperar Resultados</span>
+                <span className="sm:hidden">Resultados</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/login")}
+                className="text-white hover:bg-white/20 touch-button text-xs sm:text-sm px-2 sm:px-3"
+              >
+                Login
+              </Button>
+            </div>
+          </div>
+
+          {/* Main Header Content */}
           <div className="text-center">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
@@ -257,23 +287,7 @@ export default function Home() {
             </Card>
           </div>
 
-          {/* Secondary Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/find-results")}
-              className="mobile-button touch-button"
-            >
-              Recuperar Resultados
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/login")}
-              className="mobile-button touch-button"
-            >
-              Fazer Login
-            </Button>
-          </div>
+
         </div>
       </div>
 
