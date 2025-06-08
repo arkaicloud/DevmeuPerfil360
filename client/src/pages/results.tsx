@@ -337,9 +337,11 @@ export default function Results() {
             </CardContent>
           </Card>
         )}
+        </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3">
+        <div className="responsive-container">
+          <div className="mobile-stack">
           <Button 
             onClick={() => setShowRegistrationModal(true)}
             className="w-full bg-accent text-white btn-hover-lift"
@@ -370,9 +372,10 @@ export default function Results() {
           )}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-4">
-          💡 Crie sua conta gratuita para salvar seus resultados e fazer novos testes
-        </p>
+          <p className="text-center mobile-text text-muted-foreground mt-4">
+            Crie sua conta gratuita para salvar seus resultados e fazer novos testes
+          </p>
+        </div>
       </div>
 
       {/* Modals */}
