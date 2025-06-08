@@ -175,53 +175,74 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Top Navigation */}
-      <div className="w-full py-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate("/find-results")}
-            className="w-full sm:w-auto text-sm font-medium hover:bg-blue-50 border-blue-200 text-blue-700"
-          >
-            Recuperar Resultados
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate("/login")}
-            className="w-full sm:w-auto text-sm font-medium hover:bg-blue-50 border-blue-200 text-blue-700"
-          >
-            Login
-          </Button>
-        </div>
-      </div>
-      
-      {/* Main Content */}
-      <main className="responsive-container section-spacing">
-        <div className="text-center content-spacing max-w-4xl mx-auto">
-          <h1 className="responsive-title text-slate-800 mb-6">
-            meuperfil360
-          </h1>
-          
-          <h2 className="responsive-subtitle text-slate-700 mb-4 font-semibold">
-            Descubra seu Perfil Comportamental
-          </h2>
-          
-          <p className="responsive-body text-slate-600 max-w-2xl mx-auto mb-8">
-            O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, ajudando você a entender como se relaciona, comunica e toma decisões.
-          </p>
-          
-          <Button 
-            onClick={() => setShowDataForm(true)}
-            size="lg"
-            className="btn-responsive btn-hover-lift bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-lg"
-          >
-            Iniciar Teste Gratuito
-          </Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-purple-600">
+      {/* Header Section */}
+      <header className="bg-gradient-to-r from-blue-400 to-purple-500 text-white">
+        {/* Top Navigation */}
+        <div className="w-full py-4 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <span className="font-semibold text-lg">MeuPerfil360</span>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate("/find-results")}
+                className="text-white hover:bg-white/20 border-white/30 text-sm font-medium"
+              >
+                Recuperar Resultados
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate("/login")}
+                className="text-white hover:bg-white/20 border-white/30 text-sm font-medium"
+              >
+                Login
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16 sm:mt-20 lg:mt-24">
+        {/* Hero Content */}
+        <div className="text-center py-16 px-4 sm:px-6 lg:px-8">
+          <div className="w-20 h-20 mx-auto mb-6 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <Brain className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+            MeuPerfil360
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
+            Descubra seu perfil comportamental DISC
+          </p>
+        </div>
+      </header>
+      
+      {/* Main Content */}
+      <main className="bg-white">
+        <div className="responsive-container section-spacing">
+          <div className="text-center content-spacing max-w-4xl mx-auto">
+            <h2 className="responsive-subtitle text-slate-700 mb-4 font-semibold">
+              Descubra seu Perfil Comportamental
+            </h2>
+            
+            <p className="responsive-body text-slate-600 max-w-2xl mx-auto mb-8">
+              O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, ajudando você a entender como se relaciona, comunica e toma decisões.
+            </p>
+            
+            <Button 
+              onClick={() => setShowDataForm(true)}
+              size="lg"
+              className="btn-responsive btn-hover-lift bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-lg"
+            >
+              Iniciar Teste Gratuito
+            </Button>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16 sm:mt-20 lg:mt-24">
           <Card className="bg-blue-50 border-blue-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl">
             <CardContent className="text-center p-6">
               <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
@@ -269,13 +290,14 @@ export default function Home() {
               </p>
             </CardContent>
           </Card>
-        </div>
+          </div>
 
-        {/* Social Proof */}
-        <div className="text-center mt-16 sm:mt-20">
-          <p className="responsive-body text-slate-600">
-            Já usado por mais de 10.000 pessoas para descobrir seu perfil comportamental
-          </p>
+          {/* Social Proof */}
+          <div className="text-center mt-16 sm:mt-20">
+            <p className="responsive-body text-slate-600">
+              Já usado por mais de 10.000 pessoas para descobrir seu perfil comportamental
+            </p>
+          </div>
         </div>
       </main>
     </div>
