@@ -177,30 +177,30 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white px-4 sm:px-6 lg:px-8 xl:px-16 py-6 lg:py-12">
-        <div className="max-w-7xl mx-auto">
+      <header className="psychology-gradient text-white responsive-header">
+        <div className="responsive-container">
           {/* Top Navigation - Only on larger screens */}
-          <div className="hidden lg:flex justify-between items-center mb-12 xl:mb-16">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 xl:w-14 xl:h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Brain className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
+          <div className="hidden lg:flex justify-between items-center mb-8 lg:mb-12 xl:mb-16">
+            <div className="flex items-center space-x-3 lg:space-x-4">
+              <div className="responsive-icon-container bg-white/20 backdrop-blur-sm">
+                <Brain className="responsive-icon text-white" />
               </div>
-              <span className="font-semibold text-xl xl:text-2xl">MeuPerfil360</span>
+              <span className="responsive-heading text-white">MeuPerfil360</span>
             </div>
-            <div className="flex gap-6">
+            <div className="responsive-flex">
               <Button
                 variant="ghost"
-                size="lg"
                 onClick={() => navigate("/find-results")}
-                className="text-white hover:bg-white/20 touch-button text-base xl:text-lg px-6 py-3"
+                className="text-white hover:bg-white/20 px-4 py-2 lg:px-6 lg:py-3 xl:px-8 xl:py-4 
+                          text-sm lg:text-base xl:text-lg font-medium touch-button transition-all duration-300"
               >
                 Recuperar Resultados
               </Button>
               <Button
                 variant="ghost"
-                size="lg"
                 onClick={() => navigate("/login")}
-                className="text-white hover:bg-white/20 touch-button text-base xl:text-lg px-6 py-3"
+                className="text-white hover:bg-white/20 px-4 py-2 lg:px-6 lg:py-3 xl:px-8 xl:py-4 
+                          text-sm lg:text-base xl:text-lg font-medium touch-button transition-all duration-300"
               >
                 Login
               </Button>
@@ -208,27 +208,28 @@ export default function Home() {
           </div>
 
           {/* Mobile Top Navigation */}
-          <div className="md:hidden flex justify-between items-center mb-6">
+          <div className="lg:hidden flex justify-between items-center mb-6">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Brain className="w-4 h-4 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="font-semibold text-base">MeuPerfil360</span>
+              <span className="font-semibold text-base sm:text-lg">MeuPerfil360</span>
             </div>
             <div className="flex gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/find-results")}
-                className="text-white hover:bg-white/20 touch-button text-xs px-2"
+                className="text-white hover:bg-white/20 touch-button text-xs sm:text-sm px-2 sm:px-3 py-2"
               >
-                Resultados
+                <span className="hidden sm:inline">Resultados</span>
+                <span className="sm:hidden">Res</span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/login")}
-                className="text-white hover:bg-white/20 touch-button text-xs px-2"
+                className="text-white hover:bg-white/20 touch-button text-xs sm:text-sm px-2 sm:px-3 py-2"
               >
                 Login
               </Button>
@@ -236,43 +237,47 @@ export default function Home() {
           </div>
 
           {/* Main Header Content */}
-          <div className="text-center">
-            <div className="flex justify-center mb-6 lg:mb-10">
-              <div className="w-16 h-16 lg:w-24 lg:h-24 xl:w-28 xl:h-28 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
-                <Brain className="w-8 h-8 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-white" />
+          <div className="text-center content-stack">
+            <div className="flex justify-center">
+              <div className="responsive-icon-container bg-white/20 backdrop-blur-sm shadow-xl">
+                <Brain className="responsive-icon text-white" />
               </div>
             </div>
-            <div>
-              <h1 className="text-2xl lg:text-5xl xl:text-6xl font-bold mb-3 lg:mb-6">MeuPerfil360</h1>
-              <p className="text-base lg:text-xl xl:text-2xl opacity-90">Descubra seu perfil comportamental DISC</p>
+            <div className="space-y-2 lg:space-y-4">
+              <h1 className="responsive-title text-white">MeuPerfil360</h1>
+              <p className="responsive-text text-white/90">Descubra seu perfil comportamental DISC</p>
             </div>
           </div>
         </div>
       </header>
       
       {/* Main Content */}
-      <div className="px-4 sm:px-6 lg:px-8 xl:px-16 py-12 lg:py-20 xl:py-24">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold mb-6 lg:mb-10 text-psychology-blue">
-            Descubra seu Perfil Comportamental
-          </h2>
-          <p className="text-base lg:text-xl xl:text-2xl text-muted-foreground mb-10 lg:mb-16 max-w-4xl mx-auto leading-relaxed">
-            O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, 
-            ajudando você a entender como se relaciona, comunica e toma decisões.
-          </p>
+      <div className="responsive-section">
+        <div className="responsive-container text-center">
+          <div className="content-stack">
+            <div>
+              <h2 className="responsive-subtitle text-psychology-blue mb-4 lg:mb-6">
+                Descubra seu Perfil Comportamental
+              </h2>
+              <p className="responsive-text text-muted-foreground max-w-4xl mx-auto">
+                O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, 
+                ajudando você a entender como se relaciona, comunica e toma decisões.
+              </p>
+            </div>
 
-          {/* Main CTA Button */}
-          <Button
-            onClick={() => setShowDataForm(true)}
-            className="psychology-gradient w-auto px-8 lg:px-12 py-4 lg:py-6 text-base lg:text-xl xl:text-2xl touch-button shadow-xl mb-16 lg:mb-24 font-semibold"
-            size="lg"
-          >
-            <Brain className="w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 mr-3" />
-            Iniciar Teste Gratuito
-          </Button>
+            {/* Main CTA Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={() => setShowDataForm(true)}
+                className="responsive-button-primary"
+              >
+                <Brain className="w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 mr-2 lg:mr-3" />
+                Iniciar Teste Gratuito
+              </Button>
+            </div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 xl:gap-12 mb-16 lg:mb-24">
+            {/* Features Grid */}
+            <div className="features-grid">
             <Card className="text-center hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
               <CardContent className="p-6 lg:p-8 xl:p-10">
                 <div className="w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
@@ -313,8 +318,7 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
-
-
+          </div>
         </div>
       </div>
 
