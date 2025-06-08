@@ -331,7 +331,7 @@ ${config.resources.courses.map(course => `• ${course}`).join('\n')}
   `;
 }
 
-export function generatePremiumPDF(testResult: TestResult): string {
+export async function generatePremiumPDF(testResult: TestResult): Promise<void> {
   const { profileType, scores, guestName } = testResult;
   const config = PROFILE_CONFIGS[profileType];
   
@@ -342,43 +342,143 @@ export function generatePremiumPDF(testResult: TestResult): string {
   const actionPlan = generateWeeklyActionPlan(profileType);
   const questions = generateReflectiveQuestions(profileType);
   
-  return `
-# Relatório DISC Premium - ${guestName}
-
-${narrative}
-
-## Seu Plano de Ação de 4 Semanas
-
-${actionPlan.map((week, index) => `### ${week}`).join('\n\n')}
-
-## Perguntas para Reflexão Semanal
-
-${questions.map((question, index) => `**Semana ${index + 1}:** ${question}`).join('\n\n')}
-
-## Sabotadores Inconscientes para ${config.dominantFactor}
-
-Como pessoa com perfil ${config.dominantFactor} dominante, esteja atento a estes padrões que podem sabotar seu progresso:
-
-${profileType === 'D' ? `
-• **Impaciência excessiva:** Tomar decisões rápidas demais sem considerar todas as variáveis
-• **Microgerenciamento:** Dificuldade para delegar verdadeiramente
-• **Comunicação brusca:** Ser percebido como insensível ou autoritário
-` : profileType === 'I' ? `
-• **Falta de foco:** Dispersar energia em muitas direções ao mesmo tempo
-• **Promessas excessivas:** Comprometer-se com mais do que consegue entregar
-• **Evitar detalhes:** Negligenciar aspectos importantes por serem "chatos"
-` : profileType === 'S' ? `
-• **Evitar conflitos:** Não expressar opiniões importantes para manter harmonia
-• **Sobrecarga por não saber dizer não:** Aceitar mais responsabilidades do que deveria
-• **Resistência a mudanças:** Ficar na zona de conforto mesmo quando é prejudicial
-` : `
-• **Paralisia por análise:** Buscar informações demais antes de tomar decisões
-• **Perfeccionismo paralisante:** Não entregar por não estar "perfeito"
-• **Isolamento social:** Focar tanto em tarefas que negligencia relacionamentos
-`}
-
----
-
-*Este relatório foi gerado especificamente para seu perfil ${config.dominantFactor} dominante. Use-o como um guia para seu desenvolvimento pessoal e profissional contínuo.*
-  `;
+  // Dynamic import for jsPDF
+  const { jsPDF } = await import('jspdf');
+  const pdf = new jsPDF();
+  
+  // Configure PDF
+  pdf.setFont('helvetica');
+  let yPosition = 20;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const margin = 20;
+  const contentWidth = pageWidth - 2 * margin;
+  
+  // Helper function to add text with automatic line breaks
+  const addText = (text: string, fontSize: number = 12, isBold: boolean = false) => {
+    pdf.setFontSize(fontSize);
+    pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
+    
+    const lines = pdf.splitTextToSize(text, contentWidth);
+    
+    // Check if we need a new page
+    if (yPosition + (lines.length * fontSize * 0.5) > pdf.internal.pageSize.getHeight() - 20) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    
+    pdf.text(lines, margin, yPosition);
+    yPosition += lines.length * fontSize * 0.5 + 5;
+  };
+  
+  // Header
+  addText(`RELATÓRIO DISC PREMIUM`, 20, true);
+  addText(`${guestName}`, 16, true);
+  addText(`Perfil ${config.dominantFactor} - ${config.percentage}%`, 14);
+  yPosition += 10;
+  
+  // Profile Description
+  addText(`SEU PERFIL COMPORTAMENTAL`, 16, true);
+  addText(config.description, 12);
+  yPosition += 10;
+  
+  // Strengths
+  addText(`PRINCIPAIS PONTOS FORTES`, 14, true);
+  config.strengths.forEach(strength => {
+    addText(`• ${strength}`, 11);
+  });
+  yPosition += 10;
+  
+  // Development Areas
+  addText(`ÁREAS DE DESENVOLVIMENTO`, 14, true);
+  config.developmentAreas.forEach(area => {
+    addText(`• ${area}`, 11);
+  });
+  yPosition += 10;
+  
+  // Under Pressure
+  addText(`COMPORTAMENTO SOB PRESSÃO`, 14, true);
+  addText(config.underPressure, 12);
+  yPosition += 10;
+  
+  // Support Factors
+  addText(`FATORES DE APOIO`, 14, true);
+  config.supportFactors.forEach(factor => {
+    addText(`• ${factor}`, 11);
+  });
+  yPosition += 10;
+  
+  // Career Recommendations
+  addText(`CARREIRAS E FUNÇÕES IDEAIS`, 14, true);
+  config.careers.forEach(career => {
+    addText(`• ${career}`, 11);
+  });
+  yPosition += 10;
+  
+  // Resources
+  addText(`RECURSOS RECOMENDADOS`, 14, true);
+  addText(`Livros:`, 12, true);
+  config.resources.books.forEach(book => {
+    addText(`• ${book}`, 11);
+  });
+  
+  addText(`Podcasts:`, 12, true);
+  config.resources.podcasts.forEach(podcast => {
+    addText(`• ${podcast}`, 11);
+  });
+  
+  addText(`Cursos:`, 12, true);
+  config.resources.courses.forEach(course => {
+    addText(`• ${course}`, 11);
+  });
+  yPosition += 10;
+  
+  // Action Plan
+  addText(`PLANO DE AÇÃO DE 4 SEMANAS`, 14, true);
+  actionPlan.forEach((week, index) => {
+    addText(`Semana ${index + 1}:`, 12, true);
+    addText(week, 11);
+  });
+  yPosition += 10;
+  
+  // Reflection Questions
+  addText(`PERGUNTAS PARA REFLEXÃO SEMANAL`, 14, true);
+  questions.forEach((question, index) => {
+    addText(`Semana ${index + 1}: ${question}`, 11);
+  });
+  yPosition += 10;
+  
+  // Sabotage Patterns
+  addText(`SABOTADORES INCONSCIENTES`, 14, true);
+  addText(`Como pessoa com perfil ${config.dominantFactor} dominante, esteja atento a estes padrões:`, 12);
+  
+  const sabotagePatterns = profileType === 'D' ? [
+    'Impaciência excessiva: Tomar decisões rápidas demais sem considerar todas as variáveis',
+    'Microgerenciamento: Dificuldade para delegar verdadeiramente',
+    'Comunicação brusca: Ser percebido como insensível ou autoritário'
+  ] : profileType === 'I' ? [
+    'Falta de foco: Dispersar energia em muitas direções ao mesmo tempo',
+    'Promessas excessivas: Comprometer-se com mais do que consegue entregar',
+    'Evitar detalhes: Negligenciar aspectos importantes por serem "chatos"'
+  ] : profileType === 'S' ? [
+    'Evitar conflitos: Não expressar opiniões importantes para manter harmonia',
+    'Sobrecarga por não saber dizer não: Aceitar mais responsabilidades do que deveria',
+    'Resistência a mudanças: Ficar na zona de conforto mesmo quando é prejudicial'
+  ] : [
+    'Paralisia por análise: Buscar informações demais antes de tomar decisões',
+    'Perfeccionismo paralisante: Não entregar por não estar "perfeito"',
+    'Isolamento social: Focar tanto em tarefas que negligencia relacionamentos'
+  ];
+  
+  sabotagePatterns.forEach(pattern => {
+    addText(`• ${pattern}`, 11);
+  });
+  
+  // Footer
+  yPosition += 20;
+  addText(`Este relatório foi gerado especificamente para seu perfil ${config.dominantFactor} dominante.`, 10);
+  addText(`Use-o como guia para seu desenvolvimento pessoal e profissional contínuo.`, 10);
+  
+  // Download PDF
+  const fileName = `relatorio-disc-premium-${guestName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+  pdf.save(fileName);
 }

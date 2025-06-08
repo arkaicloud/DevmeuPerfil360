@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Brain, Trophy, Crown, CheckCircle, Share, UserPlus, FileText, BarChart3, Target, Users, Lightbulb, Zap, Heart, Shield, Cog } from "lucide-react";
 import PaymentModal from "@/components/payment-modal";
 import RegistrationModal from "@/components/registration-modal";
-import { generatePremiumPDF, generateWeeklyActionPlan, generateReflectiveQuestions } from "@/lib/pdf-generator";
+import { generatePremiumPDF } from "@/lib/pdf-generator";
 
 interface DiscProfile {
   D: number;
@@ -162,33 +162,22 @@ export default function Results() {
 
     try {
       toast({
-        title: "Gerando Relatório Premium...",
-        description: "Criando seu relatório personalizado completo.",
+        title: "Gerando PDF Premium...",
+        description: "Criando seu relatório personalizado em PDF.",
       });
 
-      // Generate enhanced premium PDF content
-      const pdfContent = generatePremiumPDF(testResult);
-      
-      // Create and download enhanced PDF
-      const blob = new Blob([pdfContent], { type: 'text/markdown; charset=utf-8' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `relatorio-disc-premium-${testResult.guestName.replace(/\s+/g, '-').toLowerCase()}.md`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      // Generate actual PDF using jsPDF
+      await generatePremiumPDF(testResult);
 
       toast({
-        title: "Download Concluído!",
-        description: "Seu relatório DISC premium personalizado foi baixado com sucesso!",
+        title: "PDF Baixado com Sucesso!",
+        description: "Seu relatório DISC premium foi salvo como PDF.",
       });
     } catch (error) {
-      console.error("Erro ao gerar relatório:", error);
+      console.error("Erro ao gerar PDF:", error);
       toast({
-        title: "Erro ao Gerar",
-        description: "Não foi possível gerar o relatório. Tente novamente.",
+        title: "Erro ao Gerar PDF",
+        description: "Não foi possível criar o relatório em PDF. Tente novamente.",
         variant: "destructive",
       });
     }
