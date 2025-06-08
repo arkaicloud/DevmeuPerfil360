@@ -1187,15 +1187,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </ul>
             </div>
 
-            <div class="resource-card courses">
-              <h4>💻 Cursos e Capacitações</h4>
-              <ul>
-                <li>Fundação Dom Cabral - Liderança DISC</li>
-                <li>HSM University - Inteligência Comportamental</li>
-                <li>Conquer - Soft Skills para ${testResult.profileType}</li>
-                <li>LinkedIn Learning - Perfil DISC na Prática</li>
-              </ul>
-            </div>
           </div>
 
           <!-- SABOTADORES -->
