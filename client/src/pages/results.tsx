@@ -5,9 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Trophy, Crown, CheckCircle, Share, UserPlus, FileText } from "lucide-react";
+import { Brain, Trophy, Crown, CheckCircle, Share, UserPlus, FileText, BarChart3, Target, Users, Lightbulb } from "lucide-react";
 import PaymentModal from "@/components/payment-modal";
 import RegistrationModal from "@/components/registration-modal";
+import { generatePremiumPDF, generateWeeklyActionPlan, generateReflectiveQuestions } from "@/lib/pdf-generator";
 
 interface DiscProfile {
   D: number;
@@ -151,23 +152,33 @@ export default function Results() {
 
     try {
       toast({
-        title: "Abrindo Relatório...",
-        description: "Seu relatório será aberto em uma nova aba para impressão em PDF.",
+        title: "Gerando Relatório Premium...",
+        description: "Criando seu relatório personalizado completo.",
       });
 
-      // Abrir o relatório em uma nova aba para que o usuário possa imprimir como PDF
-      const url = `/api/test/result/${testResult.id}/pdf`;
-      window.open(url, '_blank');
+      // Generate enhanced premium PDF content
+      const pdfContent = generatePremiumPDF(testResult);
+      
+      // Create and download enhanced PDF
+      const blob = new Blob([pdfContent], { type: 'text/markdown; charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio-disc-premium-${testResult.guestName.replace(/\s+/g, '-').toLowerCase()}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
 
       toast({
-        title: "Relatório Aberto!",
-        description: "Use Ctrl+P (ou Cmd+P no Mac) para salvar como PDF.",
+        title: "Download Concluído!",
+        description: "Seu relatório DISC premium personalizado foi baixado com sucesso!",
       });
     } catch (error) {
-      console.error("Erro ao abrir relatório:", error);
+      console.error("Erro ao gerar relatório:", error);
       toast({
-        title: "Erro ao Abrir",
-        description: "Não foi possível abrir o relatório. Tente novamente.",
+        title: "Erro ao Gerar",
+        description: "Não foi possível gerar o relatório. Tente novamente.",
         variant: "destructive",
       });
     }
@@ -259,14 +270,76 @@ export default function Results() {
                 </p>
               </div>
 
-              {/* DISC Scores */}
-              <div className="mobile-stack">
-                {Object.entries(testResult.scores).map(([type, score]) => (
-                  <div key={type} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${getDiscColor(type)}`}>
-                        <span className="font-bold text-xs sm:text-sm">{type}</span>
+              {/* Enhanced DISC Scores with Visual Chart */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {Object.entries(testResult.scores).map(([type, score]) => (
+                    <div key={type} className="text-center p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg">
+                      <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center border-2 ${getDiscColor(type)}`}>
+                        <span className="font-bold text-lg">{type}</span>
                       </div>
+                      <div className="mt-3">
+                        <div className="text-xl font-bold">{score}%</div>
+                        <Progress value={score} className="mt-2 h-2" />
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {type === 'D' ? 'Dominância' : 
+                           type === 'I' ? 'Influência' : 
+                           type === 'S' ? 'Estabilidade' : 'Conformidade'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Radar Chart Visualization */}
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-lg mt-6">
+                  <h4 className="text-lg font-semibold mb-4 text-center flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 mr-2" />
+                    Gráfico de Comportamento
+                  </h4>
+                  <div className="relative w-48 h-48 mx-auto">
+                    <svg viewBox="0 0 200 200" className="w-full h-full">
+                      {/* Radar Chart Grid */}
+                      <g stroke="#e5e7eb" strokeWidth="1" fill="none">
+                        <circle cx="100" cy="100" r="80" />
+                        <circle cx="100" cy="100" r="60" />
+                        <circle cx="100" cy="100" r="40" />
+                        <circle cx="100" cy="100" r="20" />
+                        <line x1="100" y1="20" x2="100" y2="180" />
+                        <line x1="20" y1="100" x2="180" y2="100" />
+                        <line x1="43.4" y1="43.4" x2="156.6" y2="156.6" />
+                        <line x1="156.6" y1="43.4" x2="43.4" y2="156.6" />
+                      </g>
+                      
+                      {/* Data Points */}
+                      <g fill="rgba(59, 130, 246, 0.3)" stroke="rgb(59, 130, 246)" strokeWidth="2">
+                        <polygon points={
+                          `100,${100 - (testResult.scores.D * 0.6)} 
+                           ${100 + (testResult.scores.I * 0.6)},100 
+                           100,${100 + (testResult.scores.S * 0.6)} 
+                           ${100 - (testResult.scores.C * 0.6)},100`
+                        } />
+                      </g>
+                      
+                      {/* Labels */}
+                      <g fill="#374151" fontSize="14" fontWeight="bold" textAnchor="middle">
+                        <text x="100" y="15">D</text>
+                        <text x="185" y="105">I</text>
+                        <text x="100" y="195">S</text>
+                        <text x="15" y="105">C</text>
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Original DISC Scores List for Mobile */}
+                <div className="sm:hidden mobile-stack">
+                  {Object.entries(testResult.scores).map(([type, score]) => (
+                    <div key={type} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 sm:space-x-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${getDiscColor(type)}`}>
+                          <span className="font-bold text-xs sm:text-sm">{type}</span>
+                        </div>
                       <span className="mobile-text font-medium text-foreground">
                         {type === "D" && "Dominância"}
                         {type === "I" && "Influência"}
@@ -283,8 +356,10 @@ export default function Results() {
                       </div>
                       <span className="text-xs sm:text-sm font-medium text-foreground w-8 sm:w-10 text-right">{score}%</span>
                     </div>
-                  </div>
-                ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
