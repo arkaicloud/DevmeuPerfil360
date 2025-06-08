@@ -582,7 +582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const careers = getCareerSuggestions(testResult.profileType, testResult.scores);
       const actionPlan = getActionPlan(testResult.profileType);
 
-      // Criar conteúdo HTML completo para conversão em PDF
+      // Criar conteúdo HTML otimizado para conversão em PDF
       const htmlContent = `
         <!DOCTYPE html>
         <html>
@@ -590,157 +590,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           <meta charset="UTF-8">
           <title>Relatório Completo Perfil360 - ${testResult.guestName}</title>
           <style>
-            body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              margin: 0; 
-              padding: 20px;
-              line-height: 1.6; 
-              color: #333;
-              background: #f8fafc;
-            }
-            .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-            .header { text-align: center; margin-bottom: 50px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; }
-            .profile-badge { 
-              display: inline-block; 
-              width: 100px; height: 100px; 
-              border-radius: 50%; 
-              background: rgba(255,255,255,0.2); 
-              color: white; 
-              font-size: 48px; 
-              font-weight: bold; 
-              line-height: 100px; 
-              text-align: center; 
-              margin: 20px 0; 
-              border: 3px solid rgba(255,255,255,0.3);
-            }
-            .section { 
-              margin: 40px 0; 
-              padding: 30px; 
-              background: #f9fafb; 
-              border-radius: 10px; 
-              border-left: 5px solid #667eea;
-            }
-            .section h2 { 
-              color: #1e40af; 
-              margin-bottom: 20px; 
-              font-size: 24px;
-              border-bottom: 2px solid #e5e7eb; 
-              padding-bottom: 10px; 
-            }
-            .scores-grid { 
-              display: grid; 
-              grid-template-columns: repeat(2, 1fr); 
-              gap: 20px; 
-              margin: 30px 0; 
-            }
-            .score-card { 
-              background: white; 
-              padding: 20px; 
-              border-radius: 10px; 
-              text-align: center; 
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            .score-circle { 
-              width: 80px; 
-              height: 80px; 
-              border-radius: 50%; 
-              margin: 0 auto 15px; 
-              display: flex; 
-              align-items: center; 
-              justify-content: center; 
-              font-size: 24px; 
-              font-weight: bold; 
-              color: white;
-            }
-            .score-d { background: linear-gradient(135deg, #ef4444, #dc2626); }
-            .score-i { background: linear-gradient(135deg, #eab308, #d97706); }
-            .score-s { background: linear-gradient(135deg, #22c55e, #16a34a); }
-            .score-c { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-            .radar-chart { 
-              width: 300px; 
-              height: 300px; 
-              margin: 30px auto; 
-              border: 2px solid #e5e7eb; 
-              border-radius: 50%; 
-              position: relative;
-              background: linear-gradient(45deg, #f0f9ff 25%, transparent 25%), 
-                          linear-gradient(-45deg, #f0f9ff 25%, transparent 25%);
-            }
-            .career-grid { 
-              display: grid; 
-              grid-template-columns: repeat(2, 1fr); 
-              gap: 15px; 
-              margin: 20px 0; 
-            }
-            .career-item { 
-              background: white; 
-              padding: 15px; 
-              border-radius: 8px; 
-              border-left: 4px solid #667eea; 
-              box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            }
-            .strength-weakness { 
-              display: grid; 
-              grid-template-columns: 1fr 1fr; 
-              gap: 30px; 
-              margin: 20px 0; 
-            }
-            .strength-card, .weakness-card { 
-              background: white; 
-              padding: 20px; 
-              border-radius: 10px; 
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            .strength-card { border-left: 5px solid #22c55e; }
-            .weakness-card { border-left: 5px solid #f59e0b; }
+            * { box-sizing: border-box; }
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; line-height: 1.5; color: #333; }
+            .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; }
+            .header { text-align: center; margin-bottom: 30px; padding: 20px; background: #667eea; border-radius: 8px; color: white; }
+            .profile-badge { display: inline-block; width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; font-size: 36px; font-weight: bold; line-height: 80px; text-align: center; margin: 15px 0; }
+            .section { margin: 30px 0; padding: 20px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea; }
+            .section h2 { color: #1e40af; margin-bottom: 15px; font-size: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+            .scores-grid { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; }
+            .score-card { flex: 1; min-width: 150px; background: white; padding: 15px; border-radius: 8px; text-align: center; }
+            .score-circle { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: white; }
+            .score-d { background: #ef4444; }
+            .score-i { background: #eab308; }
+            .score-s { background: #22c55e; }
+            .score-c { background: #3b82f6; }
+            .career-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+            .career-item { flex: 1; min-width: 200px; background: white; padding: 12px; border-radius: 6px; border-left: 3px solid #667eea; }
+            .strength-weakness { display: flex; gap: 20px; margin: 15px 0; }
+            .strength-card, .weakness-card { flex: 1; background: white; padding: 15px; border-radius: 8px; }
+            .strength-card { border-left: 4px solid #22c55e; }
+            .weakness-card { border-left: 4px solid #f59e0b; }
             ul { padding-left: 0; list-style: none; }
-            li { 
-              margin: 12px 0; 
-              padding: 8px 15px; 
-              background: rgba(103, 126, 234, 0.1); 
-              border-radius: 5px; 
-              position: relative;
-              padding-left: 30px;
-            }
-            li:before { 
-              content: "✓"; 
-              position: absolute; 
-              left: 10px; 
-              color: #667eea; 
-              font-weight: bold;
-            }
-            .action-plan { 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-              color: white; 
-              padding: 30px; 
-              border-radius: 10px; 
-              margin: 30px 0;
-            }
-            .action-plan h3 { color: white; margin-bottom: 20px; }
+            li { margin: 8px 0; padding: 6px 12px; background: rgba(103, 126, 234, 0.1); border-radius: 4px; }
+            .action-plan { background: #667eea; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .action-plan h3 { color: white; margin-bottom: 15px; }
             .action-plan li { background: rgba(255,255,255,0.1); color: white; }
-            .action-plan li:before { color: #fbbf24; }
-            .footer { 
-              margin-top: 50px; 
-              text-align: center; 
-              font-size: 12px; 
-              color: #6b7280; 
-              padding: 20px;
-              border-top: 1px solid #e5e7eb;
-            }
-            .summary-box {
-              background: linear-gradient(135deg, #fef3c7, #fde68a);
-              padding: 20px;
-              border-radius: 10px;
-              margin: 20px 0;
-              border-left: 5px solid #f59e0b;
-            }
-            .percentile-info {
-              background: #eff6ff;
-              padding: 15px;
-              border-radius: 8px;
-              margin: 10px 0;
-              border: 1px solid #dbeafe;
-            }
+            .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #6b7280; padding: 15px; border-top: 1px solid #e5e7eb; }
+            .summary-box { background: #fef3c7; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #f59e0b; }
           </style>
         </head>
         <body>
