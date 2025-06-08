@@ -328,8 +328,8 @@ export default function Results() {
 
               <Button 
                 onClick={() => setShowPaymentModal(true)}
-                className="w-full bg-gradient-to-r from-secondary to-primary text-white btn-hover-lift"
-                size="lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-secondary to-primary text-white btn-hover-lift"
+                size="default"
               >
                 <Crown className="w-4 h-4 mr-2" />
                 Desbloquear Relatório Completo
@@ -341,11 +341,11 @@ export default function Results() {
 
         {/* Action Buttons */}
         <div className="responsive-container">
-          <div className="mobile-stack">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
             onClick={() => setShowRegistrationModal(true)}
-            className="w-full bg-accent text-white btn-hover-lift"
-            size="lg"
+            className="w-full sm:w-auto bg-accent text-white btn-hover-lift"
+            size="default"
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Criar Conta Gratuita
@@ -354,7 +354,8 @@ export default function Results() {
           <Button 
             onClick={handleShareResults}
             variant="outline"
-            className="w-full"
+            className="w-full sm:w-auto"
+            size="default"
           >
             <Share className="w-4 h-4 mr-2" />
             Compartilhar Resultados
@@ -363,7 +364,8 @@ export default function Results() {
           {testResult.isPremium && (
             <Button 
               variant="outline"
-              className="w-full"
+              className="w-full sm:w-auto"
+              size="default"
               onClick={() => handleDownloadPDF()}
             >
               <FileText className="w-4 h-4 mr-2" />
