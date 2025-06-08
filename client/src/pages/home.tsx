@@ -45,25 +45,27 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
         {/* Header */}
-        <header className="psychology-gradient text-white p-4 safe-area-top">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Brain className="w-5 h-5 text-white" />
+        <header className="psychology-gradient text-white mobile-padding">
+          <div className="responsive-container">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="mobile-subtitle font-bold">MeuPerfil360</h1>
+                  <p className="text-xs sm:text-sm opacity-90">Descubra seu perfil comportamental</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-lg font-bold">MeuPerfil360</h1>
-                <p className="text-xs opacity-90">Descubra seu perfil comportamental</p>
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 touch-button"
+                onClick={() => navigate("/login")}
+              >
+                Fazer Login
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => navigate("/login")}
-            >
-              Fazer Login
-            </Button>
           </div>
         </header>
 
