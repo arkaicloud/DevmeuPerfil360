@@ -626,8 +626,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               <h1>Relatório Completo Perfil360</h1>
               <h2>Análise DISC & Comportamental</h2>
               <div class="profile-badge">${testResult.profileType}</div>
-              <h3>${testResult.guestName}</h3>
-              <p>Data da Avaliação: ${new Date(testResult.createdAt).toLocaleDateString('pt-BR')}</p>
+              <h3>${testResult.guestName || 'Usuário'}</h3>
+              <p>Data da Avaliação: ${testResult.createdAt ? new Date(testResult.createdAt as Date).toLocaleDateString('pt-BR') : 'N/A'}</p>
               <p>ID da Avaliação: ${testResult.id}</p>
             </div>
 
@@ -643,12 +643,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               <h2>🎯 Perfil DISC - Análise Detalhada</h2>
               
               <div class="scores-grid">
-                ${Object.entries(testResult.scores).map(([type, score]) => `
+                ${Object.entries(testResult.scores as any).map(([type, score]: [string, any]) => `
                   <div class="score-card">
                     <div class="score-circle score-${type.toLowerCase()}">${score}%</div>
                     <h4>${type === 'D' ? 'Dominância' : type === 'I' ? 'Influência' : type === 'S' ? 'Estabilidade' : 'Conformidade'}</h4>
                     <div class="percentile-info">
-                      <small>Percentil: ${Math.round((score / 100) * 95 + 5)}º</small>
+                      <small>Percentil: ${Math.round((Number(score) / 100) * 95 + 5)}º</small>
                     </div>
                   </div>
                 `).join('')}
@@ -656,24 +656,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
               <h3>Interpretação por Dimensão</h3>
               
-              <h4>🔴 Dominância (D): ${testResult.scores.D}%</h4>
-              <p>Você tende a ser ${testResult.scores.D > 70 ? 'altamente assertivo e orientado para resultados' : 
-                 testResult.scores.D > 40 ? 'moderadamente assertivo, equilibrando decisão com colaboração' : 
+              <h4>🔴 Dominância (D): ${(testResult.scores as any).D}%</h4>
+              <p>Você tende a ser ${(testResult.scores as any).D > 70 ? 'altamente assertivo e orientado para resultados' : 
+                 (testResult.scores as any).D > 40 ? 'moderadamente assertivo, equilibrando decisão com colaboração' : 
                  'mais colaborativo, preferindo consenso antes de tomar decisões'}.</p>
 
-              <h4>🟡 Influência (I): ${testResult.scores.I}%</h4>
-              <p>No trabalho, você se comporta de forma ${testResult.scores.I > 70 ? 'altamente comunicativa e entusiasmada' : 
-                 testResult.scores.I > 40 ? 'sociável e persuasiva quando necessário' : 
+              <h4>🟡 Influência (I): ${(testResult.scores as any).I}%</h4>
+              <p>No trabalho, você se comporta de forma ${(testResult.scores as any).I > 70 ? 'altamente comunicativa e entusiasmada' : 
+                 (testResult.scores as any).I > 40 ? 'sociável e persuasiva quando necessário' : 
                  'mais reservada, preferindo comunicação direta e objetiva'}.</p>
 
-              <h4>🟢 Estabilidade (S): ${testResult.scores.S}%</h4>
-              <p>Sua abordagem ao trabalho é ${testResult.scores.S > 70 ? 'extremamente consistente e confiável' : 
-                 testResult.scores.S > 40 ? 'equilibrada entre estabilidade e adaptabilidade' : 
+              <h4>🟢 Estabilidade (S): ${(testResult.scores as any).S}%</h4>
+              <p>Sua abordagem ao trabalho é ${(testResult.scores as any).S > 70 ? 'extremamente consistente e confiável' : 
+                 (testResult.scores as any).S > 40 ? 'equilibrada entre estabilidade e adaptabilidade' : 
                  'altamente adaptável, lidando bem com mudanças rápidas'}.</p>
 
-              <h4>🔵 Conformidade (C): ${testResult.scores.C}%</h4>
-              <p>Você demonstra ${testResult.scores.C > 70 ? 'alta atenção aos detalhes e procedimentos' : 
-                 testResult.scores.C > 40 ? 'equilíbrio entre qualidade e eficiência' : 
+              <h4>🔵 Conformidade (C): ${(testResult.scores as any).C}%</h4>
+              <p>Você demonstra ${(testResult.scores as any).C > 70 ? 'alta atenção aos detalhes e procedimentos' : 
+                 (testResult.scores as any).C > 40 ? 'equilíbrio entre qualidade e eficiência' : 
                  'foco em soluções práticas, menos preocupação com detalhes'}.</p>
             </div>
 

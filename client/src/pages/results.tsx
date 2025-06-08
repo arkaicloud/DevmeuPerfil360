@@ -42,7 +42,7 @@ export default function Results() {
   }, [navigate]);
 
   const { data: testResult, isLoading, error, refetch } = useQuery<TestResult>({
-    queryKey: ['/api/test/result', testId],
+    queryKey: [`/api/test/result/${testId}`],
     enabled: !!testId,
   });
   
