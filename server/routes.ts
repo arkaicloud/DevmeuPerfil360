@@ -9,7 +9,7 @@ import {
 } from "@shared/schema";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
 import bcrypt from "bcrypt";
-import puppeteer from "puppeteer";
+// import puppeteer from "puppeteer"; // Disabled due to system dependencies
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -1239,7 +1239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
 
-  // Download PDF route - converts HTML to actual PDF
+  // Download PDF route - optimized HTML for browser-based PDF printing
   app.get("/api/test/result/:id/download", async (req, res) => {
     try {
       const testId = parseInt(req.params.id);
@@ -1253,7 +1253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: 'PDF premium requerido' });
       }
 
-      // Generate the HTML content (reuse the same logic from /pdf route)
+      // Generate the HTML content with enhanced print optimization
       const normalizedScores = {
         D: Math.round(((testResult.scores as any).D / 4) * 100),
         I: Math.round(((testResult.scores as any).I / 4) * 100), 
@@ -1297,7 +1297,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           <meta charset="UTF-8">
           <title>Relatório Premium DISC - ${testResult.guestName || 'Usuário'}</title>
           <style>
-            @page { size: A4; margin: 15mm; }
+            @page { 
+              size: A4; 
+              margin: 10mm; 
+            }
+            @media print {
+              * { 
+                -webkit-print-color-adjust: exact !important; 
+                color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+              }
+              body { 
+                font-size: 12px !important; 
+                line-height: 1.4 !important; 
+              }
+              .no-print { display: none !important; }
+              .page-break { page-break-before: always; }
+            }
             * { 
               -webkit-print-color-adjust: exact !important; 
               color-adjust: exact !important; 
@@ -1311,6 +1327,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
               margin: 0; 
               padding: 0; 
               background: white; 
+              font-size: 14px;
+            }
+            .print-controls {
+              position: fixed;
+              top: 10px;
+              right: 10px;
+              background: #4f46e5;
+              color: white;
+              padding: 15px;
+              border-radius: 8px;
+              z-index: 1000;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .print-btn {
+              background: white;
+              color: #4f46e5;
+              border: none;
+              padding: 10px 20px;
+              border-radius: 5px;
+              font-weight: bold;
+              cursor: pointer;
+              margin: 5px;
+            }
+            .print-btn:hover {
+              background: #f3f4f6;
             }
             .header { 
               background: #4f46e5 !important; 
@@ -1322,26 +1363,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
               print-color-adjust: exact !important;
             }
             .title { 
-              font-size: 32px; 
+              font-size: 28px; 
               font-weight: bold; 
               margin-bottom: 10px; 
             }
             .subtitle { 
-              font-size: 18px; 
+              font-size: 16px; 
               margin-bottom: 20px; 
             }
             .profile-circle { 
-              width: 100px; 
-              height: 100px; 
+              width: 80px; 
+              height: 80px; 
               background: rgba(255,255,255,0.2) !important; 
               border: 3px solid white; 
               border-radius: 50%; 
               display: inline-flex; 
               align-items: center; 
               justify-content: center; 
-              font-size: 48px; 
+              font-size: 36px; 
               font-weight: bold; 
-              margin: 20px auto; 
+              margin: 15px auto; 
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
@@ -1350,17 +1391,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               border: 2px solid #e2e8f0; 
               border-radius: 8px; 
               padding: 20px; 
-              margin: 20px 0; 
+              margin: 15px 0; 
               page-break-inside: avoid; 
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .section-title { 
-              font-size: 24px; 
+              font-size: 20px; 
               font-weight: bold; 
               color: #1a202c; 
               margin-bottom: 15px; 
-              padding-bottom: 10px; 
+              padding-bottom: 8px; 
               border-bottom: 3px solid #4f46e5; 
             }
             .disc-table { 
@@ -1374,39 +1415,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .disc-table th { 
               background: #4f46e5 !important; 
               color: white !important; 
-              padding: 12px; 
+              padding: 10px; 
               font-weight: bold; 
               border: 1px solid white; 
+              font-size: 12px;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .disc-table td { 
-              padding: 12px; 
+              padding: 10px; 
               border: 1px solid #ddd; 
               text-align: center; 
+              font-size: 12px;
             }
             .disc-d { background: #ef4444 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .disc-i { background: #f59e0b !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .disc-s { background: #10b981 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .disc-c { background: #3b82f6 !important; color: white !important; font-weight: bold; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .progress-container { 
-              margin: 15px 0; 
+              margin: 12px 0; 
               background: white !important; 
-              padding: 15px; 
+              padding: 12px; 
               border-radius: 5px; 
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .progress-label { 
               font-weight: bold; 
-              margin-bottom: 8px; 
+              margin-bottom: 6px; 
               display: flex; 
-              justify-content: space-between; 
+              justify-content: space-between;
+              font-size: 13px; 
             }
             .progress-bar { 
-              height: 30px; 
+              height: 25px; 
               background: #e5e7eb !important; 
-              border-radius: 15px; 
+              border-radius: 12px; 
               overflow: hidden; 
               position: relative; 
               -webkit-print-color-adjust: exact !important;
@@ -1419,7 +1463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               justify-content: center; 
               color: white !important; 
               font-weight: bold; 
-              font-size: 14px; 
+              font-size: 12px; 
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
@@ -1430,58 +1474,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .quote-box { 
               background: #eff6ff !important; 
               border-left: 4px solid #3b82f6; 
-              padding: 20px; 
-              margin: 15px 0; 
-              border-radius: 0 8px 8px 0; 
+              padding: 15px; 
+              margin: 12px 0; 
+              border-radius: 0 6px 6px 0; 
               font-style: italic; 
+              font-size: 13px;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .action-table { 
               width: 100%; 
               border-collapse: collapse; 
-              margin: 15px 0; 
+              margin: 12px 0; 
               background: white !important; 
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .action-table th { 
               background: #f3f4f6 !important; 
-              padding: 12px; 
+              padding: 8px; 
               border: 1px solid #d1d5db; 
               font-weight: bold; 
+              font-size: 11px;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .action-table td { 
-              padding: 12px; 
+              padding: 8px; 
               border: 1px solid #d1d5db; 
               vertical-align: top; 
+              font-size: 11px;
             }
             .week-badge { 
               background: #4f46e5 !important; 
               color: white !important; 
-              padding: 5px 10px; 
+              padding: 4px 8px; 
               border-radius: 50%; 
               font-weight: bold; 
+              font-size: 11px;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .warning-box { 
               background: #fef3c7 !important; 
               border: 2px solid #f59e0b; 
-              border-radius: 8px; 
-              padding: 20px; 
-              margin: 15px 0; 
+              border-radius: 6px; 
+              padding: 15px; 
+              margin: 12px 0; 
+              font-size: 12px;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             .resource-card { 
               background: white !important; 
               border-left: 4px solid #10b981; 
-              padding: 20px; 
-              margin: 15px 0; 
-              border-radius: 0 8px 8px 0; 
+              padding: 15px; 
+              margin: 12px 0; 
+              border-radius: 0 6px 6px 0; 
+              font-size: 12px;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
@@ -1491,27 +1541,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .resource-card h4 { 
               margin-top: 0; 
               color: #1f2937; 
-              font-size: 18px; 
+              font-size: 14px; 
             }
             .resource-card ul { 
-              margin: 10px 0; 
-              padding-left: 20px; 
+              margin: 8px 0; 
+              padding-left: 18px; 
             }
             .resource-card li { 
-              margin: 8px 0; 
-              line-height: 1.4; 
+              margin: 6px 0; 
+              line-height: 1.3; 
             }
           </style>
+          <script>
+            function printPDF() {
+              window.print();
+            }
+            function downloadPDF() {
+              printPDF();
+            }
+          </script>
         </head>
         <body>
+          <div class="print-controls no-print">
+            <div style="font-size: 14px; margin-bottom: 10px;">📄 Relatório DISC Premium</div>
+            <button class="print-btn" onclick="printPDF()">🖨️ Imprimir/Salvar PDF</button>
+            <button class="print-btn" onclick="downloadPDF()">💾 Baixar PDF</button>
+          </div>
+
           <!-- HEADER -->
           <div class="header">
             <div class="title">✨ RELATÓRIO DISC PREMIUM</div>
             <div class="subtitle">Análise Comportamental Personalizada</div>
             <div class="profile-circle">${testResult.profileType}</div>
-            <h3 style="margin: 15px 0; font-size: 24px;">${testResult.guestName || 'Usuário'}</h3>
-            <p style="margin: 5px 0; font-size: 16px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
-            <p style="margin: 5px 0; font-size: 14px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
+            <h3 style="margin: 10px 0; font-size: 20px;">${testResult.guestName || 'Usuário'}</h3>
+            <p style="margin: 5px 0; font-size: 14px;"><strong>Perfil Dominante:</strong> ${analysis.title}</p>
+            <p style="margin: 5px 0; font-size: 12px;">📅 ${new Date().toLocaleDateString('pt-BR')} | 📧 ${testResult.guestEmail || 'Não informado'}</p>
           </div>
 
           <!-- RESUMO EXECUTIVO -->
@@ -1538,7 +1602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </thead>
               <tbody>
                 ${['D', 'I', 'S', 'C'].map((type) => {
-                  const score = normalizedScores[type] || 0;
+                  const score = normalizedScores[type as keyof typeof normalizedScores] || 0;
                   const names = {
                     D: 'Dominância',
                     I: 'Influência',
@@ -1550,7 +1614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     <tr>
                       <td class="disc-${type.toLowerCase()}">${type}</td>
                       <td><strong>${names[type as keyof typeof names]}</strong></td>
-                      <td><strong style="font-size: 18px;">${score}%</strong></td>
+                      <td><strong style="font-size: 16px;">${score}%</strong></td>
                       <td><strong>${nivel}</strong></td>
                     </tr>
                   `;
@@ -1558,9 +1622,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </tbody>
             </table>
 
-            <h3>📈 Intensidade Visual dos Fatores</h3>
+            <h3 style="font-size: 16px;">📈 Intensidade Visual dos Fatores</h3>
             ${['D', 'I', 'S', 'C'].map((type) => {
-              const score = normalizedScores[type] || 0;
+              const score = normalizedScores[type as keyof typeof normalizedScores] || 0;
               const names = {
                 D: 'Dominância',
                 I: 'Influência',
@@ -1584,6 +1648,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               <p><strong>Interpretação:</strong> Seu perfil ${testResult.profileType} revela uma personalidade única com potencial extraordinário. Cada dimensão DISC contribui para sua história de sucesso e crescimento pessoal.</p>
             </div>
           </div>
+
+          <div class="page-break"></div>
 
           <!-- PLANO DE AÇÃO -->
           <div class="section">
@@ -1612,9 +1678,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             </table>
 
             <div class="warning-box">
-              <h4>💭 Perguntas para Reflexão Semanal</h4>
+              <h4 style="margin-top: 0; font-size: 14px;">💭 Perguntas para Reflexão Semanal</h4>
               ${reflectiveQuestions.map((question, index) => `
-                <p><strong>Semana ${index + 1}:</strong> ${question}</p>
+                <p style="margin: 8px 0;"><strong>Semana ${index + 1}:</strong> ${question}</p>
               `).join('')}
             </div>
           </div>
@@ -1691,53 +1757,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         </body>
         </html>`;
 
-      console.log('Launching Puppeteer for PDF generation...');
-      
-      // Launch Puppeteer and generate PDF
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox', 
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--disable-gpu'
-        ]
-      });
-      
-      try {
-        const page = await browser.newPage();
-        await page.setContent(htmlContent, { 
-          waitUntil: 'networkidle0',
-          timeout: 30000 
-        });
-        
-        console.log('Generating PDF...');
-        const pdfBuffer = await page.pdf({
-          format: 'A4',
-          printBackground: true,
-          preferCSSPageSize: false,
-          margin: {
-            top: '15mm',
-            right: '15mm',
-            bottom: '15mm',
-            left: '15mm'
-          }
-        });
-        
-        console.log('PDF generated successfully, size:', pdfBuffer.length);
-
-        // Set headers for PDF download
-        const fileName = `relatorio-disc-${testResult.guestName?.replace(/[^a-zA-Z0-9]/g, '') || 'usuario'}-${Date.now()}.pdf`;
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-        res.setHeader('Content-Length', pdfBuffer.length);
-        
-        res.send(pdfBuffer);
-        
-      } finally {
-        await browser.close();
-      }
+      // Return optimized HTML for browser PDF generation
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(htmlContent);
 
     } catch (error) {
       console.error('PDF download error:', error);
