@@ -175,161 +175,109 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      {/* Header */}
-      <header className="psychology-gradient text-white responsive-header">
-        <div className="responsive-container">
-          {/* Top Navigation - Only on larger screens */}
-          <div className="hidden lg:flex justify-between items-center mb-8 lg:mb-12 xl:mb-16">
-            <div className="flex items-center space-x-3 lg:space-x-4">
-              <div className="responsive-icon-container bg-white/20 backdrop-blur-sm">
-                <Brain className="responsive-icon text-white" />
-              </div>
-              <span className="responsive-heading text-white">MeuPerfil360</span>
-            </div>
-            <div className="responsive-flex">
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/find-results")}
-                className="text-white hover:bg-white/20 px-4 py-2 lg:px-6 lg:py-3 xl:px-8 xl:py-4 
-                          text-sm lg:text-base xl:text-lg font-medium touch-button transition-all duration-300"
-              >
-                Recuperar Resultados
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/login")}
-                className="text-white hover:bg-white/20 px-4 py-2 lg:px-6 lg:py-3 xl:px-8 xl:py-4 
-                          text-sm lg:text-base xl:text-lg font-medium touch-button transition-all duration-300"
-              >
-                Login
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Top Navigation */}
-          <div className="lg:hidden flex justify-between items-center mb-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <span className="font-semibold text-base sm:text-lg">MeuPerfil360</span>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/find-results")}
-                className="text-white hover:bg-white/20 touch-button text-xs sm:text-sm px-2 sm:px-3 py-2"
-              >
-                <span className="hidden sm:inline">Resultados</span>
-                <span className="sm:hidden">Res</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/login")}
-                className="text-white hover:bg-white/20 touch-button text-xs sm:text-sm px-2 sm:px-3 py-2"
-              >
-                Login
-              </Button>
-            </div>
-          </div>
-
-          {/* Main Header Content */}
-          <div className="text-center content-stack">
-            <div className="flex justify-center">
-              <div className="responsive-icon-container bg-white/20 backdrop-blur-sm shadow-xl">
-                <Brain className="responsive-icon text-white" />
-              </div>
-            </div>
-            <div className="space-y-2 lg:space-y-4">
-              <h1 className="responsive-title text-white">MeuPerfil360</h1>
-              <p className="responsive-text text-white/90">Descubra seu perfil comportamental DISC</p>
-            </div>
-          </div>
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <div className="responsive-section">
-        <div className="responsive-container text-center">
-          <div className="content-stack">
-            <div>
-              <h2 className="responsive-subtitle text-psychology-blue mb-4 lg:mb-6">
-                Descubra seu Perfil Comportamental
-              </h2>
-              <p className="responsive-text text-muted-foreground max-w-4xl mx-auto">
-                O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, 
-                ajudando você a entender como se relaciona, comunica e toma decisões.
-              </p>
-            </div>
-
-            {/* Main CTA Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={() => setShowDataForm(true)}
-                className="responsive-button-primary"
-              >
-                <Brain className="w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 mr-2 lg:mr-3" />
-                Iniciar Teste Gratuito
-              </Button>
-            </div>
-
-            {/* Features Grid */}
-            <div className="features-grid">
-              <Card className="responsive-card border-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
-                <CardContent className="responsive-card-content">
-                  <div className="responsive-icon-container bg-blue-100 dark:bg-blue-800">
-                    <ChartPie className="responsive-icon text-blue-600 dark:text-blue-300" />
-                  </div>
-                  <h3 className="responsive-heading">Análise Completa</h3>
-                  <p className="responsive-text text-muted-foreground">Descubra seus padrões comportamentais detalhados</p>
-                </CardContent>
-              </Card>
-
-              <Card className="responsive-card border-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-                <CardContent className="responsive-card-content">
-                  <div className="responsive-icon-container bg-green-100 dark:bg-green-800">
-                    <FileText className="responsive-icon text-green-600 dark:text-green-300" />
-                  </div>
-                  <h3 className="responsive-heading">Relatório Premium</h3>
-                  <p className="responsive-text text-muted-foreground">PDF completo com insights personalizados</p>
-                </CardContent>
-              </Card>
-
-              <Card className="responsive-card border-none bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
-                <CardContent className="responsive-card-content">
-                  <div className="responsive-icon-container bg-purple-100 dark:bg-purple-800">
-                    <Brain className="responsive-icon text-purple-600 dark:text-purple-300" />
-                  </div>
-                  <h3 className="responsive-heading">Baseado em Ciência</h3>
-                  <p className="responsive-text text-muted-foreground">Metodologia DISC validada cientificamente</p>
-                </CardContent>
-              </Card>
-
-              <Card className="responsive-card border-none bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
-                <CardContent className="responsive-card-content">
-                  <div className="responsive-icon-container bg-orange-100 dark:bg-orange-800">
-                    <Gift className="responsive-icon text-orange-600 dark:text-orange-300" />
-                  </div>
-                  <h3 className="responsive-heading">Teste Gratuito</h3>
-                  <p className="responsive-text text-muted-foreground">Comece agora sem compromisso</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Top Navigation */}
+      <div className="w-full py-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/find-results")}
+            className="w-full sm:w-auto text-sm font-medium hover:bg-blue-50 border-blue-200 text-blue-700"
+          >
+            Recuperar Resultados
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/login")}
+            className="w-full sm:w-auto text-sm font-medium hover:bg-blue-50 border-blue-200 text-blue-700"
+          >
+            Login
+          </Button>
         </div>
       </div>
+      
+      {/* Main Content */}
+      <main className="responsive-container section-spacing">
+        <div className="text-center content-spacing max-w-4xl mx-auto">
+          <h1 className="responsive-title text-slate-800 mb-6">
+            meuperfil360
+          </h1>
+          
+          <h2 className="responsive-subtitle text-slate-700 mb-4 font-semibold">
+            Descubra seu Perfil Comportamental
+          </h2>
+          
+          <p className="responsive-body text-slate-600 max-w-2xl mx-auto mb-8">
+            O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, ajudando você a entender como se relaciona, comunica e toma decisões.
+          </p>
+          
+          <Button 
+            onClick={() => setShowDataForm(true)}
+            size="lg"
+            className="btn-responsive btn-hover-lift bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-lg"
+          >
+            Iniciar Teste Gratuito
+          </Button>
+        </div>
 
-      {/* Bottom Section */}
-      <div className="bg-muted/30 responsive-section">
-        <div className="responsive-container text-center">
-          <p className="responsive-text text-muted-foreground font-medium">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16 sm:mt-20 lg:mt-24">
+          <Card className="bg-blue-50 border-blue-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl">
+            <CardContent className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <ChartPie className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">Análise Completa</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Descubra seus padrões comportamentais detalhados
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-green-50 border-green-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl">
+            <CardContent className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <FileText className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">Relatório Premium</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                PDF completo com insights personalizados
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-purple-50 border-purple-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl">
+            <CardContent className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
+                <Shield className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">Baseado em Ciência</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Metodologia DISC validada cientificamente
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-orange-50 border-orange-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl">
+            <CardContent className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center">
+                <Gift className="w-8 h-8 text-orange-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">Teste Gratuito</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Comece agora sem compromisso
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Social Proof */}
+        <div className="text-center mt-16 sm:mt-20">
+          <p className="responsive-body text-slate-600">
             Já usado por mais de 10.000 pessoas para descobrir seu perfil comportamental
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
