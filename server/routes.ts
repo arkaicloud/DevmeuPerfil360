@@ -1268,10 +1268,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate the HTML content with enhanced print optimization
       const normalizedScores = {
-        D: Math.round(((testResult.scores as any).D / 16) * 100),
-        I: Math.round(((testResult.scores as any).I / 16) * 100), 
-        S: Math.round(((testResult.scores as any).S / 16) * 100),
-        C: Math.round(((testResult.scores as any).C / 16) * 100)
+        D: (testResult.scores as any).D,
+        I: (testResult.scores as any).I, 
+        S: (testResult.scores as any).S,
+        C: (testResult.scores as any).C
       };
 
       const analysis = {
