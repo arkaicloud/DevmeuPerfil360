@@ -100,10 +100,10 @@ export default function FindResults() {
           </p>
         </div>
 
-        <Card className="mb-6">
-          <CardContent className="p-6">
+        <Card className="mb-6 max-w-md mx-auto">
+          <CardContent className="p-4">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="identifier"
@@ -145,8 +145,8 @@ export default function FindResults() {
           </CardContent>
         </Card>
 
-        <Card className="bg-muted/50 border-muted/80">
-          <CardContent className="p-4">
+        <Card className="bg-muted/50 border-muted/80 max-w-md mx-auto">
+          <CardContent className="p-3">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 Quer ter acesso a todos os seus testes em um só lugar?
