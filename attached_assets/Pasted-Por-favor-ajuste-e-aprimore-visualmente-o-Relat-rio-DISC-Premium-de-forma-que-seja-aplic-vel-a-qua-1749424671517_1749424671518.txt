@@ -1,0 +1,45 @@
+Por favor, ajuste e aprimore visualmente o Relatório DISC Premium, de forma que seja aplicável a qualquer perfil (D, I, S ou C).
+
+✅ Orientações gerais:
+
+Use títulos e subtítulos bem destacados, com cores suaves e modernas, para separar cada seção (ex.: Pontos Fortes, Áreas de Desenvolvimento, Gráficos, Plano de Ação, Recursos, Carreiras, etc.).
+
+Garanta espaçamento adequado entre blocos e listas para melhorar a leitura e dar sensação de “respiro” ao PDF.
+
+Inclua gráficos visuais (pizza, barras ou radar) para exibir as porcentagens dos 4 fatores DISC de forma clara e colorida.
+
+Use cores consistentes para cada letra DISC (ex.: vermelho para D, amarelo para I, verde para S, azul para C).
+
+✅ Detalhamento e Conexão:
+
+Adicione um parágrafo introdutório acolhedor e motivacional, explicando que o relatório visa apoiar o desenvolvimento pessoal e profissional.
+
+Para cada fator DISC, insira frases interpretativas básicas conectando a pontuação aos comportamentos e potencialidades.
+
+✅ Plano de Ação:
+
+Crie um quadro ou tabela visual para o plano de ação de 4 semanas, destacando cada semana com um foco (ex.: Autoconhecimento, Desenvolvimento, Aplicação, Consolidação).
+
+Para cada semana, inclua exemplos práticos e perguntas reflexivas que ajudem o usuário a aplicar as descobertas do relatório.
+
+✅ Recursos Recomendados:
+
+Organize livros, podcasts e cursos em listas visuais (ex.: usando ícones como 📚, 🎧 e 💻).
+
+Adicione um parágrafo breve explicando que esses recursos são sugestões gerais para apoiar o crescimento de qualquer perfil DISC.
+
+✅ Rodapé:
+
+Inclua um rodapé discreto com aviso de uso exclusivo (ex.: “Este relatório é exclusivo para o usuário e recomenda-se atualizá-lo a cada 6 meses para maior precisão.”).
+
+Adicione um convite final (ex.: “Conte com o MeuPerfil360 para impulsionar seu autoconhecimento e evolução profissional!”).
+
+✅ Estilo Geral:
+
+Mantenha um tom de voz inspirador e humano, mesclado com linguagem profissional e clara.
+
+Use ícones (💡, ✅, 🎯) para guiar o leitor e facilitar a leitura.
+
+Finalize com um quadro de “Sabotadores Inconscientes” em destaque visual suave para chamar atenção sem ser agressivo.
+
+Importante: O resultado final deve ser um PDF visualmente atrativo, acessível e aplicável a qualquer perfil DISC, mantendo a personalização no texto, mas com formatação e layout consistentes para todos

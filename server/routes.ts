@@ -719,12 +719,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               page-break-inside: avoid; 
             }
             .section-title { 
-              font-size: 24px; 
-              font-weight: bold; 
-              color: #1a202c; 
-              margin-bottom: 15px; 
-              padding-bottom: 10px; 
-              border-bottom: 3px solid #4f46e5; 
+              font-size: 26px; font-weight: 700; color: #2b6cb0; 
+              margin-bottom: 25px; padding: 18px 0 18px 55px;
+              border-bottom: 2px solid #e2e8f0; position: relative;
+              background: linear-gradient(90deg, #f7fafc 0%, #ffffff 100%);
+              border-radius: 10px; margin-left: -35px; margin-right: -35px;
+              margin-top: -35px; padding-top: 28px;
+            }
+            .section-title::before {
+              content: ''; position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+              width: 6px; height: 45px; background: linear-gradient(135deg, #4299e1, #3182ce);
+              border-radius: 3px;
             }
             .disc-table { 
               width: 100%; 
@@ -744,10 +749,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               border: 1px solid #ddd; 
               text-align: center; 
             }
-            .disc-d { background: #ef4444; color: white; font-weight: bold; }
-            .disc-i { background: #f59e0b; color: white; font-weight: bold; }
-            .disc-s { background: #10b981; color: white; font-weight: bold; }
-            .disc-c { background: #3b82f6; color: white; font-weight: bold; }
+            .disc-d { background: linear-gradient(135deg, #e53e3e, #c53030); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(229,62,62,0.3); }
+            .disc-i { background: linear-gradient(135deg, #dd6b20, #c05621); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(221,107,32,0.3); }
+            .disc-s { background: linear-gradient(135deg, #38a169, #2f855a); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(56,161,105,0.3); }
+            .disc-c { background: linear-gradient(135deg, #3182ce, #2c5aa0); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(49,130,206,0.3); }
             .progress-container { 
               margin: 15px 0; 
               background: white; 
@@ -774,18 +779,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
               text-align: center; 
               line-height: 30px; 
             }
-            .fill-d { background: #ef4444; }
-            .fill-i { background: #f59e0b; }
-            .fill-s { background: #10b981; }
-            .fill-c { background: #3b82f6; }
+            .fill-d { background: linear-gradient(135deg, #e53e3e, #c53030); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+            .fill-i { background: linear-gradient(135deg, #dd6b20, #c05621); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+            .fill-s { background: linear-gradient(135deg, #38a169, #2f855a); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+            .fill-c { background: linear-gradient(135deg, #3182ce, #2c5aa0); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
             .quote-box { 
-              background: #e0e7ff; 
-              border: 2px solid #6366f1; 
-              border-radius: 8px; 
-              padding: 20px; 
-              margin: 15px 0; 
-              font-style: italic; 
-              color: #3730a3; 
+              background: linear-gradient(135deg, #f0f9ff, #e0f2fe); 
+              border: 1px solid #0ea5e9; 
+              border-radius: 12px; 
+              padding: 25px; 
+              margin: 20px 0; 
+              position: relative;
+              box-shadow: 0 4px 20px rgba(14, 165, 233, 0.1);
+            }
+            .intro-box {
+              background: linear-gradient(135deg, #fef3c7, #fde68a);
+              border: 1px solid #f59e0b;
+              border-radius: 12px;
+              padding: 30px;
+              margin: 25px 0;
+              text-align: center;
+              box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1);
+            }
+            .intro-box h3 {
+              color: #92400e;
+              font-size: 22px;
+              margin-bottom: 15px;
+              font-weight: 700;
             }
             .action-table { 
               width: 100%; 
@@ -850,33 +870,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             * { box-sizing: border-box; }
             body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              margin: 0; padding: 0; line-height: 1.6; color: #2d3748; 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
+              margin: 0; padding: 0; line-height: 1.7; color: #1a202c; 
+              background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             }
             .container { 
-              max-width: 900px; margin: 0 auto; background: white; 
-              box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;
+              max-width: 950px; margin: 20px auto; background: white; 
+              box-shadow: 0 25px 50px rgba(0,0,0,0.08); border-radius: 16px; overflow: hidden;
+              border: 1px solid rgba(226, 232, 240, 0.6);
             }
             .header { 
-              text-align: center; padding: 40px 30px; 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-              color: white; position: relative;
+              text-align: center; padding: 50px 40px; 
+              background: linear-gradient(135deg, #4299e1 0%, #3182ce 50%, #2b77cb 100%); 
+              color: white; position: relative; border-radius: 16px 16px 0 0;
             }
             .header::before {
               content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
               background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1.5" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></svg>');
             }
             .profile-badge { 
-              display: inline-block; width: 100px; height: 100px; border-radius: 50%; 
-              background: rgba(255,255,255,0.15); color: white; font-size: 42px; 
-              font-weight: bold; line-height: 100px; text-align: center; margin: 20px 0;
-              border: 3px solid rgba(255,255,255,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+              display: inline-block; width: 120px; height: 120px; border-radius: 50%; 
+              background: rgba(255,255,255,0.2); color: white; font-size: 48px; 
+              font-weight: 800; line-height: 120px; text-align: center; margin: 25px 0;
+              border: 4px solid rgba(255,255,255,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.15);
             }
-            .content { padding: 40px; }
+            .content { padding: 45px; }
             .section { 
-              margin: 40px 0; padding: 30px; background: #f8fafc; 
-              border-radius: 12px; border: 1px solid #e2e8f0; position: relative;
+              margin: 45px 0; padding: 35px; background: #fdfdfe; 
+              border-radius: 16px; border: 1px solid #e2e8f0; position: relative;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             }
             .section::before {
               content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
