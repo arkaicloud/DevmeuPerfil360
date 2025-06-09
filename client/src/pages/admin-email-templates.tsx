@@ -131,8 +131,8 @@ Equipe MeuPerfil360
     },
     onSuccess: () => {
       toast({
-        title: "Templates salvos",
-        description: "Templates de email salvos com sucesso",
+        title: "Templates salvos no banco",
+        description: "Todos os templates foram persistidos com sucesso no banco de dados",
       });
     },
     onError: (error: any) => {

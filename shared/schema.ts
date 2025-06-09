@@ -70,7 +70,7 @@ export const adminConfigs = pgTable("admin_configs", {
 
 // Email templates table
 export const emailTemplates = pgTable("email_templates", {
-  id: varchar("id", { length: 255 }).primaryKey(),
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   subject: varchar("subject", { length: 500 }).notNull(),
   content: text("content").notNull(),

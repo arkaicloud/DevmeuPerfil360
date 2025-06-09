@@ -554,8 +554,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             target: adminConfigs.key,
             set: { value: config.value, updatedAt: new Date() }
           });
+        console.log(`Configuração ${config.key} salva no banco: ${config.value}`);
       }
 
+      console.log('Todas as configurações SMTP foram salvas no banco de dados');
       res.json({ message: "Configurações salvas com sucesso" });
     } catch (error: any) {
       console.error('Email config save error:', error);
@@ -588,26 +590,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const templates = req.body;
 
       for (const [templateId, template] of Object.entries(templates as any)) {
-        await db.insert(emailTemplates)
-          .values({
-            id: templateId,
-            name: template.name,
-            subject: template.subject,
-            content: template.content,
-            variables: template.variables,
-          })
-          .onConflictDoUpdate({
-            target: emailTemplates.id,
-            set: {
-              name: template.name,
-              subject: template.subject,
-              content: template.content,
-              variables: template.variables,
-              updatedAt: new Date()
-            }
-          });
+        const templateData = {
+          name: template.name,
+          subject: template.subject,
+          content: template.content,
+          variables: template.variables || [],
+          updatedAt: new Date()
+        };
+
+        // Update existing template by ID
+        await db.update(emailTemplates)
+          .set(templateData)
+          .where(eq(emailTemplates.id, parseInt(templateId)));
+        
+        console.log(`Template ${template.name} (ID: ${templateId}) atualizado no banco de dados`);
       }
 
+      console.log('Todos os templates de email foram salvos no banco de dados');
       res.json({ message: "Templates salvos com sucesso" });
     } catch (error: any) {
       console.error('Email templates save error:', error);

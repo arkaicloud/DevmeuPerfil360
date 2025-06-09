@@ -58,8 +58,8 @@ export default function AdminEmailConfig() {
     },
     onSuccess: () => {
       toast({
-        title: "Configurações salvas",
-        description: "Configurações SMTP salvas com sucesso",
+        title: "Configurações salvas no banco",
+        description: "Todas as configurações SMTP foram persistidas com sucesso",
       });
     },
     onError: (error: any) => {
