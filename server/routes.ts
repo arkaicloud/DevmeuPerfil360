@@ -1497,10 +1497,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             // Add floating download button
             function addDownloadButton() {
-              // Create container
-              const container = document.createElement('div');
-              container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px;';
-              
               // Create PDF button
               const pdfBtn = document.createElement('button');
               pdfBtn.innerHTML = \`
@@ -1509,9 +1505,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                Salvar PDF
+                Baixar PDF
               \`;
               pdfBtn.style.cssText = \`
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
                 background: linear-gradient(135deg, #4299e1, #3182ce);
                 color: white;
                 border: none;
@@ -1527,43 +1527,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 gap: 8px;
               \`;
               
-              // Create HTML button
-              const htmlBtn = document.createElement('button');
-              htmlBtn.innerHTML = \`
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M16 13L12 17L8 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M12 17V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                HTML
-              \`;
-              htmlBtn.style.cssText = \`
-                background: linear-gradient(135deg, #10b981, #059669);
-                color: white;
-                border: none;
-                border-radius: 12px;
-                padding: 12px 16px;
-                font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-                transition: all 0.2s ease;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-              \`;
-              htmlBtn.title = 'Baixar como HTML para converter em PDF offline';
-              
-              // Add event listeners
+              // Add event listener
               pdfBtn.addEventListener('click', function(e) {
                 console.log('PDF button clicked');
                 downloadCurrentPDF(e);
-              });
-              
-              htmlBtn.addEventListener('click', function(e) {
-                console.log('HTML button clicked');
-                downloadAsHTML(e);
               });
               
               // Add hover effects
@@ -1576,19 +1543,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 this.style.boxShadow = '0 4px 12px rgba(66, 153, 225, 0.3)';
               });
               
-              htmlBtn.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
-              });
-              htmlBtn.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
-              });
-              
-              // Append to container and then to body
-              container.appendChild(pdfBtn);
-              container.appendChild(htmlBtn);
-              document.body.appendChild(container);
+              // Append to body
+              document.body.appendChild(pdfBtn);
             }
             
             // Add keyboard shortcut
