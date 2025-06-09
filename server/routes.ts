@@ -1383,6 +1383,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .enhanced-section { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
             }
           </style>
+          <script>
+            function generateAndDownloadPDF() {
+              window.print();
+            }
+            
+            function downloadCurrentPDF() {
+              // Set a filename for the download
+              document.title = 'Relatório DISC Premium - ${testResult.guestName ? testResult.guestName.replace(/[^a-zA-Z0-9]/g, '-') : 'Usuario'}';
+              window.print();
+            }
+            
+            // Add floating download button
+            function addDownloadButton() {
+              const downloadBtn = document.createElement('div');
+              downloadBtn.innerHTML = \`
+                <button onclick="downloadCurrentPDF()" style="
+                  position: fixed;
+                  top: 20px;
+                  right: 20px;
+                  z-index: 1000;
+                  background: linear-gradient(135deg, #4299e1, #3182ce);
+                  color: white;
+                  border: none;
+                  border-radius: 12px;
+                  padding: 12px 20px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+                  transition: all 0.2s ease;
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(66, 153, 225, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(66, 153, 225, 0.3)'">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Baixar PDF
+                </button>
+              \`;
+              document.body.appendChild(downloadBtn);
+            }
+            
+            // Add keyboard shortcut
+            document.addEventListener('keydown', function(e) {
+              if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                downloadCurrentPDF();
+              }
+            });
+            
+            // Initialize download button when page loads
+            window.addEventListener('load', addDownloadButton);
+          </script>
         </head>
         <body class="profile-${testResult.profileType.toLowerCase()}">
           <!-- HEADER -->
