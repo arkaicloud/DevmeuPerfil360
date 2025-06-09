@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Home() {
   const [showDataForm, setShowDataForm] = useState(false);
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   const form = useForm<GuestTestData>({
     resolver: zodResolver(guestTestDataSchema),
@@ -25,7 +26,56 @@ export default function Home() {
   });
 
   const onSubmit = (data: GuestTestData) => {
-    sessionStorage.setItem("guestTestData", JSON.stringify(data));
+    // Security validation before submission
+    if (!clientRateLimit.isAllowed('test_start', 5, 600000)) { // 5 attempts per 10 minutes
+      toast({
+        title: "Muitas tentativas",
+        description: "Aguarde alguns minutos antes de iniciar outro teste.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Sanitize and validate input data
+    const sanitizedData: GuestTestData = {
+      name: sanitizeInput(data.name),
+      email: sanitizeInput(data.email.toLowerCase()),
+      whatsapp: sanitizeInput(data.whatsapp.replace(/\D/g, '')),
+    };
+
+    // Additional validation
+    if (!validateName(sanitizedData.name)) {
+      toast({
+        title: "Nome inválido",
+        description: "Por favor, verifique o nome informado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateEmail(sanitizedData.email)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, verifique o formato do email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateWhatsApp(sanitizedData.whatsapp)) {
+      toast({
+        title: "WhatsApp inválido",
+        description: "Por favor, verifique o número do WhatsApp.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Initialize secure session
+    initializeSecureSession();
+    
+    // Store data securely
+    secureStorage.setItem("guestTestData", JSON.stringify(sanitizedData));
     navigate("/test");
   };
 

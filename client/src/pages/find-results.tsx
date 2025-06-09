@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Search, Key } from "lucide-react";
+import { sanitizeInput, validateEmail, clientRateLimit } from "@/lib/security";
 
 const findResultSchema = z.object({
   identifier: z.string().min(5, "Digite um email ou WhatsApp válido"),
@@ -63,7 +64,33 @@ export default function FindResults() {
   });
 
   const onSubmit = (data: FindResultFormData) => {
-    findResultMutation.mutate(data);
+    // Security validation before submission
+    if (!clientRateLimit.isAllowed('find_results', 5, 300000)) { // 5 attempts per 5 minutes
+      toast({
+        title: "Muitas tentativas",
+        description: "Aguarde alguns minutos antes de buscar novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Sanitize input data
+    const sanitizedData: FindResultFormData = {
+      identifier: sanitizeInput(data.identifier.toLowerCase()),
+    };
+
+    // Additional validation
+    const isEmail = sanitizedData.identifier.includes('@');
+    if (isEmail && !validateEmail(sanitizedData.identifier)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, verifique o formato do email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    findResultMutation.mutate(sanitizedData);
   };
 
   return (

@@ -11,6 +11,7 @@ import { discQuestions } from "@/lib/disc-questions";
 import { type DiscAnswer, type GuestTestData } from "@shared/schema";
 import DiscQuestion from "@/components/disc-question";
 import TestProgress from "@/components/test-progress";
+import { secureStorage, validateSession, sanitizeInput, clientRateLimit } from "@/lib/security";
 
 export default function Test() {
   const [, navigate] = useLocation();
@@ -24,8 +25,18 @@ export default function Test() {
   const [guestData, setGuestData] = useState<GuestTestData | null>(null);
 
   useEffect(() => {
-    // Get guest data from sessionStorage
-    const storedData = sessionStorage.getItem("guestTestData");
+    // Validate session and get guest data securely
+    if (!validateSession()) {
+      toast({
+        title: "Sessão expirada",
+        description: "Por favor, reinicie o teste.",
+        variant: "destructive",
+      });
+      navigate("/");
+      return;
+    }
+
+    const storedData = secureStorage.getItem("guestTestData");
     if (!storedData) {
       toast({
         title: "Dados não encontrados",
