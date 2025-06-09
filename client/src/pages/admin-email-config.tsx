@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Brain, ArrowLeft, Save, TestTube } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import AdminNav from "@/components/admin-nav";
 
 interface EmailConfig {
   smtpHost: string;

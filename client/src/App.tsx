@@ -11,7 +11,7 @@ import Dashboard from "@/pages/dashboard";
 import FindResults from "@/pages/find-results";
 import Login from "@/pages/login";
 import AdminLogin from "@/pages/admin-login";
-import AdminDashboard from "@/pages/admin-dashboard";
+import AdminDashboard from "@/pages/admin-dashboard-new";
 import AdminEmailConfig from "@/pages/admin-email-config";
 import AdminEmailTemplates from "@/pages/admin-email-templates";
 import NotFound from "@/pages/not-found";
