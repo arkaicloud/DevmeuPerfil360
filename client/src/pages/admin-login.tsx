@@ -1,30 +1,96 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Brain, Lock, User } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Brain, Lock, User, Shield, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { securityManager, getSecureHeaders, validateAndSanitizeInput } from "@/lib/security-enhanced";
 
 export default function AdminLogin() {
   const [, navigate] = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [securityWarning, setSecurityWarning] = useState("");
+  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
+  const [lockoutTime, setLockoutTime] = useState<number | null>(null);
   const { toast } = useToast();
+
+  // Verificar tentativas de login na inicialização
+  useEffect(() => {
+    const check = securityManager.checkLoginAttempts('admin-login');
+    if (!check.allowed) {
+      setLockoutTime(check.lockoutTime || 0);
+      setSecurityWarning(`Conta bloqueada por ${check.lockoutTime} minutos devido a tentativas excessivas`);
+    }
+  }, []);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await apiRequest("POST", "/api/admin/login", credentials);
+      // Verificar rate limiting
+      const attemptCheck = securityManager.checkLoginAttempts('admin-login');
+      if (!attemptCheck.allowed) {
+        throw new Error(`Muitas tentativas. Tente novamente em ${attemptCheck.lockoutTime} minutos`);
+      }
+
+      // Detectar atividade suspeita
+      if (securityManager.detectSuspiciousActivity('admin-login', 3, 300000)) {
+        securityManager.securityLog('Atividade suspeita detectada', { email: credentials.email });
+        throw new Error('Atividade suspeita detectada. Aguarde alguns minutos');
+      }
+
+      // Validar e sanitizar dados
+      const sanitizedCredentials = validateAndSanitizeInput(credentials);
+      
+      if (!securityManager.validateEmail(sanitizedCredentials.email)) {
+        throw new Error('Email inválido');
+      }
+
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: getSecureHeaders(),
+        body: JSON.stringify(sanitizedCredentials)
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciais inválidas');
+      }
+
       return response.json();
     },
     onSuccess: (data) => {
-      localStorage.setItem("adminToken", JSON.stringify(data));
+      // Registrar login bem-sucedido
+      securityManager.recordLoginAttempt('admin-login', true);
+      securityManager.securityLog('Login administrativo bem-sucedido', { email: data.email });
+      
+      // Armazenar sessão segura
+      securityManager.setSecureSession(data.id, data);
+      
+      setSecurityWarning("");
+      setRemainingAttempts(null);
+      setLockoutTime(null);
+      
       navigate("/admin/dashboard");
     },
     onError: (error: any) => {
+      // Registrar tentativa falhada
+      securityManager.recordLoginAttempt('admin-login', false);
+      securityManager.securityLog('Tentativa de login falhada', { email, error: error.message });
+      
+      const attemptCheck = securityManager.checkLoginAttempts('admin-login');
+      
+      if (!attemptCheck.allowed) {
+        setLockoutTime(attemptCheck.lockoutTime || 0);
+        setSecurityWarning(`Conta bloqueada por ${attemptCheck.lockoutTime} minutos`);
+      } else if (attemptCheck.remainingAttempts) {
+        setRemainingAttempts(attemptCheck.remainingAttempts);
+        setSecurityWarning(`${attemptCheck.remainingAttempts} tentativas restantes`);
+      }
+
       toast({
         title: "Erro no login",
         description: error.message || "Credenciais inválidas",
@@ -35,6 +101,8 @@ export default function AdminLogin() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validações de segurança
     if (!email || !password) {
       toast({
         title: "Campos obrigatórios",
@@ -43,7 +111,30 @@ export default function AdminLogin() {
       });
       return;
     }
-    loginMutation.mutate({ email, password });
+
+    if (lockoutTime && lockoutTime > 0) {
+      toast({
+        title: "Conta bloqueada",
+        description: `Aguarde ${lockoutTime} minutos para tentar novamente`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Sanitizar entrada
+    const sanitizedEmail = securityManager.sanitizeInput(email);
+    const sanitizedPassword = password; // Não sanitizar senha para preservar caracteres especiais
+
+    if (!securityManager.validateEmail(sanitizedEmail)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, insira um email válido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    loginMutation.mutate({ email: sanitizedEmail, password: sanitizedPassword });
   };
 
   return (

@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import AdminNav from "@/components/admin-nav";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { securityManager } from "@/lib/security-enhanced";
 
 interface AdminStats {
   totalUsers: number;
@@ -55,7 +56,32 @@ export default function AdminDashboard() {
       setLocation('/admin/login');
       return;
     }
-    setIsAuthenticated(true);
+
+    // Verificar se é sessão antiga (JSON) ou nova (criptografada)
+    try {
+      // Tentar como sessão antiga primeiro
+      const sessionData = JSON.parse(adminToken);
+      if (sessionData && sessionData.id) {
+        // Migrar para sessão segura
+        securityManager.setSecureSession(sessionData.id, sessionData);
+        setIsAuthenticated(true);
+        return;
+      }
+    } catch {
+      // Tentar como sessão nova criptografada
+      try {
+        if (securityManager.validateSession(adminToken)) {
+          setIsAuthenticated(true);
+          return;
+        }
+      } catch (error) {
+        securityManager.securityLog('Sessão inválida detectada', { error });
+      }
+    }
+
+    // Se chegou aqui, sessão inválida
+    securityManager.clearSession();
+    setLocation('/admin/login');
   }, [setLocation]);
 
   const { data: stats, isLoading, error } = useQuery<AdminStats>({
