@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, User, Calendar, FileText, Plus, Crown, ChartPie } from "lucide-react";
+import { Brain, User, Calendar, FileText, Plus, Crown, ChartPie, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -133,6 +133,14 @@ export default function Dashboard() {
                 <p className="text-xs opacity-90">Painel do Usuário</p>
               </div>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="text-white hover:bg-white/20"
+            >
+              Início
+            </Button>
           </div>
         </header>
 
@@ -207,6 +215,36 @@ export default function Dashboard() {
       </header>
 
       <div className="p-6">
+        {/* Retest Alert - Show if user needs retesting */}
+        {needsRetesting() && (
+          <Card className="mb-6 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-amber-800 mb-1">
+                    ⏰ Hora do Seu Novo Teste DISC!
+                  </h3>
+                  <p className="text-sm text-amber-700 mb-3">
+                    Já se passaram {getDaysSinceLastTest()} dias desde seu último teste. 
+                    Sua personalidade pode ter evoluído! Recomendamos refazer o teste a cada 6 meses.
+                  </p>
+                  <Button 
+                    onClick={() => navigate("/")} 
+                    size="sm"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    <Brain className="w-4 h-4 mr-2" />
+                    Fazer Novo Teste DISC
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* User Info */}
         <Card className="mb-6">
           <CardHeader>
@@ -223,6 +261,11 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground">
                 <strong>Testes realizados:</strong> {dashboardData?.testResults?.length || 0}
               </p>
+              {dashboardData?.testResults?.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  <strong>Último teste:</strong> {getDaysSinceLastTest()} dias atrás
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -284,17 +327,44 @@ export default function Dashboard() {
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-3">
                         <p className="text-sm text-muted-foreground">
                           Perfil comportamental identificado
                         </p>
+                        <div className="text-xs text-muted-foreground">
+                          {format(new Date(result.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/results/${result.id}`)}
+                          className="flex-1"
                         >
-                          Ver Detalhes
+                          <FileText className="w-4 h-4 mr-1" />
+                          Ver Resultado
                         </Button>
+                        {result.isPremium ? (
+                          <Button
+                            size="sm"
+                            onClick={() => window.open(`/api/test/result/${result.id}/pdf`, '_blank')}
+                            className="bg-amber-600 hover:bg-amber-700 text-white"
+                          >
+                            <FileText className="w-4 h-4 mr-1" />
+                            PDF Premium
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                            onClick={() => navigate(`/checkout/${result.id}`)}
+                          >
+                            <Crown className="w-4 h-4 mr-1" />
+                            Premium
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
