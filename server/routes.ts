@@ -1391,39 +1391,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
             function downloadCurrentPDF() {
               // Set a filename for the download
               document.title = 'Relatório DISC Premium - ${testResult.guestName ? testResult.guestName.replace(/[^a-zA-Z0-9]/g, '-') : 'Usuario'}';
-              window.print();
+              
+              // Show loading feedback
+              const button = event.target.closest('button');
+              const originalText = button.innerHTML;
+              button.innerHTML = '<div style="width: 16px; height: 16px; border: 2px solid #ffffff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div> Abrindo...';
+              button.disabled = true;
+              
+              // Add CSS for spinner animation if not exists
+              if (!document.getElementById('spinner-style')) {
+                const style = document.createElement('style');
+                style.id = 'spinner-style';
+                style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+              }
+              
+              // Multiple fallback methods for PDF download
+              try {
+                // Method 1: Modern browsers with focus
+                window.focus();
+                setTimeout(() => {
+                  window.print();
+                  // Reset button after delay
+                  setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                  }, 1000);
+                }, 100);
+              } catch (error) {
+                console.log('Print method 1 failed, trying alternative');
+                
+                // Method 2: Direct print call
+                try {
+                  if (window.print) {
+                    window.print();
+                  } else {
+                    // Method 3: Create a new window for printing
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(document.documentElement.outerHTML);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+                  }
+                  // Reset button
+                  setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                  }, 1000);
+                } catch (fallbackError) {
+                  // Method 4: Alert user to use Ctrl+P
+                  alert('Por favor, use Ctrl+P (ou Cmd+P no Mac) para salvar como PDF');
+                  button.innerHTML = originalText;
+                  button.disabled = false;
+                }
+              }
             }
             
+            // Alternative download method using HTML download
+            function downloadAsHTML() {
+              try {
+                // Show loading feedback
+                const button = event.target.closest('button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<div style="width: 14px; height: 14px; border: 2px solid #ffffff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div> Baixando...';
+                button.disabled = true;
+                
+                const filename = 'Relatório-DISC-Premium-${testResult.guestName ? testResult.guestName.replace(/[^a-zA-Z0-9]/g, '-') : 'Usuario'}.html';
+                
+                // Create a complete HTML document with inline styles
+                const htmlContent = \`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>\${document.title}</title>
+  <style>
+    \${Array.from(document.styleSheets).map(sheet => {
+      try {
+        return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\\n');
+      } catch (e) {
+        return '';
+      }
+    }).join('\\n')}
+  </style>
+</head>
+<body>
+  \${document.body.innerHTML.replace(/<script[^>]*>.*?<\\/script>/gi, '')}
+</body>
+</html>\`;
+                
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  button.innerHTML = originalText;
+                  button.disabled = false;
+                }, 100);
+                
+              } catch (error) {
+                console.error('Download failed:', error);
+                alert('Erro ao baixar arquivo. Tente usar Ctrl+P para salvar como PDF.');
+                if (button) {
+                  button.innerHTML = originalText;
+                  button.disabled = false;
+                }
+              }
+            }
+
             // Add floating download button
             function addDownloadButton() {
               const downloadBtn = document.createElement('div');
               downloadBtn.innerHTML = \`
-                <button onclick="downloadCurrentPDF()" style="
-                  position: fixed;
-                  top: 20px;
-                  right: 20px;
-                  z-index: 1000;
-                  background: linear-gradient(135deg, #4299e1, #3182ce);
-                  color: white;
-                  border: none;
-                  border-radius: 12px;
-                  padding: 12px 20px;
-                  font-size: 14px;
-                  font-weight: 600;
-                  cursor: pointer;
-                  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-                  transition: all 0.2s ease;
-                  display: flex;
-                  align-items: center;
-                  gap: 8px;
-                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(66, 153, 225, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(66, 153, 225, 0.3)'">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  Baixar PDF
-                </button>
+                <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px;">
+                  <button onclick="downloadCurrentPDF()" style="
+                    background: linear-gradient(135deg, #4299e1, #3182ce);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 12px 20px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                  " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(66, 153, 225, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(66, 153, 225, 0.3)'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Salvar PDF
+                  </button>
+                  
+                  <button onclick="downloadAsHTML()" style="
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 12px 16px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                  " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(16, 185, 129, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" title="Baixar como HTML para converter em PDF offline">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M16 13L12 17L8 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 17V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    HTML
+                  </button>
+                </div>
               \`;
               document.body.appendChild(downloadBtn);
             }
