@@ -204,6 +204,22 @@ class SecurityManager {
     }
   }
 
+  // Reset de segurança para desenvolvimento
+  resetSecurityLimits(): void {
+    // Limpar tentativas de login
+    this.loginAttempts.clear();
+    
+    // Limpar atividades suspeitas
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('activity_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    this.securityLog('Limites de segurança resetados');
+  }
+
   // Validação de CSRF token
   generateCSRFToken(): string {
     const token = this.generateSecureToken();
@@ -218,6 +234,12 @@ class SecurityManager {
 
   // Detecção de atividade suspeita
   detectSuspiciousActivity(action: string, frequency: number = 10, windowMs: number = 60000): boolean {
+    // Modo desenvolvimento - limites mais flexíveis
+    if (import.meta.env.DEV) {
+      frequency = 15; // Mais tentativas permitidas em dev
+      windowMs = 30000; // Janela menor em dev
+    }
+    
     const key = `activity_${action}`;
     const now = Date.now();
     const activities = JSON.parse(localStorage.getItem(key) || '[]');

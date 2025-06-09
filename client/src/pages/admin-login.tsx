@@ -140,6 +140,17 @@ export default function AdminLogin() {
     loginMutation.mutate({ email: sanitizedEmail, password: sanitizedPassword });
   };
 
+  const handleResetSecurity = () => {
+    securityManager.resetSecurityLimits();
+    setSecurityWarning("");
+    setRemainingAttempts(null);
+    setLockoutTime(null);
+    toast({
+      title: "Limites resetados",
+      description: "Você pode tentar fazer login novamente",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -183,10 +194,28 @@ export default function AdminLogin() {
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-              disabled={loginMutation.isPending}
+              disabled={loginMutation.isPending || (lockoutTime !== null && lockoutTime > 0)}
             >
               {loginMutation.isPending ? "Entrando..." : "Entrar no Painel"}
             </Button>
+            
+            {(securityWarning || lockoutTime) && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleResetSecurity}
+                className="w-full text-orange-600 border-orange-300 hover:bg-orange-50"
+              >
+                Resetar Limites de Segurança (Dev)
+              </Button>
+            )}
+
+            {remainingAttempts && remainingAttempts <= 3 && (
+              <p className="text-sm text-orange-600 text-center">
+                {remainingAttempts} tentativas restantes
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>
