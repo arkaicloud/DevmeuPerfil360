@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { X, UserPlus, Check } from "lucide-react";
+import { sanitizeInput, validateEmail, clientRateLimit, initializeSecureSession } from "@/lib/security";
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -56,7 +57,35 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
   });
 
   const onSubmit = (data: Registration) => {
-    registerMutation.mutate(data);
+    // Security validation before submission
+    if (!clientRateLimit.isAllowed('registration', 3, 300000)) { // 3 attempts per 5 minutes
+      toast({
+        title: "Muitas tentativas",
+        description: "Aguarde alguns minutos antes de tentar novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Sanitize input data
+    const sanitizedData: Registration = {
+      ...data,
+      username: sanitizeInput(data.username),
+      email: sanitizeInput(data.email.toLowerCase()),
+      password: data.password, // Don't sanitize password as it may contain special chars
+    };
+
+    // Additional email validation
+    if (!validateEmail(sanitizedData.email)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, verifique o formato do email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    registerMutation.mutate(sanitizedData);
   };
 
   return (

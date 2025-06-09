@@ -340,7 +340,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create payment intent for premium upgrade
-  app.post("/api/create-payment-intent", async (req, res) => {
+  app.post("/api/create-payment-intent", [
+    sanitizeInput,
+    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
       const { testResultId } = req.body;
       const amount = 4700; // R$ 47,00 in cents
@@ -1909,7 +1913,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
 
   // Download PDF route - optimized HTML for browser-based PDF printing
-  app.get("/api/test/result/:id/download", async (req, res) => {
+  app.get("/api/test/result/:id/download", [
+    pdfLimiter,
+    sanitizeInput,
+    param('id').isInt({ min: 1 }).withMessage('ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
       const testId = parseInt(req.params.id);
       const testResult = await storage.getTestResult(testId);

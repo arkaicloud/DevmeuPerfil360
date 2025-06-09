@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { guestTestDataSchema, type GuestTestData } from "@shared/schema";
 import { Brain, Gift, ChartPie, FileText, User, MessageCircle, Mail, Shield } from "lucide-react";
+import { sanitizeInput, validateEmail, validateWhatsApp, validateName, clientRateLimit, secureStorage, initializeSecureSession } from "@/lib/security";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [showDataForm, setShowDataForm] = useState(false);
