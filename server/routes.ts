@@ -807,6 +807,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
               margin-bottom: 15px;
               font-weight: 700;
             }
+            
+            /* New Sections Styling */
+            .strengths-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 20px;
+              margin: 20px 0;
+            }
+            .strength-card {
+              background: linear-gradient(135deg, #f8fafc, #ffffff);
+              border-radius: 12px;
+              padding: 20px;
+              border-left: 4px solid #667eea;
+              box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            }
+            .strength-card.dominance { border-left-color: #e53e3e; }
+            .strength-card.influence { border-left-color: #dd6b20; }
+            .strength-card.stability { border-left-color: #38a169; }
+            .strength-card.conscientiousness { border-left-color: #3182ce; }
+            
+            .development-areas {
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+              margin: 20px 0;
+            }
+            .development-card {
+              background: linear-gradient(135deg, #fef3c7, #fef9e7);
+              border: 1px solid #f59e0b;
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 4px 15px rgba(245,158,11,0.1);
+            }
+            
+            .pressure-analysis {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 25px;
+              margin: 20px 0;
+            }
+            .pressure-card {
+              background: linear-gradient(135deg, #fee2e2, #fef2f2);
+              border: 1px solid #ef4444;
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 4px 15px rgba(239,68,68,0.1);
+            }
+            .pressure-strategies {
+              background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+              border: 1px solid #0ea5e9;
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 4px 15px rgba(14,165,233,0.1);
+            }
+            .strategy-item {
+              background: rgba(255,255,255,0.7);
+              padding: 12px;
+              margin: 10px 0;
+              border-radius: 8px;
+              border-left: 3px solid #0ea5e9;
+            }
+            
+            .support-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 20px;
+              margin: 20px 0;
+            }
+            .support-category {
+              background: linear-gradient(135deg, #f0fdf4, #f7fee7);
+              border: 1px solid #22c55e;
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 4px 15px rgba(34,197,94,0.1);
+            }
+            
+            /* Career Analysis Styling */
+            .career-analysis {
+              margin: 20px 0;
+            }
+            .career-overview {
+              background: linear-gradient(135deg, #eff6ff, #dbeafe);
+              border: 1px solid #3b82f6;
+              border-radius: 12px;
+              padding: 20px;
+              margin-bottom: 25px;
+              box-shadow: 0 4px 15px rgba(59,130,246,0.1);
+            }
+            .career-categories {
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+              margin: 20px 0;
+            }
+            .career-category {
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            }
+            .career-category.primary {
+              background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+              border: 1px solid #0ea5e9;
+            }
+            .career-category.secondary {
+              background: linear-gradient(135deg, #fef3c7, #fef9e7);
+              border: 1px solid #f59e0b;
+            }
+            .career-category.environment {
+              background: linear-gradient(135deg, #f0fdf4, #f7fee7);
+              border: 1px solid #22c55e;
+            }
+            .career-tips {
+              background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+              border: 1px solid #8b5cf6;
+              border-radius: 12px;
+              padding: 20px;
+              margin-top: 25px;
+              box-shadow: 0 4px 15px rgba(139,92,246,0.1);
+            }
+            .tip-item {
+              background: rgba(255,255,255,0.7);
+              padding: 12px;
+              margin: 10px 0;
+              border-radius: 8px;
+              border-left: 3px solid #8b5cf6;
+            }
             .action-table { 
               width: 100%; 
               border-collapse: collapse; 
@@ -1221,9 +1347,338 @@ export async function registerRoutes(app: Express): Promise<Server> {
             </div>
           </div>
 
-          <!-- PLANO DE AÇÃO -->
-          <div class="section">
-            <div class="section-title">🎯 Plano de Ação de 4 Semanas</div>
+          <!-- PRINCIPAIS PONTOS FORTES -->
+          <div class="enhanced-section">
+            <div class="section-title">💪 Principais Pontos Fortes</div>
+            <div class="strengths-grid">
+              ${testResult.profileType === 'D' ? `
+                <div class="strength-card dominance">
+                  <h4>🎯 Liderança Natural</h4>
+                  <p>Capacidade excepcional de tomar decisões rápidas e assumir responsabilidades em situações desafiadoras.</p>
+                </div>
+                <div class="strength-card dominance">
+                  <h4>⚡ Orientação para Resultados</h4>
+                  <p>Foco intenso em objetivos e metas, com determinação para superar obstáculos e alcançar o sucesso.</p>
+                </div>
+                <div class="strength-card dominance">
+                  <h4>🚀 Iniciativa e Proatividade</h4>
+                  <p>Tendência natural para iniciar projetos e buscar oportunidades de crescimento e inovação.</p>
+                </div>
+                <div class="strength-card dominance">
+                  <h4>💼 Visão Estratégica</h4>
+                  <p>Habilidade para enxergar o panorama geral e definir direções claras para equipes e organizações.</p>
+                </div>` :
+              testResult.profileType === 'I' ? `
+                <div class="strength-card influence">
+                  <h4>🌟 Comunicação Inspiradora</h4>
+                  <p>Capacidade excepcional de se conectar com pessoas e transmitir ideias de forma envolvente e motivadora.</p>
+                </div>
+                <div class="strength-card influence">
+                  <h4>🤝 Habilidades Interpessoais</h4>
+                  <p>Facilidade natural para construir relacionamentos, criar networking e trabalhar em equipe.</p>
+                </div>
+                <div class="strength-card influence">
+                  <h4>✨ Criatividade e Inovação</h4>
+                  <p>Pensamento criativo e capacidade de gerar soluções inovadoras para desafios complexos.</p>
+                </div>
+                <div class="strength-card influence">
+                  <h4>🎭 Adaptabilidade Social</h4>
+                  <p>Flexibilidade para se ajustar a diferentes contextos sociais e influenciar positivamente diversos grupos.</p>
+                </div>` :
+              testResult.profileType === 'S' ? `
+                <div class="strength-card stability">
+                  <h4>🤝 Colaboração Excepcional</h4>
+                  <p>Habilidade natural para trabalhar harmoniosamente em equipe e apoiar colegas em seus objetivos.</p>
+                </div>
+                <div class="strength-card stability">
+                  <h4>🛡️ Confiabilidade</h4>
+                  <p>Consistência e dependabilidade em todas as atividades, sendo uma pessoa em quem outros podem confiar.</p>
+                </div>
+                <div class="strength-card stability">
+                  <h4>👂 Escuta Ativa</h4>
+                  <p>Capacidade excepcional de ouvir, compreender e oferecer suporte emocional quando necessário.</p>
+                </div>
+                <div class="strength-card stability">
+                  <h4>⚖️ Equilíbrio e Paciência</h4>
+                  <p>Manutenção da calma em situações tensas e capacidade de mediar conflitos com sabedoria.</p>
+                </div>` : `
+                <div class="strength-card conscientiousness">
+                  <h4>🔍 Atenção aos Detalhes</h4>
+                  <p>Capacidade excepcional de identificar nuances e garantir precisão em todas as atividades.</p>
+                </div>
+                <div class="strength-card conscientiousness">
+                  <h4>📊 Pensamento Analítico</h4>
+                  <p>Habilidade para analisar dados, processos e situações de forma sistemática e objetiva.</p>
+                </div>
+                <div class="strength-card conscientiousness">
+                  <h4>🎯 Organização e Planejamento</h4>
+                  <p>Competência natural para estruturar processos, criar sistemas eficientes e manter a ordem.</p>
+                </div>
+                <div class="strength-card conscientiousness">
+                  <h4>✅ Qualidade e Excelência</h4>
+                  <p>Compromisso constante com padrões elevados e busca contínua pela perfeição nos resultados.</p>
+                </div>`}
+            </div>
+          </div>
+
+          <!-- ÁREAS DE DESENVOLVIMENTO -->
+          <div class="enhanced-section">
+            <div class="section-title">🌱 Áreas de Desenvolvimento</div>
+            <div class="development-areas">
+              ${testResult.profileType === 'D' ? `
+                <div class="development-card">
+                  <h4>🤝 Desenvolvimento da Paciência</h4>
+                  <p><strong>Oportunidade:</strong> Cultivar maior tolerância com processos que demandam tempo e com pessoas que têm ritmo diferente.</p>
+                  <p><strong>Ação:</strong> Praticar técnicas de mindfulness e reservar momentos para reflexão antes de tomar decisões importantes.</p>
+                </div>
+                <div class="development-card">
+                  <h4>👂 Escuta Ativa</h4>
+                  <p><strong>Oportunidade:</strong> Melhorar a capacidade de ouvir diferentes perspectivas antes de expressar opiniões.</p>
+                  <p><strong>Ação:</strong> Implementar a regra de fazer pelo menos duas perguntas antes de apresentar soluções.</p>
+                </div>
+                <div class="development-card">
+                  <h4>🎨 Flexibilidade de Abordagem</h4>
+                  <p><strong>Oportunidade:</strong> Desenvolver maior abertura para métodos alternativos de alcançar objetivos.</p>
+                  <p><strong>Ação:</strong> Experimentar deliberadamente abordagens diferentes em projetos de menor risco.</p>
+                </div>` :
+              testResult.profileType === 'I' ? `
+                <div class="development-card">
+                  <h4>🎯 Foco e Concentração</h4>
+                  <p><strong>Oportunidade:</strong> Desenvolver maior capacidade de manter atenção em tarefas detalhadas por períodos prolongados.</p>
+                  <p><strong>Ação:</strong> Usar técnicas como Pomodoro e criar ambientes livres de distrações para trabalho focado.</p>
+                </div>
+                <div class="development-card">
+                  <h4>📋 Organização e Planejamento</h4>
+                  <p><strong>Oportunidade:</strong> Melhorar habilidades de estruturação de projetos e gestão de tempo.</p>
+                  <p><strong>Ação:</strong> Implementar sistemas de organização visual como quadros Kanban e calendários estruturados.</p>
+                </div>
+                <div class="development-card">
+                  <h4>🔍 Atenção aos Detalhes</h4>
+                  <p><strong>Oportunidade:</strong> Desenvolver maior precisão na execução de tarefas que requerem exatidão.</p>
+                  <p><strong>Ação:</strong> Criar checklists detalhados e implementar processos de revisão sistemática.</p>
+                </div>` :
+              testResult.profileType === 'S' ? `
+                <div class="development-card">
+                  <h4>🚀 Assertividade</h4>
+                  <p><strong>Oportunidade:</strong> Desenvolver maior confiança para expressar opiniões e tomar iniciativas.</p>
+                  <p><strong>Ação:</strong> Praticar comunicação assertiva em situações de baixo risco e buscar feedback construtivo.</p>
+                </div>
+                <div class="development-card">
+                  <h4>⚡ Adaptação a Mudanças</h4>
+                  <p><strong>Oportunidade:</strong> Aumentar a flexibilidade e rapidez na adaptação a novas situações.</p>
+                  <p><strong>Ação:</strong> Expor-se gradualmente a pequenas mudanças e celebrar sucessos na adaptação.</p>
+                </div>
+                <div class="development-card">
+                  <h4>🎯 Definição de Limites</h4>
+                  <p><strong>Oportunidade:</strong> Aprender a estabelecer limites saudáveis para evitar sobrecarga.</p>
+                  <p><strong>Ação:</strong> Praticar dizer "não" de forma respeitosa e definir prioridades claras.</p>
+                </div>` : `
+                <div class="development-card">
+                  <h4>⚡ Agilidade na Tomada de Decisão</h4>
+                  <p><strong>Oportunidade:</strong> Desenvolver maior rapidez em decisões quando informações completas não estão disponíveis.</p>
+                  <p><strong>Ação:</strong> Estabelecer prazos para análises e praticar decisões baseadas em 80% das informações.</p>
+                </div>
+                <div class="development-card">
+                  <h4>🤝 Flexibilidade Interpessoal</h4>
+                  <p><strong>Oportunidade:</strong> Melhorar a adaptação ao estilo de comunicação de diferentes pessoas.</p>
+                  <p><strong>Ação:</strong> Estudar estilos de comunicação e praticar ajustar abordagem conforme o interlocutor.</p>
+                </div>
+                <div class="development-card">
+                  <h4>🎨 Tolerância à Ambiguidade</h4>
+                  <p><strong>Oportunidade:</strong> Desenvolver maior conforto com situações incertas ou pouco estruturadas.</p>
+                  <p><strong>Ação:</strong> Participar de projetos criativos e brainstormings sem agenda fixa.</p>
+                </div>`}
+            </div>
+          </div>
+
+          <!-- COMPORTAMENTO SOB PRESSÃO -->
+          <div class="enhanced-section">
+            <div class="section-title">⚠️ Comportamento Sob Pressão</div>
+            <div class="pressure-analysis">
+              <div class="pressure-card alert">
+                <h4>🚨 Padrões a Observar</h4>
+                ${testResult.profileType === 'D' ? `
+                  <ul>
+                    <li><strong>Impaciência Excessiva:</strong> Tendência a tomar decisões precipitadas sem consultar a equipe</li>
+                    <li><strong>Microgerenciamento:</strong> Dificuldade em delegar quando sob pressão intensa</li>
+                    <li><strong>Comunicação Direta Demais:</strong> Pode soar agressivo ou insensível em momentos críticos</li>
+                    <li><strong>Isolamento:</strong> Tendência a trabalhar sozinho quando deveria buscar apoio</li>
+                  </ul>
+                ` : testResult.profileType === 'I' ? `
+                  <ul>
+                    <li><strong>Dispersão:</strong> Dificuldade para manter foco em prioridades quando há múltiplas demandas</li>
+                    <li><strong>Evitação de Conflitos:</strong> Tendência a adiar conversas difíceis ou decisões impopulares</li>
+                    <li><strong>Sobrecarga Social:</strong> Pode se esgotar tentando manter todos satisfeitos</li>
+                    <li><strong>Procrastinação:</strong> Adiamento de tarefas administrativas ou detalhadas</li>
+                  </ul>
+                ` : testResult.profileType === 'S' ? `
+                  <ul>
+                    <li><strong>Resistência a Mudanças:</strong> Dificuldade para se adaptar rapidamente a novos processos</li>
+                    <li><strong>Sobrecarga Silenciosa:</strong> Tendência a assumir mais responsabilidades sem comunicar o estresse</li>
+                    <li><strong>Indecisão:</strong> Dificuldade para tomar decisões rápidas quando há conflito de interesses</li>
+                    <li><strong>Evitação de Confronto:</strong> Pode concordar superficialmente mas guardar ressentimentos</li>
+                  </ul>
+                ` : `
+                  <ul>
+                    <li><strong>Paralisia por Análise:</strong> Tendência a buscar informações excessivas antes de agir</li>
+                    <li><strong>Perfeccionismo Limitante:</strong> Dificuldade em aceitar soluções "boas o suficiente"</li>
+                    <li><strong>Crítica Excessiva:</strong> Pode focar demais em problemas e pouco em soluções</li>
+                    <li><strong>Isolamento Social:</strong> Tendência a se retirar quando se sente sobrecarregado</li>
+                  </ul>
+                `}
+              </div>
+              
+              <div class="pressure-strategies">
+                <h4>🛡️ Estratégias de Manejo</h4>
+                ${testResult.profileType === 'D' ? `
+                  <div class="strategy-item">
+                    <strong>Respire e Conte até 10:</strong> Antes de tomar decisões importantes, faça uma pausa de 10 segundos para avaliar impactos.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Consulte sua Equipe:</strong> Estabeleça o hábito de buscar pelo menos uma opinião externa antes de agir.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Exercícios de Descompressão:</strong> Pratique atividades físicas intensas para liberar tensão acumulada.
+                  </div>
+                ` : testResult.profileType === 'I' ? `
+                  <div class="strategy-item">
+                    <strong>Lista de Prioridades Visual:</strong> Use quadros ou aplicativos visuais para manter foco nas tarefas mais importantes.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Time-boxing:</strong> Defina blocos específicos de tempo para diferentes tipos de atividade.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Rede de Apoio:</strong> Mantenha contato regular com mentores ou colegas de confiança.
+                  </div>
+                ` : testResult.profileType === 'S' ? `
+                  <div class="strategy-item">
+                    <strong>Comunicação Proativa:</strong> Estabeleça check-ins regulares para expressar necessidades e preocupações.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Planejamento de Transições:</strong> Crie planos detalhados para mudanças, incluindo cronogramas graduais.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Técnicas de Relaxamento:</strong> Pratique meditação ou técnicas de respiração para manter a calma.
+                  </div>
+                ` : `
+                  <div class="strategy-item">
+                    <strong>Prazos para Análise:</strong> Defina limites de tempo para pesquisa e análise antes de tomar decisões.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Regra 80/20:</strong> Aceite soluções quando tiver 80% das informações necessárias.
+                  </div>
+                  <div class="strategy-item">
+                    <strong>Pausas Estruturadas:</strong> Programe intervalos regulares para recarregar a energia mental.
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+
+          <!-- FATORES DE APOIO -->
+          <div class="enhanced-section">
+            <div class="section-title">🤝 Fatores de Apoio</div>
+            <div class="support-grid">
+              <div class="support-category">
+                <h4>👥 Tipos de Pessoas que Complementam seu Perfil</h4>
+                ${testResult.profileType === 'D' ? `
+                  <ul>
+                    <li><strong>Perfis S (Estabilidade):</strong> Pessoas pacientes que podem ajudar a moderar sua intensidade</li>
+                    <li><strong>Perfis C (Conformidade):</strong> Indivíduos detalhistas que garantem qualidade nas execuções</li>
+                    <li><strong>Perfis I (Influência):</strong> Pessoas comunicativas que facilitam relacionamentos interpessoais</li>
+                  </ul>
+                ` : testResult.profileType === 'I' ? `
+                  <ul>
+                    <li><strong>Perfis C (Conformidade):</strong> Pessoas organizadas que ajudam na estruturação de ideias</li>
+                    <li><strong>Perfis D (Dominância):</strong> Indivíduos focados em resultados que direcionam a execução</li>
+                    <li><strong>Perfis S (Estabilidade):</strong> Pessoas estáveis que oferecem apoio emocional consistente</li>
+                  </ul>
+                ` : testResult.profileType === 'S' ? `
+                  <ul>
+                    <li><strong>Perfis D (Dominância):</strong> Pessoas decisivas que podem motivá-lo a tomar iniciativas</li>
+                    <li><strong>Perfis I (Influência):</strong> Indivíduos energéticos que trazem dinamismo e motivação</li>
+                    <li><strong>Perfis C (Conformidade):</strong> Pessoas estruturadas que ajudam no planejamento detalhado</li>
+                  </ul>
+                ` : `
+                  <ul>
+                    <li><strong>Perfis I (Influência):</strong> Pessoas comunicativas que facilitam interações sociais</li>
+                    <li><strong>Perfis D (Dominância):</strong> Indivíduos decisivos que aceleram processos de tomada de decisão</li>
+                    <li><strong>Perfis S (Estabilidade):</strong> Pessoas empáticas que oferecem suporte emocional</li>
+                  </ul>
+                `}
+              </div>
+              
+              <div class="support-category">
+                <h4>🌍 Ambientes Ideais de Trabalho</h4>
+                ${testResult.profileType === 'D' ? `
+                  <ul>
+                    <li>Ambientes com autonomia e liberdade para tomar decisões</li>
+                    <li>Organizações que valorizam resultados mais que processos</li>
+                    <li>Culturas empresariais orientadas para inovação e crescimento</li>
+                    <li>Equipes pequenas e ágeis com comunicação direta</li>
+                  </ul>
+                ` : testResult.profileType === 'I' ? `
+                  <ul>
+                    <li>Ambientes colaborativos com interação social frequente</li>
+                    <li>Organizações que valorizam criatividade e inovação</li>
+                    <li>Culturas empresariais abertas e comunicativas</li>
+                    <li>Espaços flexíveis que permitem mobilidade e dinamismo</li>
+                  </ul>
+                ` : testResult.profileType === 'S' ? `
+                  <ul>
+                    <li>Ambientes estáveis com mudanças graduais e planejadas</li>
+                    <li>Organizações que valorizam trabalho em equipe e colaboração</li>
+                    <li>Culturas empresariais que priorizam bem-estar dos funcionários</li>
+                    <li>Espaços tranquilos que promovem concentração e harmonia</li>
+                  </ul>
+                ` : `
+                  <ul>
+                    <li>Ambientes organizados com processos claros e definidos</li>
+                    <li>Organizações que valorizam qualidade e precisão</li>
+                    <li>Culturas empresariais que respeitam expertise técnica</li>
+                    <li>Espaços estruturados que minimizam distrações</li>
+                  </ul>
+                `}
+              </div>
+              
+              <div class="support-category">
+                <h4>🛠️ Ferramentas e Recursos Úteis</h4>
+                ${testResult.profileType === 'D' ? `
+                  <ul>
+                    <li><strong>Apps de Produtividade:</strong> Todoist, Asana para gestão de projetos</li>
+                    <li><strong>Dashboards:</strong> Ferramentas de BI para acompanhar métricas em tempo real</li>
+                    <li><strong>Comunicação Direta:</strong> Slack, Teams para comunicação rápida</li>
+                    <li><strong>Automação:</strong> Zapier, Power Automate para otimizar processos</li>
+                  </ul>
+                ` : testResult.profileType === 'I' ? `
+                  <ul>
+                    <li><strong>Ferramentas Visuais:</strong> Miro, Canva para criação e brainstorming</li>
+                    <li><strong>Redes Sociais Profissionais:</strong> LinkedIn para networking</li>
+                    <li><strong>Calendários Visuais:</strong> Google Calendar com cores e categorias</li>
+                    <li><strong>Apresentações:</strong> Prezi, PowerPoint para comunicação dinâmica</li>
+                  </ul>
+                ` : testResult.profileType === 'S' ? `
+                  <ul>
+                    <li><strong>Organizadores Pessoais:</strong> Notion, Evernote para planejamento</li>
+                    <li><strong>Comunicação Suave:</strong> Email, mensagens diretas para interações</li>
+                    <li><strong>Ferramentas de Bem-estar:</strong> Headspace, Calm para relaxamento</li>
+                    <li><strong>Colaboração:</strong> Google Workspace para trabalho em equipe</li>
+                  </ul>
+                ` : `
+                  <ul>
+                    <li><strong>Análise de Dados:</strong> Excel, Power BI para análises detalhadas</li>
+                    <li><strong>Documentação:</strong> Confluence, SharePoint para organização</li>
+                    <li><strong>Controle de Qualidade:</strong> Checklists digitais e templates</li>
+                    <li><strong>Pesquisa:</strong> Zotero, Mendeley para gestão de referências</li>
+                  </ul>
+                `}
+              </div>
+            </div>
+          </div>
+
+          <!-- PLANO DE AÇÃO APRIMORADO -->
+          <div class="enhanced-section">
+            <div class="section-title">🎯 Plano de Ação Personalizado de 4 Semanas</div>
             
             <table class="action-table">
               <thead>
