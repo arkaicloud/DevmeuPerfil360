@@ -357,9 +357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Associate any guest tests with this user's email to their account
       try {
         await storage.associateGuestTestsWithUser(user.email, userId);
-        console.log(`Testes de convidado associados ao usuário ${user.email}`);
       } catch (error) {
-        console.log("Erro ao associar testes de convidado:", error);
         // Continue even if association fails
       }
 
@@ -380,7 +378,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Sort by creation date (newest first)
-      allResults.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      allResults.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
       
       // Transform test results to match expected format
       const formattedResults = allResults.map(result => ({
@@ -392,7 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: result.createdAt
       }));
 
-      console.log(`Dashboard carregado para ${user.email} - ${formattedResults.length} testes encontrados`);
+
 
       res.json({
         user: {

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Brain, User, Calendar, FileText, Plus, Crown, ChartPie, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [, navigate] = useLocation();
   const params = useParams();
   const userId = params.userId;
+  const [showRetestDialog, setShowRetestDialog] = useState(false);
 
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
     queryKey: [`/api/user/${userId}/dashboard`],
@@ -38,12 +40,19 @@ export default function Dashboard() {
     staleTime: 30000, // 30 seconds
   });
 
-  // Log da query status
+  // Check if popup should be shown for 6+ month retest
   useEffect(() => {
-    if (userId) {
-      console.log("Query status:", { userId, isLoading, error: !!error, dataExists: !!dashboardData });
+    if (dashboardData?.testResults && dashboardData.testResults.length > 0 && needsRetesting()) {
+      const lastShown = localStorage.getItem('lastRetestPopup');
+      const today = new Date().toDateString();
+      
+      // Show popup if not shown today
+      if (lastShown !== today) {
+        setShowRetestDialog(true);
+        localStorage.setItem('lastRetestPopup', today);
+      }
     }
-  }, [userId, isLoading, error, dashboardData]);
+  }, [dashboardData]);
 
   const getProfileBadgeVariant = (profileType: string) => {
     switch (profileType) {
@@ -420,6 +429,43 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
+
+      {/* Retest Popup Dialog */}
+      <AlertDialog open={showRetestDialog} onOpenChange={setShowRetestDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-amber-700">
+              <AlertTriangle className="w-5 h-5" />
+              Hora do Seu Novo Teste DISC!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600">
+              Já se passaram mais de 6 meses desde seu último teste DISC. Sua personalidade pode ter evoluído! 
+              <br /><br />
+              <strong>Por que refazer o teste?</strong>
+              <br />• Suas experiências moldam seu comportamento
+              <br />• Desenvolvimento pessoal e profissional
+              <br />• Resultados mais precisos e atualizados
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowRetestDialog(false)}
+            >
+              Lembrar Depois
+            </Button>
+            <AlertDialogAction
+              onClick={() => {
+                setShowRetestDialog(false);
+                navigate("/");
+              }}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+            >
+              Fazer Novo Teste Agora
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
