@@ -1235,6 +1235,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .profile-s .footer { background: linear-gradient(135deg, #38a169, #2f855a); }
             .profile-c .footer { background: linear-gradient(135deg, #3182ce, #2c5aa0); }
             
+            /* Ensure footer text is always readable on colored backgrounds */
+            .profile-d .footer-logo,
+            .profile-i .footer-logo,
+            .profile-s .footer-logo,
+            .profile-c .footer-logo { color: white !important; text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important; }
+            
+            .profile-d .contact-info p:last-child,
+            .profile-i .contact-info p:last-child,
+            .profile-s .contact-info p:last-child,
+            .profile-c .contact-info p:last-child { color: white !important; }
+            
             /* Enhanced typography */
             .report-title {
               font-size: 32px; font-weight: 800; text-transform: uppercase;
@@ -2140,6 +2151,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .profile-i .footer { background: linear-gradient(135deg, #dd6b20, #c05621) !important; }
             .profile-s .footer { background: linear-gradient(135deg, #38a169, #2f855a) !important; }
             .profile-c .footer { background: linear-gradient(135deg, #3182ce, #2c5aa0) !important; }
+            
+            /* Ensure footer text is always readable on colored backgrounds */
+            .profile-d .footer-logo,
+            .profile-i .footer-logo,
+            .profile-s .footer-logo,
+            .profile-c .footer-logo { color: white !important; text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important; }
+            
+            .profile-d .contact-info p:last-child,
+            .profile-i .contact-info p:last-child,
+            .profile-s .contact-info p:last-child,
+            .profile-c .contact-info p:last-child { color: white !important; }
           </style>
           <script>
             function printPDF() {
