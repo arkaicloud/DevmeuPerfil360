@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,35 +28,8 @@ interface DashboardData {
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Try to get user from localStorage first (from login)
-    const storedUser = localStorage.getItem("currentUser");
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        console.log("Usuário encontrado no localStorage:", user);
-        console.log("ID do usuário:", user.id, "Tipo:", typeof user.id);
-        setUserId(user.id.toString());
-      } catch (error) {
-        console.error("Erro ao processar dados do usuário:", error);
-        localStorage.removeItem("currentUser");
-        navigate("/login");
-      }
-    } else {
-      // Fallback: try to extract from URL path
-      const path = window.location.pathname;
-      const id = path.split('/').pop();
-      if (id && !isNaN(Number(id))) {
-        console.log("ID do usuário extraído da URL:", id);
-        setUserId(id);
-      } else {
-        console.log("Redirecionando para login - usuário não encontrado");
-        navigate("/login");
-      }
-    }
-  }, [navigate]);
+  const params = useParams();
+  const userId = params.userId;
 
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
     queryKey: [`/api/user/${userId}/dashboard`],
