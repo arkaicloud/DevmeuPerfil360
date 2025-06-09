@@ -287,11 +287,6 @@ export default function Dashboard() {
               <FileText className="w-5 h-5" />
               Histórico de Testes ({dashboardData?.testResults?.length || 0})
             </CardTitle>
-            {process.env.NODE_ENV === 'development' && (
-              <div className="text-xs text-muted-foreground">
-                Debug: UserID={userId}, Tests={JSON.stringify(dashboardData?.testResults?.map(t => t.id) || [])}
-              </div>
-            )}
           </CardHeader>
           <CardContent>
             {!dashboardData?.testResults || dashboardData.testResults.length === 0 ? (
