@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
@@ -9,6 +10,9 @@ import {
 } from "@shared/schema";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
 import bcrypt from "bcrypt";
+import { body, param, query, validationResult } from "express-validator";
+import rateLimit from "express-rate-limit";
+import { v4 as uuidv4 } from "uuid";
 // import puppeteer from "puppeteer"; // Disabled due to system dependencies
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -19,10 +23,80 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-04-30.basil",
 });
 
+// Security validation middleware
+const validateRequest = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      error: 'Dados inválidos fornecidos',
+      details: errors.array()
+    });
+  }
+  next();
+};
+
+// Input sanitization middleware
+const sanitizeInput = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+  // Sanitize all string inputs to prevent XSS
+  const sanitizeObj = (obj: any): any => {
+    if (typeof obj === 'string') {
+      return obj.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(sanitizeObj);
+    }
+    if (obj && typeof obj === 'object') {
+      const sanitized: any = {};
+      for (const key in obj) {
+        sanitized[key] = sanitizeObj(obj[key]);
+      }
+      return sanitized;
+    }
+    return obj;
+  };
+
+  if (req.body) {
+    req.body = sanitizeObj(req.body);
+  }
+  if (req.query) {
+    req.query = sanitizeObj(req.query);
+  }
+  if (req.params) {
+    req.params = sanitizeObj(req.params);
+  }
+  next();
+};
+
+// Enhanced rate limiting for test submissions
+const testSubmissionLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // limit each IP to 3 test submissions per hour
+  message: {
+    error: 'Limite de testes atingido. Tente novamente em 1 hora.',
+  },
+});
+
+// Rate limiting for PDF generation
+const pdfLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // limit each IP to 10 PDF requests per 5 minutes
+  message: {
+    error: 'Muitas solicitações de PDF. Tente novamente em alguns minutos.',
+  },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Submit DISC test for guest users
-  app.post("/api/test/submit", async (req, res) => {
+  app.post("/api/test/submit", [
+    testSubmissionLimiter,
+    sanitizeInput,
+    body('guestData.email').isEmail().normalizeEmail().withMessage('Email inválido'),
+    body('guestData.name').isLength({ min: 2, max: 100 }).trim().escape().withMessage('Nome deve ter entre 2 e 100 caracteres'),
+    body('guestData.whatsapp').isMobilePhone('pt-BR').withMessage('WhatsApp inválido'),
+    body('answers').isArray({ min: 1, max: 50 }).withMessage('Respostas inválidas'),
+    validateRequest
+  ], async (req, res) => {
     try {
       const validatedData = discTestSubmissionSchema.parse(req.body);
       const { guestData, answers } = validatedData;
@@ -59,7 +133,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Submit DISC test for registered users
-  app.post("/api/test/submit-user", async (req, res) => {
+  app.post("/api/test/submit-user", [
+    testSubmissionLimiter,
+    sanitizeInput,
+    body('userId').isInt({ min: 1 }).withMessage('User ID inválido'),
+    body('answers').isArray({ min: 1, max: 50 }).withMessage('Respostas inválidas'),
+    validateRequest
+  ], async (req, res) => {
     try {
       const { userId, answers } = req.body;
 
