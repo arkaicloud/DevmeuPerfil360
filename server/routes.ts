@@ -6,8 +6,15 @@ import { storage } from "./storage";
 import { 
   discTestSubmissionSchema, 
   registrationSchema,
-  guestTestDataSchema
+  guestTestDataSchema,
+  users,
+  testResults,
+  payments,
+  adminConfigs,
+  emailTemplates
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, sql } from "drizzle-orm";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
 import bcrypt from "bcrypt";
 import { body, param, query, validationResult } from "express-validator";
