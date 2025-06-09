@@ -92,6 +92,22 @@ export default function Dashboard() {
     }
   };
 
+  // Calculate if user needs retesting (6+ months)
+  const needsRetesting = () => {
+    if (!dashboardData?.testResults?.length) return false;
+    const lastTest = new Date(dashboardData.testResults[0].createdAt);
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    return lastTest < sixMonthsAgo;
+  };
+
+  const getDaysSinceLastTest = () => {
+    if (!dashboardData?.testResults?.length) return 0;
+    const lastTest = new Date(dashboardData.testResults[0].createdAt);
+    const now = new Date();
+    return Math.floor((now.getTime() - lastTest.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -104,23 +120,40 @@ export default function Dashboard() {
     console.error("Dashboard error details:", error);
     console.log("Current userId:", userId);
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-destructive">Erro ao carregar dashboard.</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              {error ? `Erro: ${error.message}` : "Dados não encontrados"}
-            </p>
-            <div className="mt-4 space-x-2">
-              <Button onClick={() => window.location.reload()} variant="outline">
-                Tentar Novamente
-              </Button>
-              <Button onClick={() => navigate("/")} className="mt-4">
-                Voltar ao Início
-              </Button>
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
+        {/* Header */}
+        <header className="psychology-gradient text-white p-4 safe-area-top">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold">MeuPerfil360</h1>
+                <p className="text-xs opacity-90">Painel do Usuário</p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </header>
+
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-destructive">Erro ao carregar dashboard.</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {error ? `Erro: ${error.message}` : "Dados não encontrados"}
+              </p>
+              <div className="mt-4 space-x-2">
+                <Button onClick={() => window.location.reload()} variant="outline">
+                  Tentar Novamente
+                </Button>
+                <Button onClick={() => navigate("/")} className="mt-4">
+                  Voltar ao Início
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

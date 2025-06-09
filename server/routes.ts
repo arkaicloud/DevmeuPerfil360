@@ -338,11 +338,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // User dashboard endpoint
+  app.get("/api/user/:userId/dashboard", [
+    sanitizeInput,
+    param('userId').isInt({ min: 1 }).withMessage('User ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Get user data
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Get user's test results
+      const testResults = await storage.getTestResultsByUser(userId);
+      
+      // Transform test results to match expected format
+      const formattedResults = testResults.map(result => ({
+        id: result.id,
+        testType: "DISC",
+        profileType: result.profileType,
+        scores: typeof result.scores === 'string' ? JSON.parse(result.scores) : result.scores,
+        isPremium: result.isPremium,
+        createdAt: result.createdAt
+      }));
+
+      res.json({
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
+        },
+        testResults: formattedResults
+      });
+    } catch (error: any) {
+      console.error('Dashboard error:', error);
+      res.status(500).json({ 
+        message: "Erro ao carregar dashboard",
+        error: error.message 
+      });
+    }
+  });
   
   // Create payment intent for premium upgrade
   app.post("/api/create-payment-intent", [
     sanitizeInput,
-    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    body('testResultId').isInt({ min: 1 }).withMessage('Test ID inválido'),
     validateRequest
   ], async (req: any, res: any) => {
     try {
