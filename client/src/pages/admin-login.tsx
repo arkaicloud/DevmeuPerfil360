@@ -43,12 +43,17 @@ export default function AdminLogin() {
         throw new Error('Atividade suspeita detectada. Aguarde alguns minutos');
       }
 
-      // Validar e sanitizar dados
-      const sanitizedCredentials = validateAndSanitizeInput(credentials);
+      // Validar email e sanitizar apenas o email (não a senha)
+      const sanitizedEmail = securityManager.sanitizeInput(credentials.email);
       
-      if (!securityManager.validateEmail(sanitizedCredentials.email)) {
+      if (!securityManager.validateEmail(sanitizedEmail)) {
         throw new Error('Email inválido');
       }
+
+      const loginData = {
+        email: sanitizedEmail,
+        password: credentials.password // Manter senha original
+      };
 
       const response = await fetch('/api/admin/login', {
         method: 'POST',
@@ -56,7 +61,7 @@ export default function AdminLogin() {
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify(sanitizedCredentials)
+        body: JSON.stringify(loginData)
       });
 
       if (!response.ok) {
