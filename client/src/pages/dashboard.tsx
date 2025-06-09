@@ -55,6 +55,26 @@ export default function Dashboard() {
     }
   };
 
+  const getProfileColor = (profileType: string) => {
+    switch (profileType) {
+      case "D": return "bg-red-500 text-white";
+      case "I": return "bg-orange-500 text-white";
+      case "S": return "bg-green-500 text-white";
+      case "C": return "bg-blue-500 text-white";
+      default: return "bg-gray-500 text-white";
+    }
+  };
+
+  const getProfileGradient = (profileType: string) => {
+    switch (profileType) {
+      case "D": return "from-red-500 to-red-600";
+      case "I": return "from-orange-500 to-orange-600";
+      case "S": return "from-green-500 to-green-600";
+      case "C": return "from-blue-500 to-blue-600";
+      default: return "from-gray-500 to-gray-600";
+    }
+  };
+
   const getProfileName = (profileType: string) => {
     switch (profileType) {
       case "D": return "Dominante";
@@ -219,25 +239,33 @@ export default function Dashboard() {
         )}
 
         {/* User Info */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Bem-vindo, {dashboardData?.user?.username || "Usuário"}
+        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <div className="text-gray-800">Bem-vindo, {dashboardData?.user?.username || "Usuário"}</div>
+                <div className="text-sm text-blue-600 font-normal">Seu Painel Pessoal DISC</div>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                <strong>Email:</strong> {dashboardData?.user?.email || "N/A"}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                <strong>Testes realizados:</strong> {dashboardData?.testResults?.length || 0}
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white/70 rounded-lg p-3 border border-blue-100">
+                <div className="text-xs text-blue-600 font-medium">EMAIL</div>
+                <div className="text-sm text-gray-700 font-medium">{dashboardData?.user?.email || "N/A"}</div>
+              </div>
+              <div className="bg-white/70 rounded-lg p-3 border border-purple-100">
+                <div className="text-xs text-purple-600 font-medium">TESTES REALIZADOS</div>
+                <div className="text-sm text-gray-700 font-medium">{dashboardData?.testResults?.length || 0}</div>
+              </div>
               {dashboardData?.testResults?.length > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  <strong>Último teste:</strong> {getDaysSinceLastTest()} dias atrás
-                </p>
+                <div className="bg-white/70 rounded-lg p-3 border border-green-100">
+                  <div className="text-xs text-green-600 font-medium">ÚLTIMO TESTE</div>
+                  <div className="text-sm text-gray-700 font-medium">{getDaysSinceLastTest()} dias atrás</div>
+                </div>
               )}
             </div>
           </CardContent>
@@ -349,38 +377,43 @@ export default function Dashboard() {
 
         {/* Statistics */}
         {dashboardData?.testResults && dashboardData.testResults.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ChartPie className="w-5 h-5" />
-                Suas Estatísticas
+          <Card className="mt-6 bg-gradient-to-r from-indigo-50 to-blue-50 border-indigo-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
+                  <ChartPie className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="text-gray-800">Suas Estatísticas DISC</div>
+                  <div className="text-sm text-indigo-600 font-normal">Análise do seu progresso</div>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-                  <div className="text-2xl font-bold psychology-blue">
+                <div className="text-center p-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl text-white shadow-lg">
+                  <div className="text-3xl font-bold mb-1">
                     {dashboardData.testResults.length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Testes Realizados</div>
+                  <div className="text-sm text-blue-100">Testes Realizados</div>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-                  <div className="text-2xl font-bold psychology-purple">
+                <div className="text-center p-5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl text-white shadow-lg">
+                  <div className="text-3xl font-bold mb-1">
                     {dashboardData.testResults.filter(r => r.isPremium).length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Relatórios Premium</div>
+                  <div className="text-sm text-purple-100">Relatórios Premium</div>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
+                <div className="text-center p-5 bg-gradient-to-br from-green-500 to-green-600 rounded-xl text-white shadow-lg">
+                  <div className="text-3xl font-bold mb-1">
                     {new Set(dashboardData.testResults.map(r => r.profileType)).size}
                   </div>
-                  <div className="text-sm text-muted-foreground">Perfis Descobertos</div>
+                  <div className="text-sm text-green-100">Perfis Descobertos</div>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg">
-                  <div className="text-2xl font-bold text-amber-600">
+                <div className="text-center p-5 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl text-white shadow-lg">
+                  <div className="text-3xl font-bold mb-1">
                     {Math.round((Date.now() - new Date(dashboardData.testResults[0]?.createdAt || Date.now()).getTime()) / (1000 * 60 * 60 * 24)) || 0}
                   </div>
-                  <div className="text-sm text-muted-foreground">Dias desde primeiro teste</div>
+                  <div className="text-sm text-amber-100">Dias desde primeiro teste</div>
                 </div>
               </div>
             </CardContent>
