@@ -5,16 +5,23 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode } from "lucide-react";
+import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, X } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+let stripePromise: Promise<any> | null = null;
+
+try {
+  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
+    console.error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+  } else {
+    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  }
+} catch (error) {
+  console.error('Failed to initialize Stripe:', error);
 }
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = ({ testId }: { testId: string }) => {
   const stripe = useStripe();
@@ -275,24 +282,50 @@ export default function Checkout() {
         </Card>
 
         {/* Payment Form */}
-        <Elements 
-          stripe={stripePromise} 
-          options={{ 
-            clientSecret,
-            appearance: {
-              theme: 'stripe',
-              variables: {
-                colorPrimary: 'hsl(207, 90%, 54%)',
-                colorBackground: 'hsl(0, 0%, 100%)',
-                colorText: 'hsl(215, 25%, 20%)',
-                colorDanger: 'hsl(0, 84%, 60%)',
-                borderRadius: '12px',
+        {stripePromise && clientSecret ? (
+          <Elements 
+            stripe={stripePromise} 
+            options={{ 
+              clientSecret,
+              appearance: {
+                theme: 'stripe',
+                variables: {
+                  colorPrimary: 'hsl(207, 90%, 54%)',
+                  colorBackground: 'hsl(0, 0%, 100%)',
+                  colorText: 'hsl(215, 25%, 20%)',
+                  colorDanger: 'hsl(0, 84%, 60%)',
+                  borderRadius: '12px',
+                },
               },
-            },
-          }}
-        >
-          <CheckoutForm testId={testId!} />
-        </Elements>
+            }}
+          >
+            <CheckoutForm testId={testId!} />
+          </Elements>
+        ) : (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+                  <X className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-foreground">Erro ao carregar pagamento</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Não foi possível inicializar o sistema de pagamento. Tente novamente em alguns minutos.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => navigate(`/results/${testId}`)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar aos Resultados
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Security Notice */}
         <Card className="mt-6 bg-primary/5 border-primary/20">
