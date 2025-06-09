@@ -21,7 +21,7 @@ export default function AdminLogin() {
       return response.json();
     },
     onSuccess: (data) => {
-      localStorage.setItem("adminSession", JSON.stringify(data));
+      localStorage.setItem("adminToken", JSON.stringify(data));
       navigate("/admin/dashboard");
     },
     onError: (error: any) => {
