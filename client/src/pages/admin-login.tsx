@@ -52,7 +52,10 @@ export default function AdminLogin() {
 
       const response = await fetch('/api/admin/login', {
         method: 'POST',
-        headers: getSecureHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
         body: JSON.stringify(sanitizedCredentials)
       });
 
