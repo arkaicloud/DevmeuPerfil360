@@ -50,7 +50,7 @@ export default function AdminNav({ onLogout }: AdminNavProps) {
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 via-orange-500 to-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">MP</span>
               </div>
               <div>
@@ -71,14 +71,14 @@ export default function AdminNav({ onLogout }: AdminNavProps) {
                     className={cn(
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
                       isActive
-                        ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                        ? "bg-gradient-to-r from-red-50 to-orange-50 text-red-700 border-r-2 border-red-500"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     )}
                   >
                     <Icon
                       className={cn(
                         "mr-3 h-5 w-5 flex-shrink-0",
-                        isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"
+                        isActive ? "text-red-500" : "text-gray-400 group-hover:text-gray-500"
                       )}
                     />
                     <div className="flex flex-col">
@@ -108,7 +108,7 @@ export default function AdminNav({ onLogout }: AdminNavProps) {
       <div className="lg:hidden bg-white shadow-sm border-b">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-red-500 via-orange-500 to-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">MP</span>
             </div>
             <div>

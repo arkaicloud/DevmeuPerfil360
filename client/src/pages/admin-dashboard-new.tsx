@@ -114,13 +114,13 @@ export default function AdminDashboard() {
     );
   }
 
-  // Prepare chart data
+  // Prepare chart data with MeuPerfil360 colors
   const monthlyData = stats?.monthlyStats || [];
   const profileData = [
-    { name: 'Dominância', value: 25, color: '#ef4444' },
-    { name: 'Influência', value: 30, color: '#f97316' },
-    { name: 'Estabilidade', value: 20, color: '#22c55e' },
-    { name: 'Conformidade', value: 25, color: '#3b82f6' }
+    { name: 'Dominância', value: 25, color: '#dc2626' }, // Red - D
+    { name: 'Influência', value: 30, color: '#ea580c' }, // Orange - I
+    { name: 'Estabilidade', value: 20, color: '#16a34a' }, // Green - S
+    { name: 'Conformidade', value: 25, color: '#2563eb' } // Blue - C
   ];
 
   const conversionRate = stats ? ((stats.premiumReports / stats.totalTests) * 100).toFixed(1) : '0';
@@ -204,8 +204,8 @@ export default function AdminDashboard() {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#3b82f6" name="Usuários" />
-                    <Line type="monotone" dataKey="tests" stroke="#10b981" name="Testes" />
+                    <Line type="monotone" dataKey="users" stroke="#dc2626" name="Usuários" strokeWidth={3} />
+                    <Line type="monotone" dataKey="tests" stroke="#ea580c" name="Testes" strokeWidth={3} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="revenue" fill="#3b82f6" name="Receita (R$)" />
+                  <Bar dataKey="revenue" fill="#dc2626" name="Receita (R$)" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
