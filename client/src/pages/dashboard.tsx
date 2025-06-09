@@ -171,31 +171,31 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white p-4 safe-area-top">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
+      <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white p-6 shadow-xl sticky top-0 z-50">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center space-x-4">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
+              <Brain className="w-7 h-7 text-white drop-shadow-sm" />
             </div>
             <div>
-              <h1 className="text-lg font-bold">MeuPerfil360</h1>
-              <p className="text-xs opacity-90">Dashboard</p>
+              <h1 className="text-2xl font-bold tracking-wide drop-shadow-sm">MeuPerfil360</h1>
+              <p className="text-sm text-indigo-100 font-medium">Painel Pessoal DISC</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
+              size="default"
+              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={() => navigate("/")}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Novo Teste
+              Novo Teste DISC
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
+              size="default"
+              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-4 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={() => {
                 localStorage.removeItem("currentUser");
                 navigate("/login");

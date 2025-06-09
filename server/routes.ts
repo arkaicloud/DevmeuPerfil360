@@ -354,11 +354,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
 
-      // Get user's test results
+      // Associate any guest tests with this user's email to their account
+      try {
+        await storage.associateGuestTestsWithUser(user.email, userId);
+        console.log(`Testes de convidado associados ao usuário ${user.email}`);
+      } catch (error) {
+        console.log("Erro ao associar testes de convidado:", error);
+        // Continue even if association fails
+      }
+
+      // Get user's test results (now including previously guest tests)
       const testResults = await storage.getTestResultsByUser(userId);
       
+      // Also get any remaining guest tests by email that might not have been associated
+      const guestTestResults = await storage.getTestResultsByEmail(user.email);
+      
+      // Combine and deduplicate results
+      const allResults = [...testResults];
+      
+      // Add guest tests that aren't already in user tests
+      for (const guestTest of guestTestResults) {
+        if (!allResults.find(test => test.id === guestTest.id)) {
+          allResults.push(guestTest);
+        }
+      }
+      
+      // Sort by creation date (newest first)
+      allResults.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
       // Transform test results to match expected format
-      const formattedResults = testResults.map(result => ({
+      const formattedResults = allResults.map(result => ({
         id: result.id,
         testType: "DISC",
         profileType: result.profileType,
@@ -366,6 +391,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isPremium: result.isPremium,
         createdAt: result.createdAt
       }));
+
+      console.log(`Dashboard carregado para ${user.email} - ${formattedResults.length} testes encontrados`);
 
       res.json({
         user: {

@@ -24,10 +24,12 @@ export interface IStorage {
   createTestResult(testResult: InsertTestResult): Promise<TestResult>;
   getTestResult(id: number): Promise<TestResult | undefined>;
   getTestResultsByUser(userId: number): Promise<TestResult[]>;
+  getTestResultsByEmail(email: string): Promise<TestResult[]>;
   getTestResultByGuest(email: string): Promise<TestResult | undefined>;
   getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined>;
   getTestResultsByName(name: string): Promise<TestResult[]>;
   updateTestResultPremium(id: number, paymentId: string): Promise<TestResult>;
+  associateGuestTestsWithUser(email: string, userId: number): Promise<void>;
 
   // Payment operations
   createPayment(payment: InsertPayment): Promise<Payment>;
@@ -92,6 +94,21 @@ export class DatabaseStorage implements IStorage {
       .from(testResults)
       .where(eq(testResults.userId, userId))
       .orderBy(desc(testResults.createdAt));
+  }
+
+  async getTestResultsByEmail(email: string): Promise<TestResult[]> {
+    return await db
+      .select()
+      .from(testResults)
+      .where(eq(testResults.guestEmail, email))
+      .orderBy(desc(testResults.createdAt));
+  }
+
+  async associateGuestTestsWithUser(email: string, userId: number): Promise<void> {
+    await db
+      .update(testResults)
+      .set({ userId: userId })
+      .where(eq(testResults.guestEmail, email));
   }
 
   async getTestResultByGuest(email: string): Promise<TestResult | undefined> {
