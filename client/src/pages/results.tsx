@@ -288,7 +288,14 @@ export default function Results() {
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <h2 className="mobile-title font-bold text-foreground mb-2">Parabéns, {testResult.guestName || 'Usuário'}!</h2>
-            <p className="mobile-text text-muted-foreground">Seu teste foi concluído com sucesso</p>
+            <p className="mobile-text text-muted-foreground mb-4">Seu teste foi concluído com sucesso</p>
+            <Button 
+              onClick={() => navigate("/")} 
+              variant="outline"
+              className="mx-auto"
+            >
+              Voltar ao Início
+            </Button>
           </div>
         </div>
 
