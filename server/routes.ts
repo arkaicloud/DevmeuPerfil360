@@ -1229,6 +1229,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .profile-s .header { background: linear-gradient(135deg, #38a169, #2f855a); }
             .profile-c .header { background: linear-gradient(135deg, #3182ce, #2c5aa0); }
             
+            /* Profile-specific footer colors - matching header */
+            .profile-d .footer { background: linear-gradient(135deg, #e53e3e, #c53030); }
+            .profile-i .footer { background: linear-gradient(135deg, #dd6b20, #c05621); }
+            .profile-s .footer { background: linear-gradient(135deg, #38a169, #2f855a); }
+            .profile-c .footer { background: linear-gradient(135deg, #3182ce, #2c5aa0); }
+            
             /* Enhanced typography */
             .report-title {
               font-size: 32px; font-weight: 800; text-transform: uppercase;
@@ -2128,6 +2134,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               margin-bottom: 0; font-weight: 600; color: #0066cc; text-align: center;
               font-size: 16px; padding-top: 15px; border-top: 1px solid rgba(0,102,204,0.2);
             }
+            
+            /* Profile-specific footer colors - matching header */
+            .profile-d .footer { background: linear-gradient(135deg, #e53e3e, #c53030) !important; }
+            .profile-i .footer { background: linear-gradient(135deg, #dd6b20, #c05621) !important; }
+            .profile-s .footer { background: linear-gradient(135deg, #38a169, #2f855a) !important; }
+            .profile-c .footer { background: linear-gradient(135deg, #3182ce, #2c5aa0) !important; }
           </style>
           <script>
             function printPDF() {
@@ -2138,7 +2150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           </script>
         </head>
-        <body>
+        <body class="profile-${testResult.profileType.toLowerCase()}">
           <div class="print-controls no-print">
             <div style="font-size: 14px; margin-bottom: 10px;">📄 Relatório DISC Premium</div>
             <button class="print-btn" onclick="printPDF()">🖨️ Imprimir/Salvar PDF</button>
