@@ -7,6 +7,9 @@ import cors from "cors";
 
 const app = express();
 
+// Trust proxy for rate limiting to work correctly behind proxies
+app.set('trust proxy', 1);
+
 // Security Headers
 app.use(helmet({
   contentSecurityPolicy: {

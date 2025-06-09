@@ -24,7 +24,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 // Security validation middleware
-const validateRequest = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+const validateRequest = (req: any, res: any, next: any) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -36,7 +36,7 @@ const validateRequest = (req: Express.Request, res: Express.Response, next: Expr
 };
 
 // Input sanitization middleware
-const sanitizeInput = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+const sanitizeInput = (req: any, res: any, next: any) => {
   // Sanitize all string inputs to prevent XSS
   const sanitizeObj = (obj: any): any => {
     if (typeof obj === 'string') {
@@ -189,7 +189,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get test result
-  app.get("/api/test/result/:id", async (req, res) => {
+  app.get("/api/test/result/:id", [
+    sanitizeInput,
+    param('id').isInt({ min: 1 }).withMessage('ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
       const testId = parseInt(req.params.id);
       const testResult = await storage.getTestResult(testId);
@@ -228,7 +232,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Find test result by email or WhatsApp
-  app.post("/api/test/find", async (req, res) => {
+  app.post("/api/test/find", [
+    sanitizeInput,
+    body('identifier').isLength({ min: 3, max: 100 }).trim().withMessage('Identificador inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
       const { identifier } = req.body;
       
@@ -275,7 +283,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upgrade test to premium after successful payment
-  app.post("/api/test/upgrade/:testId", async (req, res) => {
+  app.post("/api/test/upgrade/:testId", [
+    sanitizeInput,
+    param('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    body('paymentIntentId').isLength({ min: 10, max: 100 }).withMessage('Payment Intent ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
       const testId = parseInt(req.params.testId);
       const { paymentIntentId } = req.body;
@@ -515,7 +528,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate PDF report for premium test results
-  app.get("/api/test/result/:id/pdf", async (req, res) => {
+  app.get("/api/test/result/:id/pdf", [
+    pdfLimiter,
+    sanitizeInput,
+    param('id').isInt({ min: 1 }).withMessage('ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
       const testId = parseInt(req.params.id);
       const testResult = await storage.getTestResult(testId);
