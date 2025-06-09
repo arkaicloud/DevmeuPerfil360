@@ -214,7 +214,7 @@ export default function Test() {
                 {currentQuestion.text}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Escolha a opção que MAIS se identifica com você (MA) e a que MENOS se identifica (ME)
+                Escolha a opção que MAIS se identifica com você e a que MENOS se identifica
               </p>
             </div>
 

@@ -70,26 +70,26 @@ export default function DiscQuestion({
                   size="sm"
                   variant={selectedMost === option.id ? "default" : "outline"}
                   className={cn(
-                    "w-10 h-8 text-xs font-bold rounded-full transition-all duration-200",
+                    "w-12 h-8 text-xs font-bold rounded-full transition-all duration-200",
                     selectedMost === option.id ? "bg-accent text-white" : "border-accent text-accent hover:bg-accent hover:text-white"
                   )}
                   onClick={() => handleMostClick(option.id)}
                   disabled={selectedLeast === option.id}
                 >
-                  MA
+                  MAIS
                 </Button>
                 <Button
                   type="button"
                   size="sm"
                   variant={selectedLeast === option.id ? "destructive" : "outline"}
                   className={cn(
-                    "w-10 h-8 text-xs font-bold rounded-full transition-all duration-200",
+                    "w-14 h-8 text-xs font-bold rounded-full transition-all duration-200",
                     selectedLeast === option.id ? "bg-destructive text-white" : "border-destructive text-destructive hover:bg-destructive hover:text-white"
                   )}
                   onClick={() => handleLeastClick(option.id)}
                   disabled={selectedMost === option.id}
                 >
-                  ME
+                  MENOS
                 </Button>
               </div>
             </div>
