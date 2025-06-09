@@ -507,7 +507,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Email configuration management
   app.get("/api/admin/email-config", async (req: any, res: any) => {
     try {
-      const configs = await db.select().from(adminConfigs).where(sql`key LIKE 'smtp_%'`);
+      const allConfigs = await db.select().from(adminConfigs);
+      const configs = allConfigs.filter(c => c.key.startsWith('smtp_') || c.key.startsWith('from_'));
+      
+      console.log('Todas as configurações encontradas:', configs);
       
       const emailConfig = {
         smtpHost: configs.find(c => c.key === 'smtp_host')?.value || '',
@@ -518,6 +521,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fromEmail: configs.find(c => c.key === 'from_email')?.value || '',
         fromName: configs.find(c => c.key === 'from_name')?.value || 'MeuPerfil360',
       };
+      
+      console.log('Configurações processadas:', emailConfig);
 
       res.json(emailConfig);
     } catch (error: any) {
