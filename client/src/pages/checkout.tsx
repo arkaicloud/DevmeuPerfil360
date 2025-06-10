@@ -189,6 +189,7 @@ export default function Checkout() {
   const [testId, setTestId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [stripeLoadError, setStripeLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -197,6 +198,11 @@ export default function Checkout() {
       setTestId(id);
     } else {
       navigate("/");
+    }
+
+    // Check if Stripe is properly configured
+    if (!stripePromise) {
+      setStripeLoadError("Sistema de pagamento não configurado. Entre em contato com o suporte.");
     }
   }, [navigate]);
 

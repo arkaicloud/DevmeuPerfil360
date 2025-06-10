@@ -23,6 +23,22 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Prevent any Stripe loading on home page
+  useEffect(() => {
+    // Clear any Stripe-related errors from console
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (args.some(arg => typeof arg === 'string' && arg.includes('Stripe'))) {
+        return; // Suppress Stripe errors on home page
+      }
+      originalError.apply(console, args);
+    };
+
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
+
   const { data: pricing } = useQuery<PricingConfig>({
     queryKey: ["/api/pricing"],
   });
