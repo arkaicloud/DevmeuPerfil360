@@ -58,9 +58,18 @@ const strictLimiter = rateLimit({
   },
 });
 
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 3, // Very strict for admin operations
+  message: {
+    error: 'Muitas tentativas de login administrativo. Tente novamente em 15 minutos.',
+  },
+});
+
 app.use('/api/', limiter);
 app.use('/api/auth/', strictLimiter);
 app.use('/api/payment/', strictLimiter);
+app.use('/api/admin/', adminLimiter);
 
 // Body parsing with size limits
 app.use(express.json({ limit: '10mb' }));
@@ -99,12 +108,23 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    // Log error details for debugging (but don't expose sensitive info)
+    console.error(`Error ${status} on ${req.method} ${req.path}:`, {
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+
+    // Don't expose stack traces in production
+    const responseMessage = process.env.NODE_ENV === 'production' && status === 500 
+      ? "Erro interno do servidor" 
+      : message;
+
+    res.status(status).json({ message: responseMessage });
   });
 
   // importantly only setup vite in development and after

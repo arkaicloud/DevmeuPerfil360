@@ -99,10 +99,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/test/submit", [
     testSubmissionLimiter,
     sanitizeInput,
-    body('guestData.email').isEmail().normalizeEmail().withMessage('Email inválido'),
-    body('guestData.name').isLength({ min: 2, max: 100 }).trim().escape().withMessage('Nome deve ter entre 2 e 100 caracteres'),
+    body('guestData.email').isEmail().normalizeEmail().withMessage('Email inválido').isLength({ max: 254 }),
+    body('guestData.name').isLength({ min: 2, max: 100 }).trim().escape().matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('Nome deve conter apenas letras e espaços'),
     body('guestData.whatsapp').isMobilePhone('pt-BR').withMessage('WhatsApp inválido'),
-    body('answers').isArray({ min: 1, max: 50 }).withMessage('Respostas inválidas'),
+    body('answers').isArray({ min: 24, max: 24 }).withMessage('Deve conter exatamente 24 respostas'),
+    body('answers.*').isIn(['a', 'b', 'c', 'd']).withMessage('Resposta deve ser a, b, c ou d'),
     validateRequest
   ], async (req: any, res: any) => {
     try {
@@ -529,8 +530,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
-      // Check admin credentials
-      if (email !== "adm@meuperfil360.com.br" || password !== "=e42E8O6{Xt'") {
+      // Check admin credentials from environment variables
+      const adminEmail = process.env.ADMIN_EMAIL || "adm@meuperfil360.com.br";
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      
+      if (!adminPassword) {
+        console.error("ADMIN_PASSWORD não definida nas variáveis de ambiente");
+        return res.status(500).json({ message: "Configuração de admin inválida" });
+      }
+      
+      if (email !== adminEmail || password !== adminPassword) {
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
 
@@ -1304,6 +1313,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     param('id').isInt({ min: 1 }).withMessage('ID inválido'),
     validateRequest
   ], async (req: any, res: any) => {
+    // Set timeout for PDF generation
+    req.setTimeout(30000); // 30 seconds timeout
+    
     try {
       const testId = parseInt(req.params.id);
       const testResult = await storage.getTestResult(testId);
