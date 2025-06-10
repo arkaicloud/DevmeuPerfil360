@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Brain, ArrowLeft, Save, TestTube } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Brain, ArrowLeft, Save, TestTube, Mail, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminNav from "@/components/admin-nav";
@@ -34,7 +35,8 @@ export default function AdminEmailConfig() {
     fromName: "MeuPerfil360",
   });
 
-  const [testEmail, setTestEmail] = useState("");
+  const [testEmail, setTestEmail] = useState("leosouzaa10@gmail.com");
+  const [emailType, setEmailType] = useState<string>("welcome");
 
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -96,12 +98,71 @@ export default function AdminEmailConfig() {
     },
   });
 
+  const sendTestEmailMutation = useMutation({
+    mutationFn: async ({ email, type }: { email: string; type: string }) => {
+      const response = await apiRequest("POST", "/api/admin/send-test-email", {
+        email,
+        emailType: type,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Email enviado com sucesso",
+        description: data.message,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao enviar email",
+        description: error.message || "Falha ao enviar email",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const initTemplatesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/init-email-templates", {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Templates inicializados",
+        description: data.message,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao inicializar templates",
+        description: error.message || "Falha ao inicializar templates",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSave = () => {
     saveMutation.mutate(config);
   };
 
   const handleTest = () => {
     testMutation.mutate();
+  };
+
+  const handleSendTestEmail = () => {
+    if (!testEmail || !emailType) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Selecione o tipo de email e informe o destinatário",
+        variant: "destructive",
+      });
+      return;
+    }
+    sendTestEmailMutation.mutate({ email: testEmail, type: emailType });
+  };
+
+  const handleInitTemplates = () => {
+    initTemplatesMutation.mutate();
   };
 
   const handleLogout = () => {

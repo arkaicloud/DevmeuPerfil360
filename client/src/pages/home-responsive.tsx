@@ -237,11 +237,10 @@ export default function Home() {
           </div>
         </div>
       </header>
-
       {/* Hero Section */}
       <div className="mobile-padding">
         <div className="responsive-container">
-          <div className="text-center mb-12">
+          <div className="text-center mt-[25px] mb-[25px]">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
               <Brain className="w-10 h-10 text-white" />
             </div>

@@ -711,6 +711,236 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send test emails to specific users
+  app.post("/api/admin/send-test-email", [
+    sanitizeInput,
+    body('email').isEmail().withMessage('Email deve ser válido'),
+    body('emailType').isIn(['welcome', 'test_completion', 'premium_upgrade', 'retest_reminder']).withMessage('Tipo de email inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const { email, emailType } = req.body;
+      
+      console.log(`Enviando email de teste do tipo ${emailType} para ${email}`);
+      
+      let emailSent = false;
+      
+      switch (emailType) {
+        case 'welcome':
+          emailSent = await emailService.sendWelcomeEmail(email, 'Usuário Teste');
+          break;
+        case 'test_completion':
+          emailSent = await emailService.sendTestCompletionEmail(email, 'Usuário Teste', 'D', '123');
+          break;
+        case 'premium_upgrade':
+          emailSent = await emailService.sendPremiumUpgradeEmail(email, 'Usuário Teste', 'D', '123');
+          break;
+        case 'retest_reminder':
+          emailSent = await emailService.sendRetestReminderEmail(email, 'Usuário Teste', 180);
+          break;
+        default:
+          return res.status(400).json({ message: "Tipo de email não suportado" });
+      }
+      
+      if (emailSent) {
+        res.json({ 
+          message: `Email ${emailType} enviado com sucesso para ${email}`,
+          success: true
+        });
+      } else {
+        res.status(500).json({ 
+          message: `Erro ao enviar email ${emailType} para ${email}`,
+          success: false
+        });
+      }
+    } catch (error: any) {
+      console.error('Send test email error:', error);
+      res.status(500).json({ 
+        message: "Erro ao enviar email de teste: " + error.message,
+        success: false
+      });
+    }
+  });
+
+  // Initialize default email templates
+  app.post("/api/admin/init-email-templates", async (req: any, res: any) => {
+    try {
+      const defaultTemplates = [
+        {
+          name: 'welcome',
+          subject: 'Bem-vindo ao MeuPerfil360! 🎉',
+          content: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #4F46E5; margin: 0;">MeuPerfil360</h1>
+                <p style="color: #666; margin: 5px 0;">Descubra seu perfil comportamental</p>
+              </div>
+              
+              <h2 style="color: #333;">Olá, {{userName}}!</h2>
+              
+              <p>Seja muito bem-vindo(a) ao MeuPerfil360! 🚀</p>
+              
+              <p>Sua conta foi criada com sucesso e agora você tem acesso completo à nossa plataforma de análise DISC.</p>
+              
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #4F46E5; margin-top: 0;">O que você pode fazer agora:</h3>
+                <ul style="color: #555;">
+                  <li>Realizar testes DISC ilimitados</li>
+                  <li>Acessar seus resultados históricos</li>
+                  <li>Fazer upgrade para relatórios premium</li>
+                  <li>Acompanhar sua evolução comportamental</li>
+                </ul>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{{loginUrl}}" style="background: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                  Acessar Minha Conta
+                </a>
+              </div>
+              
+              <p style="color: #666; font-size: 14px;">
+                Dúvidas? Estamos aqui para ajudar! Entre em contato: {{supportEmail}}
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                MeuPerfil360 - Sua jornada de autoconhecimento começa aqui
+              </p>
+            </div>
+          `,
+          variables: ['userName', 'loginUrl', 'supportEmail']
+        },
+        {
+          name: 'test_completion',
+          subject: 'Seu Teste DISC foi concluído! Perfil {{profileType}} identificado',
+          content: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #4F46E5; margin: 0;">MeuPerfil360</h1>
+                <p style="color: #666; margin: 5px 0;">Seus resultados estão prontos!</p>
+              </div>
+              
+              <h2 style="color: #333;">Parabéns, {{userName}}! 🎉</h2>
+              
+              <p>Seu teste DISC foi concluído com sucesso!</p>
+              
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0;">
+                <h3 style="margin: 0 0 10px 0; font-size: 24px;">Seu Perfil: {{profileType}}</h3>
+                <p style="margin: 0; font-size: 18px; opacity: 0.9;">{{profileName}}</p>
+              </div>
+              
+              <p>Descubra insights profundos sobre seu comportamento, pontos fortes e áreas de desenvolvimento.</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{{resultUrl}}" style="background: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-right: 10px;">
+                  Ver Meus Resultados
+                </a>
+                <a href="{{upgradeUrl}}" style="background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                  Relatório Premium
+                </a>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                MeuPerfil360 - Transforme autoconhecimento em crescimento
+              </p>
+            </div>
+          `,
+          variables: ['userName', 'profileType', 'profileName', 'resultUrl', 'upgradeUrl']
+        },
+        {
+          name: 'premium_upgrade',
+          subject: 'Seu Relatório Premium está pronto! 📊',
+          content: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #4F46E5; margin: 0;">MeuPerfil360</h1>
+                <p style="color: #666; margin: 5px 0;">Relatório Premium Disponível</p>
+              </div>
+              
+              <h2 style="color: #333;">Obrigado, {{userName}}! 🎉</h2>
+              
+              <p>Seu upgrade para Premium foi processado com sucesso!</p>
+              
+              <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0;">
+                <h3 style="margin: 0 0 10px 0; font-size: 24px;">✨ Acesso Premium Ativado</h3>
+                <p style="margin: 0; opacity: 0.9;">Perfil {{profileType}} - {{profileName}}</p>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{{pdfUrl}}" style="background: #DC2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                  📄 Download PDF
+                </a>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                MeuPerfil360 - Relatório Premium para seu crescimento
+              </p>
+            </div>
+          `,
+          variables: ['userName', 'profileType', 'profileName', 'pdfUrl', 'dashboardUrl']
+        },
+        {
+          name: 'retest_reminder',
+          subject: 'Hora de refazer seu teste DISC! ⏰',
+          content: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #4F46E5; margin: 0;">MeuPerfil360</h1>
+                <p style="color: #666; margin: 5px 0;">Lembrete de Reteste</p>
+              </div>
+              
+              <h2 style="color: #333;">Olá, {{userName}}! 👋</h2>
+              
+              <p>Já se passaram {{daysSinceLastTest}} dias desde seu último teste DISC.</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{{testUrl}}" style="background: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                  🧠 Fazer Novo Teste DISC
+                </a>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                MeuPerfil360 - Evolua continuamente com autoconhecimento
+              </p>
+            </div>
+          `,
+          variables: ['userName', 'daysSinceLastTest', 'testUrl']
+        }
+      ];
+
+      // Insert or update default templates
+      for (const template of defaultTemplates) {
+        await db.insert(emailTemplates)
+          .values(template)
+          .onConflictDoUpdate({
+            target: emailTemplates.name,
+            set: {
+              subject: template.subject,
+              content: template.content,
+              variables: template.variables,
+              updatedAt: new Date()
+            }
+          });
+      }
+
+      console.log('Templates de email padrão inicializados com sucesso');
+      res.json({ 
+        message: "Templates padrão criados com sucesso", 
+        count: defaultTemplates.length,
+        success: true
+      });
+    } catch (error: any) {
+      console.error("Error initializing email templates:", error);
+      res.status(500).json({ 
+        message: "Erro ao inicializar templates de email: " + error.message,
+        success: false
+      });
+    }
+  });
+
   // Test email functionality
   app.post("/api/admin/test-email", [
     sanitizeInput,
