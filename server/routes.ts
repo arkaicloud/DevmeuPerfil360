@@ -380,6 +380,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check user test limits
+  app.get("/api/user/:userId/test-limits", [
+    sanitizeInput,
+    param('userId').isInt({ min: 1 }).withMessage('User ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      const limits = await storage.checkUserTestLimits(userId);
+      res.json(limits);
+    } catch (error: any) {
+      console.error("Error checking test limits:", error);
+      res.status(500).json({ error: "Failed to check test limits" });
+    }
+  });
+
   // User dashboard endpoint
   app.get("/api/user/:userId/dashboard", [
     sanitizeInput,

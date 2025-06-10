@@ -20,6 +20,9 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId?: string): Promise<User>;
+  checkUserTestLimits(userId: number): Promise<{ canTakeTest: boolean; reason?: string; testsRemaining?: number }>;
+  consumeUserTest(userId: number): Promise<void>;
+  grantPremiumAccess(userId: number, testsCount?: number): Promise<void>;
 
   // Test result operations
   createTestResult(testResult: InsertTestResult): Promise<TestResult>;
@@ -73,6 +76,81 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+
+  async checkUserTestLimits(userId: number): Promise<{ canTakeTest: boolean; reason?: string; testsRemaining?: number }> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      return { canTakeTest: false, reason: "Usuário não encontrado" };
+    }
+
+    // Count total tests taken by user
+    const userTests = await db.select().from(testResults).where(eq(testResults.userId, userId));
+    const totalTests = userTests.length;
+
+    // If user has premium active and tests remaining
+    const premiumTests = user.premiumTestsRemaining ?? 0;
+    if (user.isPremiumActive && premiumTests > 0) {
+      return { 
+        canTakeTest: true, 
+        testsRemaining: premiumTests
+      };
+    }
+
+    // If user never took a test and is not premium (free test)
+    if (totalTests === 0 && user.freeTestsUsed === 0) {
+      return { 
+        canTakeTest: true, 
+        testsRemaining: 1 
+      };
+    }
+
+    // If user already used free test and is not premium
+    if (!user.isPremiumActive) {
+      return { 
+        canTakeTest: false, 
+        reason: "Você já utilizou seu teste gratuito. Faça upgrade para premium para continuar." 
+      };
+    }
+
+    // If premium user has no tests remaining
+    return { 
+      canTakeTest: false, 
+      reason: "Você esgotou seus testes premium. Faça um novo upgrade para continuar." 
+    };
+  }
+
+  async consumeUserTest(userId: number): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) return;
+
+    const userTests = await db.select().from(testResults).where(eq(testResults.userId, userId));
+    const totalTests = userTests.length;
+
+    if (totalTests === 0 && user.freeTestsUsed === 0) {
+      // Consuming free test
+      await db
+        .update(users)
+        .set({ freeTestsUsed: 1 })
+        .where(eq(users.id, userId));
+    } else if (user.isPremiumActive && (user.premiumTestsRemaining ?? 0) > 0) {
+      // Consuming premium test
+      const currentTests = user.premiumTestsRemaining ?? 0;
+      await db
+        .update(users)
+        .set({ premiumTestsRemaining: currentTests - 1 })
+        .where(eq(users.id, userId));
+    }
+  }
+
+  async grantPremiumAccess(userId: number, testsCount: number = 2): Promise<void> {
+    await db
+      .update(users)
+      .set({ 
+        isPremiumActive: true,
+        premiumTestsRemaining: testsCount 
+      })
+      .where(eq(users.id, userId));
   }
 
   // Test result operations
