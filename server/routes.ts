@@ -620,13 +620,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Test email functionality
-  app.post("/api/admin/test-email", async (req: any, res: any) => {
+  app.post("/api/admin/test-email", [
+    sanitizeInput,
+    body('testEmail').isEmail().withMessage('Email de teste deve ser válido'),
+    validateRequest
+  ], async (req: any, res: any) => {
     try {
-      // This would integrate with SendGrid or SMTP in a real implementation
-      res.json({ message: "Email de teste enviado com sucesso" });
+      const { testEmail } = req.body;
+      
+      // Import email service
+      const { emailService } = await import('./email-service');
+      
+      // Verify SMTP connection first
+      const connectionValid = await emailService.verifyConnection();
+      if (!connectionValid) {
+        return res.status(400).json({ 
+          message: "Erro na conexão SMTP. Verifique as configurações." 
+        });
+      }
+      
+      // Send test email
+      const emailSent = await emailService.sendTestEmail(testEmail);
+      
+      if (emailSent) {
+        res.json({ 
+          message: "Email de teste enviado com sucesso para " + testEmail 
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Falha ao enviar email de teste. Verifique os logs do servidor." 
+        });
+      }
     } catch (error: any) {
       console.error('Test email error:', error);
-      res.status(500).json({ message: "Erro ao enviar email de teste" });
+      res.status(500).json({ message: "Erro ao enviar email de teste: " + error.message });
     }
   });
 

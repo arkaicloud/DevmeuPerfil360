@@ -34,6 +34,8 @@ export default function AdminEmailConfig() {
     fromName: "MeuPerfil360",
   });
 
+  const [testEmail, setTestEmail] = useState("");
+
   useEffect(() => {
     const adminSession = localStorage.getItem("adminSession");
     if (!adminSession) {
