@@ -88,35 +88,30 @@ export class DatabaseStorage implements IStorage {
     const userTests = await db.select().from(testResults).where(eq(testResults.userId, userId));
     const totalTests = userTests.length;
 
-    // If user has premium active and tests remaining
-    const premiumTests = user.premiumTestsRemaining ?? 0;
-    if (user.isPremiumActive && premiumTests > 0) {
+    // Check if user has any premium test (is_premium = true)
+    const premiumTests = userTests.filter(test => test.isPremium);
+    const hasPremiumTest = premiumTests.length > 0;
+
+    // If user has at least one premium test, they can take unlimited tests
+    if (hasPremiumTest) {
       return { 
         canTakeTest: true, 
-        testsRemaining: premiumTests
+        testsRemaining: 999 // Unlimited for premium users
       };
     }
 
-    // If user never took a test and is not premium (free test)
-    if (totalTests === 0 && user.freeTestsUsed === 0) {
+    // If user never took a test (free test available)
+    if (totalTests === 0) {
       return { 
         canTakeTest: true, 
         testsRemaining: 1 
       };
     }
 
-    // If user already used free test and is not premium
-    if (!user.isPremiumActive) {
-      return { 
-        canTakeTest: false, 
-        reason: "Você já utilizou seu teste gratuito. Faça upgrade para premium para continuar." 
-      };
-    }
-
-    // If premium user has no tests remaining
+    // If user already used free test and doesn't have premium
     return { 
       canTakeTest: false, 
-      reason: "Você esgotou seus testes premium. Faça um novo upgrade para continuar." 
+      reason: "Você já utilizou seu teste gratuito. Faça upgrade para premium para continuar." 
     };
   }
 
@@ -127,20 +122,15 @@ export class DatabaseStorage implements IStorage {
     const userTests = await db.select().from(testResults).where(eq(testResults.userId, userId));
     const totalTests = userTests.length;
 
-    if (totalTests === 0 && user.freeTestsUsed === 0) {
-      // Consuming free test
+    // Only mark free test as used if this is the first test
+    if (totalTests === 0) {
       await db
         .update(users)
         .set({ freeTestsUsed: 1 })
         .where(eq(users.id, userId));
-    } else if (user.isPremiumActive && (user.premiumTestsRemaining ?? 0) > 0) {
-      // Consuming premium test
-      const currentTests = user.premiumTestsRemaining ?? 0;
-      await db
-        .update(users)
-        .set({ premiumTestsRemaining: currentTests - 1 })
-        .where(eq(users.id, userId));
     }
+    
+    // For premium users, no need to decrement anything as they have unlimited tests
   }
 
   async grantPremiumAccess(userId: number, testsCount: number = 2): Promise<void> {
@@ -148,7 +138,7 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ 
         isPremiumActive: true,
-        premiumTestsRemaining: testsCount 
+        premiumTestsRemaining: 999 // Unlimited tests for premium users
       })
       .where(eq(users.id, userId));
   }
