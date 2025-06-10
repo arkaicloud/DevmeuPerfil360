@@ -204,14 +204,24 @@ export default function Home() {
                 <p className="text-xs sm:text-sm text-gray-600">Descubra seu perfil comportamental</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 touch-button"
+                onClick={() => navigate("/find-results")}
+              >
+                Recuperar Teste
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+            </div>
           </div>
         </div>
       </header>
