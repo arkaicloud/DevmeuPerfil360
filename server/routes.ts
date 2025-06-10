@@ -103,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     body('guestData.whatsapp').isMobilePhone('pt-BR').withMessage('WhatsApp inválido'),
     body('answers').isArray({ min: 1, max: 50 }).withMessage('Respostas inválidas'),
     validateRequest
-  ], async (req, res) => {
+  ], async (req: any, res: any) => {
     try {
       const validatedData = discTestSubmissionSchema.parse(req.body);
       const { guestData, answers } = validatedData;
@@ -146,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     body('userId').isInt({ min: 1 }).withMessage('User ID inválido'),
     body('answers').isArray({ min: 1, max: 50 }).withMessage('Respostas inválidas'),
     validateRequest
-  ], async (req, res) => {
+  ], async (req: any, res: any) => {
     try {
       const { userId, answers } = req.body;
 
@@ -644,12 +644,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const templates = req.body;
 
-      for (const [templateId, template] of Object.entries(templates as any)) {
+      interface TemplateData {
+        name: string;
+        subject: string;
+        content: string;
+        variables?: string[];
+      }
+      
+      for (const [templateId, template] of Object.entries(templates as Record<string, TemplateData>)) {
+        const typedTemplate = template as TemplateData;
         const templateData = {
-          name: template.name,
-          subject: template.subject,
-          content: template.content,
-          variables: template.variables || [],
+          name: typedTemplate.name,
+          subject: typedTemplate.subject,
+          content: typedTemplate.content,
+          variables: typedTemplate.variables || [],
           updatedAt: new Date()
         };
 
@@ -658,7 +666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .set(templateData)
           .where(eq(emailTemplates.id, parseInt(templateId)));
         
-        console.log(`Template ${template.name} (ID: ${templateId}) atualizado no banco de dados`);
+        console.log(`Template ${typedTemplate.name} (ID: ${templateId}) atualizado no banco de dados`);
       }
 
       console.log('Todos os templates de email foram salvos no banco de dados');
