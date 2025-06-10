@@ -204,8 +204,8 @@ export default function AdminDashboard() {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#dc2626" name="Usuários" strokeWidth={3} />
-                    <Line type="monotone" dataKey="tests" stroke="#ea580c" name="Testes" strokeWidth={3} />
+                    <Line type="monotone" dataKey="users" stroke="#8b5cf6" name="Usuários" strokeWidth={3} />
+                    <Line type="monotone" dataKey="tests" stroke="#3b82f6" name="Testes" strokeWidth={3} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
