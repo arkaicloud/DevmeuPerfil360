@@ -352,6 +352,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`Teste ${testId} atualizado para premium com sucesso`);
+
+      // Send premium upgrade email (non-blocking)
+      if (testResult.guestEmail) {
+        emailService.sendPremiumUpgradeEmail(
+          testResult.guestEmail,
+          testResult.guestName || 'Usuário',
+          testResult.profileType,
+          testId.toString()
+        ).catch(error => {
+          console.error('Erro ao enviar email de upgrade premium:', error);
+        });
+      }
+
       res.json({ 
         success: true, 
         message: "Teste atualizado para premium com sucesso",
