@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,10 +26,13 @@ export default function AdminPricing() {
 
   const { data: pricing, isLoading } = useQuery<PricingConfig>({
     queryKey: ["/api/admin/pricing"],
-    onSuccess: (data) => {
-      setFormData(data);
-    }
   });
+
+  useEffect(() => {
+    if (pricing) {
+      setFormData(pricing);
+    }
+  }, [pricing]);
 
   const savePricingMutation = useMutation({
     mutationFn: async (data: PricingConfig) => {

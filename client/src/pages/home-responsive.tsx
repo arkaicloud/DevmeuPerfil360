@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,9 +10,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { guestTestDataSchema, type GuestTestData } from "@shared/schema";
 import { Brain, Gift, ChartPie, FileText, User, MessageCircle, Mail, Shield } from "lucide-react";
 
+interface PricingConfig {
+  regularPrice: string;
+  promocionalPrice: string;
+  isPromotionActive: boolean;
+  currentPrice: string;
+}
+
 export default function Home() {
   const [showDataForm, setShowDataForm] = useState(false);
   const [, navigate] = useLocation();
+
+  const { data: pricing } = useQuery<PricingConfig>({
+    queryKey: ["/api/pricing"],
+  });
 
   const form = useForm<GuestTestData>({
     resolver: zodResolver(guestTestDataSchema),
@@ -476,7 +488,17 @@ export default function Home() {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Relatório Premium</h3>
                   <p className="text-gray-600">O Mapa Completo da Sua Jornada</p>
-                  <div className="text-3xl font-bold text-blue-600 mt-4">R$ 37</div>
+                  <div className="mt-4">
+                    {pricing?.isPromotionActive ? (
+                      <div className="text-center">
+                        <div className="text-lg text-gray-500 line-through">De R$ {pricing.regularPrice}</div>
+                        <div className="text-3xl font-bold text-green-600">Por R$ {pricing.promocionalPrice}</div>
+                        <div className="text-sm text-green-700 font-medium mt-1">Oferta Limitada!</div>
+                      </div>
+                    ) : (
+                      <div className="text-3xl font-bold text-blue-600">R$ {pricing?.currentPrice || '47'}</div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-6 text-sm">

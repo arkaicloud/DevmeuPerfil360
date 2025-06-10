@@ -31,6 +31,7 @@ function Router() {
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
+      <Route path="/admin/pricing" component={AdminPricing} />
       <Route component={NotFound} />
     </Switch>
   );
