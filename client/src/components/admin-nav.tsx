@@ -36,6 +36,12 @@ const navItems = [
     href: "/admin/email-templates",
     icon: Mail,
     description: "Personalizar mensagens automáticas"
+  },
+  {
+    title: "Configuração de Preços",
+    href: "/admin/pricing",
+    icon: DollarSign,
+    description: "Gerenciar preços e promoções"
   }
 ];
 
