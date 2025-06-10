@@ -362,3 +362,8 @@ export default function Home() {
     </div>
   );
 }
+```
+
+```
+// Stripe imports removidos da home page
+```

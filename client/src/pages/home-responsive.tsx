@@ -63,10 +63,10 @@ export default function Home() {
       email: currentUser.email,
       whatsapp: currentUser.whatsapp || "",
     };
-    
+
     // Store the data for compatibility with test flow
     sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
-    
+
     // Go directly to test without showing form
     navigate("/test");
   };

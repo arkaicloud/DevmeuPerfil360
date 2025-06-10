@@ -17,6 +17,7 @@ import AdminEmailTemplates from "@/pages/admin-email-templates";
 import AdminPricing from "@/pages/admin-pricing";
 import NotFound from "@/pages/not-found";
 
+// Stripe será carregado apenas nas páginas que precisam
 function Router() {
   return (
     <Switch>

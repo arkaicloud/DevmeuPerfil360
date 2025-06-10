@@ -75,7 +75,7 @@ export default function PaymentModal({ isOpen, onClose, testId }: PaymentModalPr
           {/* Payment Methods */}
           <div>
             <h4 className="font-semibold text-foreground mb-4">Forma de Pagamento</h4>
-            
+
             {/* PIX Option */}
             <Card 
               className={`mb-3 cursor-pointer transition-all duration-200 ${
@@ -149,7 +149,7 @@ export default function PaymentModal({ isOpen, onClose, testId }: PaymentModalPr
                 <p className="text-sm text-muted-foreground mb-4">
                   Escaneie o QR Code com o app do seu banco ou copie o código PIX
                 </p>
-                
+
                 <Card className="bg-muted/50 mb-4">
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between">
@@ -195,7 +195,7 @@ export default function PaymentModal({ isOpen, onClose, testId }: PaymentModalPr
               <Shield className="w-4 h-4 mr-2" />
               Pagamento Seguro
             </Button>
-            
+
             <p className="text-center text-xs text-muted-foreground">
               🔒 Pagamento 100% seguro processado pela Stripe
             </p>

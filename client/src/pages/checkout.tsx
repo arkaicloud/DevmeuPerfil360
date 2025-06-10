@@ -14,20 +14,20 @@ import { useToast } from "@/hooks/use-toast";
 let stripePromise: Promise<any> | null = null;
 
 const initializeStripe = () => {
-  const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_51QbPrQEHwwI2jNnxJ2LYj5V1JaEAaxIGNyHdJHzDFrZkbDf9F1n8QIr9hJF8zJ9qZwYJ1bJzJvB1vCmDfRsVqR9Q00TgOeR8wN';
+  const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+  
+  if (!stripePublicKey) {
+    console.warn('VITE_STRIPE_PUBLIC_KEY not found in environment variables');
+    return null;
+  }
   
   try {
-    if (!stripePublicKey) {
-      console.error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-      return null;
-    }
-    
     if (!stripePublicKey.startsWith('pk_')) {
       console.error('Invalid Stripe public key format');
       return null;
     }
     
-    console.log('Initializing Stripe with key:', stripePublicKey.substring(0, 20) + '...');
+    console.log('Initializing Stripe...');
     return loadStripe(stripePublicKey);
   } catch (error) {
     console.error('Failed to initialize Stripe:', error);
