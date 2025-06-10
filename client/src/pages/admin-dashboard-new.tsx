@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="revenue" fill="#dc2626" name="Receita (R$)" />
+                  <Bar dataKey="revenue" fill="#8b5cf6" name="Receita (R$)" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
