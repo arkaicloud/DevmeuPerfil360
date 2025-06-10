@@ -253,92 +253,93 @@ export default function Results() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white mobile-padding">
-        <div className="responsive-container">
+      <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Brain className="w-5 h-5 text-white" />
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <Brain className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <div>
-                <h1 className="mobile-subtitle font-bold">MeuPerfil360</h1>
-                <p className="text-xs sm:text-sm opacity-90">Seus Resultados</p>
+                <h1 className="text-base md:text-lg font-bold">MeuPerfil360</h1>
+                <p className="text-xs md:text-sm opacity-90">Seus Resultados DISC</p>
               </div>
             </div>
+            <Button 
+              onClick={() => navigate("/")} 
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 text-xs md:text-sm"
+            >
+              Início
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="mobile-padding">
-        <div className="responsive-container">
+      <div className="p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
           {/* Progress Bar */}
-          <div className="mb-6 sm:mb-8">
+          <div className="mb-4 md:mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium psychology-blue">Passo 3 de 3</span>
-              <span className="text-sm text-muted-foreground">Resultados</span>
+              <span className="text-xs md:text-sm font-medium text-blue-600">Passo 3 de 3</span>
+              <span className="text-xs md:text-sm text-muted-foreground">Resultados</span>
             </div>
             <div className="w-full bg-muted rounded-full h-2">
-              <div className="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style={{ width: "100%" }} />
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full" style={{ width: "100%" }} />
             </div>
           </div>
 
           {/* Results Header */}
-          <div className="text-center mb-6 sm:mb-8">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+          <div className="text-center mb-4 md:mb-6">
+            <div className="w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+              <Trophy className="w-6 h-6 md:w-8 md:h-8 text-white" />
             </div>
-            <h2 className="mobile-title font-bold text-foreground mb-2">Parabéns, {testResult.guestName || 'Usuário'}!</h2>
-            <p className="mobile-text text-muted-foreground mb-4">Seu teste foi concluído com sucesso</p>
-            <Button 
-              onClick={() => navigate("/")} 
-              variant="outline"
-              className="mx-auto"
-            >
-              Voltar ao Início
-            </Button>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Parabéns, {testResult.guestName || 'Usuário'}!</h2>
+            <p className="text-sm md:text-base text-muted-foreground mb-4">Seu teste foi concluído com sucesso</p>
           </div>
         </div>
 
         {/* DISC Profile Results */}
-        <div className="responsive-container">
-          <Card className="shadow-lg border-0 mb-6">
-            <CardContent className="mobile-card">
-              <h3 className="mobile-subtitle font-bold text-foreground mb-4 text-center">Seu Perfil DISC</h3>
+        <div className="max-w-7xl mx-auto">
+          <Card className="shadow-lg border-0 mb-4 md:mb-6">
+            <CardContent className="p-4 md:p-6">
+              <h3 className="text-lg md:text-xl font-bold text-foreground mb-4 text-center">Seu Perfil DISC</h3>
               
               {/* Profile Type with Custom Icon */}
-              <div className="text-center mb-6">
-                <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4 border-2 ${getDiscColor(testResult.profileType)}`}>
+              <div className="text-center mb-4 md:mb-6">
+                <div className={`w-16 h-16 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 border-2 ${getDiscColor(testResult.profileType)}`}>
                   {(() => {
                     const IconComponent = getDiscIcon(testResult.profileType);
-                    return <IconComponent className="w-10 h-10 sm:w-12 sm:h-12" />;
+                    return <IconComponent className="w-8 h-8 md:w-12 md:h-12" />;
                   })()}
                 </div>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className={`px-3 py-1 rounded-full text-lg font-bold ${getDiscColor(testResult.profileType)}`}>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-2">
+                  <span className={`px-3 py-1 rounded-full text-sm md:text-lg font-bold ${getDiscColor(testResult.profileType)}`}>
                     {testResult.profileType}
                   </span>
-                  <h4 className="mobile-subtitle font-bold text-foreground">{profileInfo.name}</h4>
+                  <h4 className="text-base md:text-xl font-bold text-foreground">{profileInfo.name}</h4>
                 </div>
-                <p className="mobile-text text-muted-foreground">
+                <p className="text-sm md:text-base text-muted-foreground px-4">
                   {profileInfo.description}
                 </p>
               </div>
 
               {/* Enhanced DISC Scores with Visual Chart */}
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                   {(['D', 'I', 'S', 'C'] as const).map((type) => {
                     const score = (testResult.scores as any)[type] || 0;
                     const IconComponent = getDiscIcon(type);
                     return (
-                      <div key={type} className="text-center p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg hover:shadow-md transition-all duration-300">
-                        <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center border-2 ${getDiscColor(type)} mb-2`}>
-                          <IconComponent className="w-6 h-6 text-white" />
+                      <div key={type} className="text-center p-3 md:p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg hover:shadow-md transition-all duration-300">
+                        <div className={`w-10 h-10 md:w-12 md:h-12 mx-auto rounded-full flex items-center justify-center border-2 ${getDiscColor(type)} mb-2`}>
+                          <IconComponent className="w-5 h-5 md:w-6 md:h-6 text-white" />
                         </div>
-                        <div className={`inline-block px-2 py-1 rounded text-sm font-bold mb-2 ${getDiscColor(type)}`}>
+                        <div className={`inline-block px-2 py-1 rounded text-xs md:text-sm font-bold mb-2 ${getDiscColor(type)}`}>
                           {type}
                         </div>
-                        <div className="text-xl font-bold">{score}%</div>
+                        <div className="text-lg md:text-xl font-bold">{score}%</div>
                         <Progress value={score} className="mt-2 h-2" />
                         <div className="text-xs text-muted-foreground mt-1">
                           {type === 'D' ? 'Dominância' : 

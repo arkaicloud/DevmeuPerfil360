@@ -197,6 +197,69 @@ class EmailService {
     console.log('=== FIM DO EMAIL ===\n');
     return true;
   }
+
+  // Automated email functions
+  async sendWelcomeEmail(to: string, userName: string): Promise<boolean> {
+    const variables = {
+      userName: userName,
+      loginUrl: process.env.VITE_APP_URL || 'https://meuperfil360.replit.app',
+      supportEmail: 'suporte@meuperfil360.com.br'
+    };
+    
+    console.log(`Enviando email de boas-vindas para: ${to}`);
+    return await this.sendTemplateEmail(to, 'welcome', variables);
+  }
+
+  async sendTestCompletionEmail(to: string, userName: string, profileType: string, resultId: string): Promise<boolean> {
+    const profileNames = {
+      'D': 'Dominante',
+      'I': 'Influente', 
+      'S': 'Estável',
+      'C': 'Conscencioso'
+    };
+
+    const variables = {
+      userName: userName,
+      profileType: profileType,
+      profileName: profileNames[profileType as keyof typeof profileNames] || profileType,
+      resultUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/results/${resultId}`,
+      upgradeUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/checkout/${resultId}`
+    };
+    
+    console.log(`Enviando email de conclusão de teste para: ${to}`);
+    return await this.sendTemplateEmail(to, 'test_completion', variables);
+  }
+
+  async sendPremiumUpgradeEmail(to: string, userName: string, profileType: string, resultId: string): Promise<boolean> {
+    const profileNames = {
+      'D': 'Dominante',
+      'I': 'Influente',
+      'S': 'Estável', 
+      'C': 'Conscencioso'
+    };
+
+    const variables = {
+      userName: userName,
+      profileType: profileType,
+      profileName: profileNames[profileType as keyof typeof profileNames] || profileType,
+      pdfUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/api/test/result/${resultId}/pdf`,
+      dashboardUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/dashboard`
+    };
+    
+    console.log(`Enviando email de upgrade premium para: ${to}`);
+    return await this.sendTemplateEmail(to, 'premium_upgrade', variables);
+  }
+
+  async sendRetestReminderEmail(to: string, userName: string, daysSinceLastTest: number): Promise<boolean> {
+    const variables = {
+      userName: userName,
+      daysSinceLastTest: daysSinceLastTest.toString(),
+      testUrl: process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'
+    };
+    
+    console.log(`Enviando lembrete de reteste para: ${to}`);
+    return await this.sendTemplateEmail(to, 'retest_reminder', variables);
+  }
 }
 
 export const emailService = new EmailService();
