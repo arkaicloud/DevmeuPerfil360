@@ -570,6 +570,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin pricing configuration endpoints
+  app.get("/api/admin/pricing", async (req: any, res: any) => {
+    try {
+      const configs = await storage.getAllAdminConfigs();
+      const pricing = {
+        regularPrice: configs.regularPrice || '97',
+        promocionalPrice: configs.promocionalPrice || '47',
+        isPromotionActive: configs.isPromotionActive === 'true'
+      };
+      res.json(pricing);
+    } catch (error: any) {
+      console.error("Error fetching pricing config:", error);
+      res.status(500).json({ error: "Failed to fetch pricing configuration" });
+    }
+  });
+
+  app.post("/api/admin/pricing", async (req: any, res: any) => {
+    try {
+      const { regularPrice, promocionalPrice, isPromotionActive } = req.body;
+      
+      await storage.setAdminConfig('regularPrice', regularPrice.toString());
+      await storage.setAdminConfig('promocionalPrice', promocionalPrice.toString());
+      await storage.setAdminConfig('isPromotionActive', isPromotionActive.toString());
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error updating pricing config:", error);
+      res.status(500).json({ error: "Failed to update pricing configuration" });
+    }
+  });
+
+  // Public endpoint to get current pricing
+  app.get("/api/pricing", async (req: any, res: any) => {
+    try {
+      const configs = await storage.getAllAdminConfigs();
+      const pricing = {
+        regularPrice: configs.regularPrice || '97',
+        promocionalPrice: configs.promocionalPrice || '47',
+        isPromotionActive: configs.isPromotionActive === 'true',
+        currentPrice: configs.isPromotionActive === 'true' ? 
+          configs.promocionalPrice || '47' : 
+          configs.regularPrice || '97'
+      };
+      res.json(pricing);
+    } catch (error: any) {
+      console.error("Error fetching public pricing:", error);
+      res.status(500).json({ error: "Failed to fetch pricing" });
+    }
+  });
+
   // Email templates management
   app.get("/api/admin/email-templates", async (req: any, res: any) => {
     try {

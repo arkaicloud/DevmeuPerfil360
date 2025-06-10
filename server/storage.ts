@@ -2,6 +2,7 @@ import {
   users, 
   testResults, 
   payments,
+  adminConfigs,
   type User, 
   type InsertUser, 
   type TestResult, 
@@ -188,6 +189,30 @@ export class DatabaseStorage implements IStorage {
       .where(eq(payments.id, id))
       .returning();
     return payment;
+  }
+
+  // Admin config operations
+  async getAdminConfig(key: string): Promise<string | null> {
+    const [config] = await db.select().from(adminConfigs).where(eq(adminConfigs.key, key));
+    return config?.value || null;
+  }
+
+  async setAdminConfig(key: string, value: string): Promise<void> {
+    await db
+      .insert(adminConfigs)
+      .values({ key, value })
+      .onConflictDoUpdate({
+        target: adminConfigs.key,
+        set: { value, updatedAt: new Date() }
+      });
+  }
+
+  async getAllAdminConfigs(): Promise<Record<string, string>> {
+    const configs = await db.select().from(adminConfigs);
+    return configs.reduce((acc, config) => {
+      acc[config.key] = config.value || '';
+      return acc;
+    }, {} as Record<string, string>);
   }
 }
 

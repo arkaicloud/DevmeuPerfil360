@@ -14,6 +14,7 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard-new";
 import AdminEmailConfig from "@/pages/admin-email-config";
 import AdminEmailTemplates from "@/pages/admin-email-templates";
+import AdminPricing from "@/pages/admin-pricing";
 import NotFound from "@/pages/not-found";
 
 function Router() {
