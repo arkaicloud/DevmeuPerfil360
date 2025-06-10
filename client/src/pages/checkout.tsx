@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,31 +11,39 @@ import { useToast } from "@/hooks/use-toast";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
-let stripePromise: Promise<any> | null = null;
+let stripePromise: Promise<Stripe | null> | null = null;
 
-const initializeStripe = () => {
+const initializeStripe = (): Promise<Stripe | null> | null => {
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
   
   if (!stripePublicKey) {
     console.warn('VITE_STRIPE_PUBLIC_KEY not found in environment variables');
-    return null;
+    return Promise.resolve(null);
   }
   
   try {
     if (!stripePublicKey.startsWith('pk_')) {
       console.error('Invalid Stripe public key format');
-      return null;
+      return Promise.resolve(null);
     }
     
-    console.log('Initializing Stripe...');
+    console.log('Initializing Stripe with key:', stripePublicKey.substring(0, 12) + '...');
     return loadStripe(stripePublicKey);
   } catch (error) {
     console.error('Failed to initialize Stripe:', error);
-    return null;
+    return Promise.resolve(null);
   }
 };
 
-stripePromise = initializeStripe();
+// Initialize Stripe only once
+if (typeof window !== 'undefined' && !stripePromise) {
+  stripePromise = initializeStripe();
+}
 
 const CheckoutForm = ({ testId }: { testId: string }) => {
   const stripe = useStripe();
@@ -201,9 +209,24 @@ export default function Checkout() {
     }
 
     // Check if Stripe is properly configured
-    if (!stripePromise) {
-      setStripeLoadError("Sistema de pagamento não configurado. Entre em contato com o suporte.");
-    }
+    const checkStripeConfig = async () => {
+      if (!stripePromise) {
+        setStripeLoadError("Sistema de pagamento não configurado. Verifique as variáveis de ambiente.");
+        return;
+      }
+
+      try {
+        const stripe = await stripePromise;
+        if (!stripe) {
+          setStripeLoadError("Falha ao carregar Stripe.js. Verifique sua conexão com a internet.");
+        }
+      } catch (error) {
+        console.error('Stripe loading error:', error);
+        setStripeLoadError("Erro ao carregar sistema de pagamento. Tente recarregar a página.");
+      }
+    };
+
+    checkStripeConfig();
   }, [navigate]);
 
   useEffect(() => {
