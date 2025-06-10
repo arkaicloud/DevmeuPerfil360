@@ -37,8 +37,8 @@ export default function AdminEmailConfig() {
   const [testEmail, setTestEmail] = useState("");
 
   useEffect(() => {
-    const adminSession = localStorage.getItem("adminSession");
-    if (!adminSession) {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
       navigate("/admin/login");
     }
   }, [navigate]);
@@ -104,29 +104,14 @@ export default function AdminEmailConfig() {
     testMutation.mutate();
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    navigate('/admin/login');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <header className="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 text-white p-6 shadow-xl">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/admin/dashboard")}
-              className="text-white hover:bg-white/20"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Configurações de Email</h1>
-              <p className="text-sm text-purple-200">SMTP e Templates</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <AdminNav onLogout={handleLogout} />
 
       <div className="p-6 max-w-4xl mx-auto">
         <Card>
