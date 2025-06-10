@@ -30,11 +30,12 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
-  // Aplicar middlewares de segurança
+  // Middlewares de segurança básicos apenas
   app.use(securityHeaders);
-  app.use(strictRateLimit);
-  app.use(threatDetection);
-  app.use(validateInput);
+  // Removidos temporariamente para evitar falsos positivos:
+  // app.use(strictRateLimit);
+  // app.use(threatDetection);
+  // app.use(validateInput);
 
   // CORS configuration - mais restritivo
   app.use(cors({

@@ -457,7 +457,8 @@ export const inputSanitizationMiddleware = (req: Request, res: Response, next: N
 }
 
 export function applySecurityMiddlewares(app: any) {
-    //app.use(rateLimitMiddleware);
-    //app.use(threatDetectionMiddleware);
-    //app.use(inputSanitizationMiddleware);
+    // Middlewares de segurança desativados temporariamente para evitar falsos positivos
+    // app.use(rateLimitMiddleware);
+    // app.use(threatDetectionMiddleware);
+    // app.use(inputSanitizationMiddleware);
 }
