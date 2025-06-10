@@ -56,6 +56,11 @@ export default function Home() {
     navigate("/test");
   };
 
+  const startTestAsLoggedUser = () => {
+    // For logged users, no need to collect data again
+    navigate("/test");
+  };
+
   const formatWhatsApp = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length >= 11) {
@@ -234,22 +239,41 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 touch-button"
-                onClick={() => navigate("/find-results")}
-              >
-                Recuperar Teste
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </Button>
+              {isLoggedIn ? (
+                <div className="flex items-center space-x-3">
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900">{currentUser?.username}</p>
+                    <p className="text-xs text-gray-600">{currentUser?.email}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="touch-button"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Dashboard
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 touch-button"
+                    onClick={() => navigate("/find-results")}
+                  >
+                    Recuperar Teste
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
+                    onClick={() => navigate("/login")}
+                  >
+                    Login
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -461,10 +485,17 @@ export default function Home() {
                 </div>
 
                 <Button
-                  onClick={() => setShowDataForm(true)}
+                  onClick={isLoggedIn ? startTestAsLoggedUser : () => setShowDataForm(true)}
                   className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold"
                 >
-                  Começar Teste Grátis
+                  {isLoggedIn ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <Crown className="w-5 h-5" />
+                      <span>Fazer Teste - {currentUser?.username}</span>
+                    </div>
+                  ) : (
+                    "Começar Teste Grátis"
+                  )}
                 </Button>
               </div>
 
