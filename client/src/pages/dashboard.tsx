@@ -180,31 +180,32 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white p-6 shadow-xl sticky top-0 z-50">
+      <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white p-4 md:p-6 shadow-xl sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
-              <Brain className="w-7 h-7 text-white drop-shadow-sm" />
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="w-10 h-10 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
+              <Brain className="w-5 h-5 md:w-7 md:h-7 text-white drop-shadow-sm" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-wide drop-shadow-sm">MeuPerfil360</h1>
-              <p className="text-sm text-indigo-100 font-medium">Painel Pessoal DISC</p>
+              <h1 className="text-lg md:text-2xl font-bold tracking-wide drop-shadow-sm">MeuPerfil360</h1>
+              <p className="text-xs md:text-sm text-indigo-100 font-medium hidden sm:block">Painel Pessoal DISC</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <Button
               variant="ghost"
-              size="default"
-              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              size="sm"
+              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
               onClick={() => navigate("/")}
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Teste DISC
+              <Plus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Novo Teste</span>
+              <span className="sm:hidden">Novo</span>
             </Button>
             <Button
               variant="ghost"
-              size="default"
-              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-4 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              size="sm"
+              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-4 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
               onClick={() => {
                 localStorage.removeItem("currentUser");
                 navigate("/login");
@@ -216,7 +217,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <div className="p-6">
+      <div className="p-4 md:p-6 max-w-7xl mx-auto">
         {/* Retest Alert - Show if user needs retesting */}
         {needsRetesting() && (
           <Card className="mb-6 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
@@ -248,30 +249,30 @@ export default function Dashboard() {
         )}
 
         {/* User Info */}
-        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
+        <Card className="mb-4 md:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 md:gap-3 text-base md:text-lg">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <div>
-                <div className="text-gray-800">Bem-vindo, {dashboardData?.user?.username || "Usuário"}</div>
-                <div className="text-sm text-blue-600 font-normal">Seu Painel Pessoal DISC</div>
+                <div className="text-gray-800 text-sm md:text-base">Bem-vindo, {dashboardData?.user?.username || "Usuário"}</div>
+                <div className="text-xs md:text-sm text-blue-600 font-normal">Seu Painel Pessoal DISC</div>
               </div>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CardContent className="p-4 md:p-6 pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               <div className="bg-white/70 rounded-lg p-3 border border-blue-100">
                 <div className="text-xs text-blue-600 font-medium">EMAIL</div>
-                <div className="text-sm text-gray-700 font-medium">{dashboardData?.user?.email || "N/A"}</div>
+                <div className="text-sm text-gray-700 font-medium truncate">{dashboardData?.user?.email || "N/A"}</div>
               </div>
               <div className="bg-white/70 rounded-lg p-3 border border-purple-100">
                 <div className="text-xs text-purple-600 font-medium">TESTES REALIZADOS</div>
                 <div className="text-sm text-gray-700 font-medium">{dashboardData?.testResults?.length || 0}</div>
               </div>
               {dashboardData?.testResults?.length > 0 && (
-                <div className="bg-white/70 rounded-lg p-3 border border-green-100">
+                <div className="bg-white/70 rounded-lg p-3 border border-green-100 sm:col-span-2 md:col-span-1">
                   <div className="text-xs text-green-600 font-medium">ÚLTIMO TESTE</div>
                   <div className="text-sm text-gray-700 font-medium">{getDaysSinceLastTest()} dias atrás</div>
                 </div>
@@ -282,28 +283,28 @@ export default function Dashboard() {
 
         {/* Test Results */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+              <FileText className="w-4 h-4 md:w-5 md:h-5" />
               Histórico de Testes ({dashboardData?.testResults?.length || 0})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6 pt-0">
             {!dashboardData?.testResults || dashboardData.testResults.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Brain className="w-10 h-10 text-primary" />
+              <div className="text-center py-8 md:py-12">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                  <Brain className="w-8 h-8 md:w-10 md:h-10 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">Nenhum teste realizado ainda</h3>
-                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2 md:mb-3">Nenhum teste realizado ainda</h3>
+                <p className="text-muted-foreground mb-4 md:mb-6 max-w-md mx-auto text-sm md:text-base px-4">
                   Descubra seu perfil comportamental e potencialize seu desenvolvimento pessoal e profissional com nosso teste DISC.
                 </p>
                 <div className="space-y-3">
-                  <Button onClick={() => navigate("/")} className="psychology-gradient" size="lg">
+                  <Button onClick={() => navigate("/")} className="psychology-gradient" size="default">
                     <Brain className="w-4 h-4 mr-2" />
                     Fazer Primeiro Teste DISC
                   </Button>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground px-4">
                     ✓ Teste gratuito • ✓ Resultado imediato • ✓ Relatório premium disponível
                   </div>
                 </div>
@@ -312,61 +313,59 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {dashboardData.testResults.map((result) => (
                   <Card key={result.id} className="border-l-4 border-l-primary">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold">Teste {result.testType}</h4>
-                          <Badge variant={getProfileBadgeVariant(result.profileType)}>
+                    <CardContent className="p-3 md:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="font-semibold text-sm md:text-base">Teste {result.testType}</h4>
+                          <Badge variant={getProfileBadgeVariant(result.profileType)} className="text-xs">
                             {result.profileType} - {getProfileName(result.profileType)}
                           </Badge>
                           {result.isPremium && (
-                            <Badge variant="secondary" className="bg-amber-100 text-amber-700">
-                              <Crown className="w-3 h-3 mr-1" />
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-700 text-xs">
+                              <Crown className="w-2 h-2 md:w-3 md:h-3 mr-1" />
                               Premium
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="w-3 h-3" />
                           {format(new Date(result.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-sm text-muted-foreground">
+                      <div className="mb-3">
+                        <p className="text-xs md:text-sm text-muted-foreground">
                           Perfil comportamental identificado
                         </p>
-                        <div className="text-xs text-muted-foreground">
-                          {format(new Date(result.createdAt), "dd/MM/yyyy", { locale: ptBR })}
-                        </div>
                       </div>
                       
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/results/${result.id}`)}
-                          className="flex-1"
+                          className="flex-1 text-xs md:text-sm"
                         >
-                          <FileText className="w-4 h-4 mr-1" />
+                          <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Ver Resultado
                         </Button>
                         {result.isPremium ? (
                           <Button
                             size="sm"
                             onClick={() => window.open(`/api/test/result/${result.id}/pdf`, '_blank')}
-                            className="bg-amber-600 hover:bg-amber-700 text-white"
+                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs md:text-sm flex-1 sm:flex-none"
                           >
-                            <FileText className="w-4 h-4 mr-1" />
-                            PDF Premium
+                            <FileText className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+                            <span className="hidden sm:inline">PDF Premium</span>
+                            <span className="sm:hidden">Premium</span>
                           </Button>
                         ) : (
                           <Button
                             size="sm"
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-xs md:text-sm flex-1 sm:flex-none"
                             onClick={() => navigate(`/checkout/${result.id}`)}
                           >
-                            <Crown className="w-4 h-4 mr-1" />
+                            <Crown className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                             Premium
                           </Button>
                         )}
