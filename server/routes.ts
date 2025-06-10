@@ -421,6 +421,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Grant premium access (for testing purposes)
+  app.post("/api/user/:userId/grant-premium", [
+    sanitizeInput,
+    param('userId').isInt({ min: 1 }).withMessage('User ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { testsCount = 2 } = req.body;
+      
+      await storage.grantPremiumAccess(userId, testsCount);
+      console.log(`Premium access granted to user ${userId} with ${testsCount} tests`);
+      
+      res.json({ 
+        success: true, 
+        message: `Premium access granted with ${testsCount} tests`,
+        testsGranted: testsCount
+      });
+    } catch (error: any) {
+      console.error("Error granting premium access:", error);
+      res.status(500).json({ error: "Failed to grant premium access" });
+    }
+  });
+
   // User dashboard endpoint
   app.get("/api/user/:userId/dashboard", [
     sanitizeInput,
