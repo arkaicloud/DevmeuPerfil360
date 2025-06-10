@@ -723,20 +723,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Enviando email de teste do tipo ${emailType} para ${email}`);
       
+      // Try to find real user data
+      let userName = 'Usuário Teste';
+      let profileType = 'D';
+      let resultId = '123';
+      
+      // Look for existing user by email
+      console.log(`Procurando usuário por email: ${email}`);
+      const user = await storage.getUserByEmail(email);
+      if (user) {
+        userName = user.username;
+        console.log(`✅ Usuário encontrado: ${userName} (ID: ${user.id})`);
+        
+        // Get user's most recent test result
+        const testResults = await storage.getTestResultsByUser(user.id);
+        if (testResults.length > 0) {
+          const latestTest = testResults[0];
+          profileType = latestTest.profileType;
+          resultId = latestTest.id.toString();
+          console.log(`✅ Teste mais recente encontrado: ${profileType}, ID: ${resultId}`);
+        } else {
+          console.log(`ℹ️ Nenhum teste encontrado para o usuário ${userName}`);
+        }
+      } else {
+        console.log(`❌ Usuário não encontrado por email, procurando como convidado...`);
+        // Look for guest test results by email
+        const guestTest = await storage.getTestResultByGuest(email);
+        if (guestTest) {
+          userName = guestTest.guestName || 'Usuário Teste';
+          profileType = guestTest.profileType;
+          resultId = guestTest.id.toString();
+          console.log(`✅ Teste de convidado encontrado: ${userName}, ${profileType}`);
+        } else {
+          console.log(`❌ Nenhum dado encontrado para ${email}, usando dados padrão`);
+        }
+      }
+      
       let emailSent = false;
       
       switch (emailType) {
         case 'welcome':
-          emailSent = await emailService.sendWelcomeEmail(email, 'Usuário Teste');
+          emailSent = await emailService.sendWelcomeEmail(email, userName);
           break;
         case 'test_completion':
-          emailSent = await emailService.sendTestCompletionEmail(email, 'Usuário Teste', 'D', '123');
+          emailSent = await emailService.sendTestCompletionEmail(email, userName, profileType, resultId);
           break;
         case 'premium_upgrade':
-          emailSent = await emailService.sendPremiumUpgradeEmail(email, 'Usuário Teste', 'D', '123');
+          emailSent = await emailService.sendPremiumUpgradeEmail(email, userName, profileType, resultId);
           break;
         case 'retest_reminder':
-          emailSent = await emailService.sendRetestReminderEmail(email, 'Usuário Teste', 180);
+          emailSent = await emailService.sendRetestReminderEmail(email, userName, 180);
           break;
         default:
           return res.status(400).json({ message: "Tipo de email não suportado" });
@@ -744,7 +780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (emailSent) {
         res.json({ 
-          message: `Email ${emailType} enviado com sucesso para ${email}`,
+          message: `Email ${emailType} enviado com sucesso para ${email} (${userName})`,
           success: true
         });
       } else {

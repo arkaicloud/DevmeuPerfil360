@@ -159,12 +159,31 @@ class EmailService {
       let subject = template.subject;
       let content = template.content;
 
+      console.log(`Substituindo variáveis para template ${templateName}:`, variables);
+
       // Replace variables in subject and content
       for (const [key, value] of Object.entries(variables)) {
         const placeholder = `{{${key}}}`;
-        subject = subject.replace(new RegExp(placeholder, 'g'), value);
-        content = content.replace(new RegExp(placeholder, 'g'), value);
+        const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
+        subject = subject.replace(regex, value || '');
+        content = content.replace(regex, value || '');
+        console.log(`Substituindo ${placeholder} por "${value}"`);
       }
+
+      // Also handle common alternative variable names
+      const alternativeVariables: Record<string, string> = {
+        '{{name}}': variables.userName || variables.name || 'Usuário',
+        '{{user}}': variables.userName || variables.name || 'Usuário',
+        '{{email}}': to
+      };
+
+      for (const [placeholder, value] of Object.entries(alternativeVariables)) {
+        const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
+        subject = subject.replace(regex, value);
+        content = content.replace(regex, value);
+      }
+
+      console.log(`Email final para ${to} - Assunto: ${subject}`);
 
       return await this.sendEmail(to, subject, content);
     } catch (error) {
