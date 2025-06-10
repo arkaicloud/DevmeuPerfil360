@@ -368,62 +368,40 @@ export default function Home() {
           </div>
 
           {/* Features Section */}
-          <div className="mobile-grid-2 mb-6">
-            <Card className="bg-accent/10 border-accent/20">
-              <CardContent className="mobile-card">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent/20 rounded-full flex items-center justify-center">
-                    <Gift className="w-5 h-5 sm:w-6 sm:h-6 psychology-green" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mobile-text">100% Gratuito</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Teste completo sem custos</p>
-                  </div>
+          <div className="mb-16">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-green-100 text-center hover:shadow-md transition-shadow">
+                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Gift className="w-8 h-8 text-green-600" />
                 </div>
-              </CardContent>
-            </Card>
+                <h4 className="font-bold text-gray-900 mb-2">100% Gratuito</h4>
+                <p className="text-sm text-gray-600">Teste completo sem custos</p>
+              </div>
 
-            <Card className="bg-secondary/10 border-secondary/20">
-              <CardContent className="mobile-card">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/20 rounded-full flex items-center justify-center">
-                    <ChartPie className="w-5 h-5 sm:w-6 sm:h-6 psychology-purple" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mobile-text">Resultado Imediato</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Veja seu perfil em tempo real</p>
-                  </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-purple-100 text-center hover:shadow-md transition-shadow">
+                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <ChartPie className="w-8 h-8 text-purple-600" />
                 </div>
-              </CardContent>
-            </Card>
+                <h4 className="font-bold text-gray-900 mb-2">Resultado Imediato</h4>
+                <p className="text-sm text-gray-600">Veja seu perfil em tempo real</p>
+              </div>
 
-            <Card className="bg-primary/10 border-primary/20">
-              <CardContent className="mobile-card">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                    <FileText className="w-5 h-5 sm:w-6 sm:h-6 psychology-blue" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mobile-text">Export em PDF</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Salve e compartilhe seus resultados</p>
-                  </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-100 text-center hover:shadow-md transition-shadow">
+                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <FileText className="w-8 h-8 text-blue-600" />
                 </div>
-              </CardContent>
-            </Card>
+                <h4 className="font-bold text-gray-900 mb-2">Export em PDF</h4>
+                <p className="text-sm text-gray-600">Salve e compartilhe seus resultados</p>
+              </div>
 
-            <Card className="bg-accent/10 border-accent/20">
-              <CardContent className="mobile-card">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent/20 rounded-full flex items-center justify-center">
-                    <Shield className="w-5 h-5 sm:w-6 sm:h-6 psychology-green" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mobile-text">100% Seguro</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Seus dados estão protegidos</p>
-                  </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-green-100 text-center hover:shadow-md transition-shadow">
+                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-8 h-8 text-green-600" />
                 </div>
-              </CardContent>
-            </Card>
+                <h4 className="font-bold text-gray-900 mb-2">100% Seguro</h4>
+                <p className="text-sm text-gray-600">Seus dados estão protegidos</p>
+              </div>
+            </div>
           </div>
 
           {/* Pricing Comparison */}
