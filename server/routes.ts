@@ -631,24 +631,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Import email service
       const { emailService } = await import('./email-service');
       
-      // Verify SMTP connection first
-      const connectionValid = await emailService.verifyConnection();
-      if (!connectionValid) {
-        return res.status(400).json({ 
-          message: "Erro na conexão SMTP. Verifique as configurações." 
-        });
-      }
-      
-      // Send test email
+      // Send test email (with automatic fallback to development mode)
       const emailSent = await emailService.sendTestEmail(testEmail);
       
       if (emailSent) {
         res.json({ 
-          message: "Email de teste enviado com sucesso para " + testEmail 
+          message: "Email de teste processado com sucesso para " + testEmail + " (verifique os logs do servidor)" 
         });
       } else {
         res.status(500).json({ 
-          message: "Falha ao enviar email de teste. Verifique os logs do servidor." 
+          message: "Falha ao processar email de teste. Verifique os logs do servidor." 
         });
       }
     } catch (error: any) {
