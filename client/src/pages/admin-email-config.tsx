@@ -75,15 +75,16 @@ export default function AdminEmailConfig() {
 
   const testMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/admin/test-email", {
-        testEmail: "test@example.com"
-      });
+      if (!testEmail) {
+        throw new Error("Email de teste é obrigatório");
+      }
+      const response = await apiRequest("POST", "/api/admin/test-email", { testEmail });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       toast({
-        title: "Teste enviado",
-        description: "Email de teste enviado com sucesso",
+        title: "Email enviado",
+        description: data.message || "Email de teste enviado com sucesso",
       });
     },
     onError: (error: any) => {
@@ -212,6 +213,25 @@ export default function AdminEmailConfig() {
               <Label htmlFor="smtpSecure">Usar conexão segura (SSL/TLS)</Label>
             </div>
 
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-semibold mb-4 text-gray-700">Teste de Configuração</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="testEmail">Email para Teste</Label>
+                  <Input
+                    id="testEmail"
+                    type="email"
+                    placeholder="admin@meuperfil360.com.br"
+                    value={testEmail}
+                    onChange={(e) => setTestEmail(e.target.value)}
+                  />
+                  <p className="text-sm text-gray-500">
+                    Digite um email válido para receber o email de teste
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="flex gap-4 pt-4">
               <Button 
                 onClick={handleSave}
@@ -224,10 +244,11 @@ export default function AdminEmailConfig() {
               <Button 
                 variant="outline"
                 onClick={handleTest}
-                disabled={testMutation.isPending}
+                disabled={testMutation.isPending || !testEmail}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
               >
                 <TestTube className="w-4 h-4 mr-2" />
-                {testMutation.isPending ? "Testando..." : "Testar Email"}
+                {testMutation.isPending ? "Enviando..." : "Testar Email"}
               </Button>
             </div>
           </CardContent>
