@@ -192,22 +192,22 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white mobile-padding">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50 mobile-padding">
         <div className="responsive-container">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
                 <Brain className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="mobile-subtitle font-bold">MeuPerfil360</h1>
-                <p className="text-xs sm:text-sm opacity-90">Descubra seu perfil comportamental</p>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">MeuPerfil360</h1>
+                <p className="text-xs sm:text-sm text-gray-600">Descubra seu perfil comportamental</p>
               </div>
             </div>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="text-white hover:bg-white/20 touch-button"
+              className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
               onClick={() => navigate("/login")}
             >
               Login
@@ -232,6 +232,21 @@ export default function Home() {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Uma poderosa ferramenta de autoconhecimento que analisa seu perfil comportamental em quatro dimensões:
               <span className="font-semibold"> Dominância, Influência, Estabilidade e Conformidade.</span>
+            </p>
+          </div>
+
+          {/* Early CTA Button */}
+          <div className="text-center mb-16">
+            <Button
+              onClick={() => setShowDataForm(true)}
+              size="lg"
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-4 text-xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
+            >
+              <Brain className="w-6 h-6 mr-3" />
+              Fazer Teste Grátis Agora
+            </Button>
+            <p className="text-sm text-gray-500 mt-3">
+              ⚡ Resultado em 5 minutos • 100% gratuito • Sem cadastro inicial
             </p>
           </div>
 
