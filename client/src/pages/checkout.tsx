@@ -13,15 +13,29 @@ import { useToast } from "@/hooks/use-toast";
 // recreating the `Stripe` object on every render.
 let stripePromise: Promise<any> | null = null;
 
-try {
-  if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-    console.error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-  } else {
-    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const initializeStripe = () => {
+  const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_51QbPrQEHwwI2jNnxJ2LYj5V1JaEAaxIGNyHdJHzDFrZkbDf9F1n8QIr9hJF8zJ9qZwYJ1bJzJvB1vCmDfRsVqR9Q00TgOeR8wN';
+  
+  try {
+    if (!stripePublicKey) {
+      console.error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+      return null;
+    }
+    
+    if (!stripePublicKey.startsWith('pk_')) {
+      console.error('Invalid Stripe public key format');
+      return null;
+    }
+    
+    console.log('Initializing Stripe with key:', stripePublicKey.substring(0, 20) + '...');
+    return loadStripe(stripePublicKey);
+  } catch (error) {
+    console.error('Failed to initialize Stripe:', error);
+    return null;
   }
-} catch (error) {
-  console.error('Failed to initialize Stripe:', error);
-}
+};
+
+stripePromise = initializeStripe();
 
 const CheckoutForm = ({ testId }: { testId: string }) => {
   const stripe = useStripe();
@@ -29,11 +43,25 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [stripeError, setStripeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!stripe) {
+      setStripeError('Stripe não foi carregado. Verifique sua conexão com a internet.');
+    } else {
+      setStripeError(null);
+    }
+  }, [stripe]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
+      toast({
+        title: "Erro no Sistema de Pagamento",
+        description: "O sistema de pagamento não foi carregado corretamente. Tente recarregar a página.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -95,6 +123,26 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {stripeError && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-red-600">
+              <X className="w-4 h-4" />
+              <p className="text-sm">{stripeError}</p>
+            </div>
+            <Button 
+              type="button"
+              onClick={() => window.location.reload()}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
+              🔄 Recarregar Página
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -301,7 +349,7 @@ export default function Checkout() {
           >
             <CheckoutForm testId={testId!} />
           </Elements>
-        ) : (
+        ) : !stripePromise && clientSecret ? (
           <Card>
             <CardContent className="p-6 text-center">
               <div className="space-y-4">
@@ -309,19 +357,44 @@ export default function Checkout() {
                   <X className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-foreground">Erro ao carregar pagamento</h3>
+                  <h3 className="font-medium text-foreground">Erro ao carregar Stripe.js</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Não foi possível inicializar o sistema de pagamento. Tente novamente em alguns minutos.
+                    Não foi possível carregar o sistema de pagamento. Verifique sua conexão com a internet e tente novamente.
                   </p>
                 </div>
-                <Button 
-                  onClick={() => navigate(`/results/${testId}`)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Voltar aos Resultados
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => window.location.reload()}
+                    variant="default"
+                    className="flex-1"
+                  >
+                    🔄 Tentar Novamente
+                  </Button>
+                  <Button 
+                    onClick={() => navigate(`/results/${testId}`)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                  <div className="spinner w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-foreground">Carregando sistema de pagamento...</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Aguarde enquanto preparamos o checkout seguro.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
