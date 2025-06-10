@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { guestTestDataSchema, type GuestTestData } from "@shared/schema";
-import { Brain, Gift, ChartPie, FileText, User, MessageCircle, Mail, Shield } from "lucide-react";
+import { Brain, Gift, ChartPie, FileText, User, MessageCircle, Mail, Shield, Crown } from "lucide-react";
 
 interface PricingConfig {
   regularPrice: string;
@@ -20,10 +20,27 @@ interface PricingConfig {
 export default function Home() {
   const [showDataForm, setShowDataForm] = useState(false);
   const [, navigate] = useLocation();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const { data: pricing } = useQuery<PricingConfig>({
     queryKey: ["/api/pricing"],
   });
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userData = localStorage.getItem("currentUser");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("currentUser");
+      }
+    }
+  }, []);
 
   const form = useForm<GuestTestData>({
     resolver: zodResolver(guestTestDataSchema),

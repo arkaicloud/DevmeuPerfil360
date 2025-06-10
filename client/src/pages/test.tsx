@@ -23,9 +23,35 @@ export default function Test() {
     least: "",
   });
   const [guestData, setGuestData] = useState<GuestTestData | null>(null);
+  const [isLoggedUser, setIsLoggedUser] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-    // Validate session and get guest data securely
+    // Check if user is logged in first
+    const userData = localStorage.getItem("currentUser");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setCurrentUser(user);
+        setIsLoggedUser(true);
+        
+        // For logged users, create mock guest data for compatibility
+        const mockGuestData: GuestTestData = {
+          name: user.username,
+          email: user.email,
+          whatsapp: user.whatsapp || "",
+        };
+        setGuestData(mockGuestData);
+        
+        console.log(`Usuário logado detectado: ${user.username}`);
+        return;
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("currentUser");
+      }
+    }
+
+    // If not logged in, check for guest data
     if (!validateSession()) {
       toast({
         title: "Sessão expirada",
@@ -47,45 +73,68 @@ export default function Test() {
       return;
     }
     setGuestData(JSON.parse(storedData));
+    setIsLoggedUser(false);
   }, [navigate, toast]);
 
   const submitTestMutation = useMutation({
     mutationFn: async (data: { guestData: GuestTestData; answers: DiscAnswer[] }) => {
-      // Check if user is logged in
-      const currentUser = localStorage.getItem("currentUser");
       let endpoint = "/api/test/submit";
       let payload: any = data;
 
-      if (currentUser) {
-        try {
-          const userData = JSON.parse(currentUser);
-          endpoint = "/api/test/submit-user";
-          payload = {
-            userId: userData.id,
-            answers: data.answers,
-          };
-        } catch (error) {
-          console.error("Error parsing user data:", error);
-          // Fallback to guest submission
-        }
+      // Use logged user data if available
+      if (isLoggedUser && currentUser) {
+        console.log(`Enviando teste para usuário logado: ${currentUser.username} (ID: ${currentUser.id})`);
+        endpoint = "/api/test/submit-user";
+        payload = {
+          userId: currentUser.id,
+          answers: data.answers,
+        };
+      } else {
+        console.log("Enviando teste como convidado");
       }
 
       const response = await apiRequest("POST", endpoint, payload);
-
       return response.json();
     },
     onSuccess: (data) => {
       // Clear guest data from sessionStorage
       sessionStorage.removeItem("guestTestData");
-      // Navigate to results
-      navigate(`/results/${data.testResultId}`);
+      
+      // Navigate based on user type
+      if (isLoggedUser && currentUser) {
+        // For logged users, go to dashboard and show success message
+        toast({
+          title: "Teste concluído com sucesso!",
+          description: `Seu perfil ${data.profile?.profileType || ''} foi identificado. Confira seu dashboard.`,
+        });
+        navigate(`/dashboard/${currentUser.id}`);
+      } else {
+        // For guests, go to results page
+        navigate(`/results/${data.testResultId}`);
+      }
     },
     onError: (error: any) => {
-      toast({
-        title: "Erro ao enviar teste",
-        description: error.message || "Ocorreu um erro. Tente novamente.",
-        variant: "destructive",
-      });
+      // Handle test limit errors specifically
+      if (error.message && error.message.includes("limite de testes")) {
+        toast({
+          title: "Limite de testes atingido",
+          description: error.message,
+          variant: "destructive",
+        });
+        
+        // Redirect to dashboard or home based on user type
+        if (isLoggedUser && currentUser) {
+          navigate(`/dashboard/${currentUser.id}`);
+        } else {
+          navigate("/");
+        }
+      } else {
+        toast({
+          title: "Erro ao enviar teste",
+          description: error.message || "Ocorreu um erro. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -187,9 +236,17 @@ export default function Test() {
             </div>
             <div>
               <h1 className="text-lg font-bold">MeuPerfil360</h1>
-              <p className="text-xs opacity-90">Teste DISC</p>
+              <p className="text-xs opacity-90">
+                {isLoggedUser ? `Teste DISC - ${currentUser?.username}` : 'Teste DISC'}
+              </p>
             </div>
           </div>
+          {isLoggedUser && (
+            <div className="text-right">
+              <p className="text-xs opacity-90">Usuário Logado</p>
+              <p className="text-xs opacity-75">{currentUser?.email}</p>
+            </div>
+          )}
         </div>
       </header>
 
