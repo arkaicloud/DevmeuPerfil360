@@ -57,7 +57,17 @@ export default function Home() {
   };
 
   const startTestAsLoggedUser = () => {
-    // For logged users, no need to collect data again
+    // For logged users, create session data from user info and go directly to test
+    const mockGuestData = {
+      name: currentUser.username,
+      email: currentUser.email,
+      whatsapp: currentUser.whatsapp || "",
+    };
+    
+    // Store the data for compatibility with test flow
+    sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+    
+    // Go directly to test without showing form
     navigate("/test");
   };
 

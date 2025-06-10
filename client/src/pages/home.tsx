@@ -15,6 +15,8 @@ export default function Home() {
   const [showDataForm, setShowDataForm] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const isLoggedIn = false; // TODO: Replace with actual auth check
+  const currentUser = { username: "Test User" }; // TODO: Replace with actual user data
 
   const form = useForm<GuestTestData>({
     resolver: zodResolver(guestTestDataSchema),
@@ -73,7 +75,7 @@ export default function Home() {
 
     // Initialize secure session
     initializeSecureSession();
-    
+
     // Store data securely
     secureStorage.setItem("guestTestData", JSON.stringify(sanitizedData));
     navigate("/test");
@@ -89,6 +91,10 @@ export default function Home() {
       return numbers.replace(/(\d{2})(\d{0,5})/, "($1) $2");
     }
     return numbers;
+  };
+
+  const startTestAsLoggedUser = () => {
+    navigate("/test"); // TODO: Adjust as necessary, potentially passing user info
   };
 
   if (showDataForm) {
@@ -271,7 +277,7 @@ export default function Home() {
           </p>
         </div>
       </header>
-      
+
       {/* Main Content */}
       <main className="bg-white">
         <div className="responsive-container section-spacing">
@@ -279,17 +285,18 @@ export default function Home() {
             <h2 className="responsive-subtitle text-slate-700 mb-4 font-semibold">
               Descubra seu Perfil Comportamental
             </h2>
-            
+
             <p className="responsive-body text-slate-600 max-w-2xl mx-auto mb-8">
               O teste DISC é uma ferramenta poderosa que revela suas características comportamentais, ajudando você a entender como se relaciona, comunica e toma decisões.
             </p>
-            
+
             <Button 
-              onClick={() => setShowDataForm(true)}
+              onClick={isLoggedIn ? startTestAsLoggedUser : () => setShowDataForm(true)}
               size="lg"
               className="btn-responsive btn-hover-lift bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-lg"
             >
-              Iniciar Teste Gratuito
+              <Brain className="w-4 h-4 mr-2" />
+              {isLoggedIn ? `Fazer Teste - ${currentUser?.username}` : "Iniciar Teste Gratuito"}
             </Button>
           </div>
 
