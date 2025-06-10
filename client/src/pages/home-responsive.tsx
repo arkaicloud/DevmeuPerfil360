@@ -229,11 +229,15 @@ export default function Home() {
             </div>
             
             <div className="text-center">
-              <h3 className="mobile-title font-bold text-foreground mb-3">Conheça seu Perfil Comportamental</h3>
+              <h3 className="mobile-title font-bold text-foreground mb-3">🎯 Descubra o Poder do Método DISC</h3>
               <p className="mobile-text text-muted-foreground leading-relaxed mb-6">
-                Faça nosso teste DISC gratuito e descubra características únicas da sua personalidade. 
-                Ideal para autoconhecimento e desenvolvimento pessoal.
+                O método DISC é uma poderosa ferramenta de autoconhecimento que analisa seu perfil comportamental em quatro dimensões:
+                <strong> Dominância, Influência, Estabilidade e Conformidade.</strong>
               </p>
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-6">
+                <p className="text-sm text-gray-700 font-medium mb-2">🔎 Com ele, você identifica como se comunica, toma decisões, lida com desafios e se adapta aos ambientes.</p>
+                <p className="text-sm text-gray-700">💡 <strong>Por que é importante?</strong> Porque conhecer seu perfil ajuda a melhorar suas relações, potencializar seus pontos fortes e evoluir nos desafios do dia a dia — seja na carreira ou na vida pessoal.</p>
+              </div>
             </div>
           </div>
 
@@ -296,16 +300,114 @@ export default function Home() {
             </Card>
           </div>
 
+          {/* Free vs Premium Comparison */}
+          <div className="mb-8">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Free Test */}
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="p-6">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Gift className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-green-800 mb-2">✨ Teste Grátis</h3>
+                    <p className="text-sm text-green-700 font-medium">A Base do Seu Perfil</p>
+                  </div>
+                  <p className="text-sm text-gray-700 mb-4 text-center">
+                    Você pode começar gratuitamente, acessando um teste básico que te mostra o seu estilo predominante e já traz clareza para o seu perfil comportamental.
+                  </p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center text-sm text-gray-700">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                      Perfil comportamental básico
+                    </div>
+                    <div className="flex items-center text-sm text-gray-700">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                      Análise do estilo predominante
+                    </div>
+                    <div className="flex items-center text-sm text-gray-700">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                      Resultado imediato
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => setShowDataForm(true)}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    size="lg"
+                  >
+                    <Brain className="w-4 h-4 mr-2" />
+                    Começar Grátis
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Premium Test */}
+              <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200 relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-1 rounded-full text-xs font-bold">
+                    🚀 RECOMENDADO
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <ChartPie className="w-8 h-8 text-purple-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-purple-800 mb-2">🚀 Teste Premium</h3>
+                    <p className="text-sm text-purple-700 font-medium">O Mapa Completo da Sua Jornada</p>
+                  </div>
+                  <p className="text-sm text-gray-700 mb-4 text-center">
+                    Para quem deseja ir além e transformar resultados, a versão premium inclui:
+                  </p>
+                  <div className="space-y-2 mb-4 text-xs">
+                    <div className="flex items-center text-gray-700">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                      💪 Principais Pontos Fortes
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                      🌱 Áreas de Desenvolvimento
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                      ⚠️ Comportamento Sob Pressão
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                      🎯 Plano de Ação de 4 Semanas
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                      📚 Livros e Podcasts Recomendados
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                      💼 Carreiras Ideais
+                    </div>
+                  </div>
+                  <div className="bg-purple-100 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-purple-800 font-medium text-center">
+                      💎 Com o premium, você tem um guia prático e profundo para usar seu perfil como alavanca para seus objetivos.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => setShowDataForm(true)}
+                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                    size="lg"
+                  >
+                    <Brain className="w-4 h-4 mr-2" />
+                    Começar e Upgradar
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
           {/* CTA Section */}
           <div className="text-center mobile-stack">
-            <Button
-              onClick={() => setShowDataForm(true)}
-              className="psychology-gradient mobile-button touch-button"
-              size="lg"
-            >
-              <Brain className="w-4 h-4 mr-2" />
-              Começar Teste Gratuito
-            </Button>
+            <p className="text-lg font-semibold text-gray-800 mb-4">
+              👉 Escolha seu caminho e comece hoje mesmo a construir a melhor versão de você.
+            </p>
             
             <div className="text-xs sm:text-sm text-muted-foreground">
               ✓ Teste gratuito • ✓ Resultado imediato • ✓ Relatório premium disponível
