@@ -249,7 +249,7 @@ export default function Home() {
                     variant="outline"
                     size="sm"
                     className="touch-button"
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate(`/dashboard/${currentUser?.id}`)}
                   >
                     Dashboard
                   </Button>
