@@ -92,12 +92,23 @@ export class DatabaseStorage implements IStorage {
     const premiumTests = userTests.filter(test => test.isPremium);
     const hasPremiumTest = premiumTests.length > 0;
 
-    // If user has at least one premium test, they can take unlimited tests
+    // If user has premium access
     if (hasPremiumTest) {
-      return { 
-        canTakeTest: true, 
-        testsRemaining: 999 // Unlimited for premium users
-      };
+      // Premium users can take up to 3 tests total (1 free + 2 premium)
+      const maxTestsForPremium = 3;
+      const remainingTests = maxTestsForPremium - totalTests;
+      
+      if (remainingTests > 0) {
+        return { 
+          canTakeTest: true, 
+          testsRemaining: remainingTests
+        };
+      } else {
+        return { 
+          canTakeTest: false, 
+          reason: "Você atingiu o limite de testes premium (máximo 3 testes: 1 gratuito + 2 premium)." 
+        };
+      }
     }
 
     // If user never took a test (free test available)
@@ -111,7 +122,7 @@ export class DatabaseStorage implements IStorage {
     // If user already used free test and doesn't have premium
     return { 
       canTakeTest: false, 
-      reason: "Você já utilizou seu teste gratuito. Faça upgrade para premium para continuar." 
+      reason: "Você já utilizou seu teste gratuito. Faça upgrade para premium para ter acesso a 2 testes adicionais." 
     };
   }
 
@@ -138,7 +149,7 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ 
         isPremiumActive: true,
-        premiumTestsRemaining: 999 // Unlimited tests for premium users
+        premiumTestsRemaining: testsCount // Limited to 2 additional tests for premium users
       })
       .where(eq(users.id, userId));
   }

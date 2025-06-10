@@ -211,25 +211,41 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
-              onClick={() => {
-                // Create session data from user info for compatibility
-                const mockGuestData = {
-                  name: user?.username || "",
-                  email: user?.email || "",
-                  whatsapp: user?.whatsapp || "",
-                };
-                sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
-                navigate("/test");
-              }}
-            >
-              <Plus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Novo Teste</span>
-              <span className="sm:hidden">Novo</span>
-            </Button>
+            {/* Só mostra o botão "Novo Teste" se o usuário pode fazer testes */}
+            {testLimits?.canTakeTest && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
+                onClick={() => {
+                  // Create session data from user info for compatibility
+                  const mockGuestData = {
+                    name: user?.username || "",
+                    email: user?.email || "",
+                    whatsapp: user?.whatsapp || "",
+                  };
+                  sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+                  navigate("/test");
+                }}
+              >
+                <Plus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Novo Teste</span>
+                <span className="sm:hidden">Novo</span>
+              </Button>
+            )}
+            {/* Se não pode fazer testes, mostra botão de upgrade */}
+            {!testLimits?.canTakeTest && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
+                onClick={() => navigate("/")}
+              >
+                <Crown className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Upgrade Premium</span>
+                <span className="sm:hidden">Premium</span>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -262,28 +278,34 @@ export default function Dashboard() {
                     Já se passaram {getDaysSinceLastTest()} dias desde seu último teste. 
                     Sua personalidade pode ter evoluído! Recomendamos refazer o teste a cada 6 meses.
                   </p>
-                  <Button 
-                    onClick={() => {
-                      // Create session data from user info for compatibility
-                      const mockGuestData = {
-                        name: user?.username || "",
-                        email: user?.email || "",
-                        whatsapp: user?.whatsapp || "",
-                      };
-                      sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
-                      if (testLimits?.canTakeTest) {
+                  {testLimits?.canTakeTest ? (
+                    <Button 
+                      onClick={() => {
+                        // Create session data from user info for compatibility
+                        const mockGuestData = {
+                          name: user?.username || "",
+                          email: user?.email || "",
+                          whatsapp: user?.whatsapp || "",
+                        };
+                        sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
                         navigate("/test");
-                      } else {
-                        alert(testLimits?.reason || "Você atingiu o limite de testes disponíveis");
-                      }
-                    }} 
-                    size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
-                    disabled={!testLimits?.canTakeTest}
-                  >
-                    <Brain className="w-4 h-4 mr-2" />
-                    Fazer Novo Teste DISC
-                  </Button>
+                      }} 
+                      size="sm"
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      <Brain className="w-4 h-4 mr-2" />
+                      Fazer Novo Teste DISC
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate("/")} 
+                      size="sm"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                    >
+                      <Crown className="w-4 h-4 mr-2" />
+                      Upgrade Premium
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -339,7 +361,7 @@ export default function Dashboard() {
                     Fazer Upgrade Premium
                   </Button>
                   <p className="text-sm text-gray-600 self-center">
-                    Desbloqueie testes ilimitados com o plano premium
+                    Desbloqueie até 2 testes adicionais com o plano premium
                   </p>
                 </div>
               )}
@@ -559,18 +581,22 @@ export default function Dashboard() {
             <AlertDialogAction
               onClick={() => {
                 setShowRetestDialog(false);
-                 // Create session data from user info for compatibility
-                 const mockGuestData = {
-                  name: user?.username || "",
-                  email: user?.email || "",
-                  whatsapp: user?.whatsapp || "",
-                };
-                sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
-                navigate("/test");
+                if (testLimits?.canTakeTest) {
+                  // Create session data from user info for compatibility
+                  const mockGuestData = {
+                    name: user?.username || "",
+                    email: user?.email || "",
+                    whatsapp: user?.whatsapp || "",
+                  };
+                  sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+                  navigate("/test");
+                } else {
+                  navigate("/");
+                }
               }}
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
             >
-              Fazer Novo Teste Agora
+              {testLimits?.canTakeTest ? "Fazer Novo Teste Agora" : "Upgrade Premium"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
