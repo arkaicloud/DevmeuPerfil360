@@ -48,18 +48,27 @@ export default function FindResults() {
         navigate(`/results/${data.testResultId}`);
       } else {
         toast({
-          title: "Nenhum resultado encontrado",
-          description: "Não encontramos testes associados com esses dados.",
+          title: "Teste não encontrado",
+          description: "Por favor, realize seu teste DISC primeiro.",
           variant: "destructive",
         });
       }
     },
     onError: (error: any) => {
-      toast({
-        title: "Erro ao buscar resultados",
-        description: error.message || "Ocorreu um erro. Tente novamente.",
-        variant: "destructive",
-      });
+      // Check if it's a 404 error (not found)
+      if (error.message.includes('404')) {
+        toast({
+          title: "Teste não encontrado",
+          description: "Por favor, realize seu teste DISC primeiro para acessar seus resultados.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao buscar resultados",
+          description: error.message || "Ocorreu um erro. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
