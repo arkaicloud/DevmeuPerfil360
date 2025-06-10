@@ -259,8 +259,11 @@ export default function AdminEmailConfig() {
               <Label htmlFor="smtpSecure">Usar conexão segura (SSL/TLS)</Label>
             </div>
 
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-semibold mb-4 text-gray-700">Teste de Configuração</h3>
+            <div className="border-t pt-6 mt-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-700 flex items-center">
+                <Mail className="w-5 h-5 mr-2" />
+                Teste de Configuração SMTP
+              </h3>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="testEmail">Email para Teste</Label>
@@ -274,6 +277,69 @@ export default function AdminEmailConfig() {
                   <p className="text-sm text-gray-500">
                     Digite um email válido para receber o email de teste
                   </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-6 mt-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-700 flex items-center">
+                <Send className="w-5 h-5 mr-2" />
+                Teste de Emails Automatizados
+              </h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="emailTestRecipient">Email Destinatário</Label>
+                    <Input
+                      id="emailTestRecipient"
+                      type="email"
+                      placeholder="leosouzaa10@gmail.com"
+                      value={testEmail}
+                      onChange={(e) => setTestEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="emailType">Tipo de Email</Label>
+                    <Select value={emailType} onValueChange={setEmailType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo de email" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="welcome">Boas-vindas (Cadastro)</SelectItem>
+                        <SelectItem value="test_completion">Teste Concluído</SelectItem>
+                        <SelectItem value="premium_upgrade">Upgrade Premium</SelectItem>
+                        <SelectItem value="retest_reminder">Lembrete de Reteste</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={handleSendTestEmail}
+                    disabled={sendTestEmailMutation.isPending || !testEmail || !emailType}
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    {sendTestEmailMutation.isPending ? "Enviando..." : "Enviar Email Teste"}
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={handleInitTemplates}
+                    disabled={initTemplatesMutation.isPending}
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                  >
+                    <TestTube className="w-4 h-4 mr-2" />
+                    {initTemplatesMutation.isPending ? "Inicializando..." : "Inicializar Templates"}
+                  </Button>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-blue-800 mb-2">Tipos de Email Disponíveis:</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li><strong>Boas-vindas:</strong> Enviado quando um usuário se cadastra</li>
+                    <li><strong>Teste Concluído:</strong> Enviado após completar um teste DISC</li>
+                    <li><strong>Upgrade Premium:</strong> Enviado após compra do relatório premium</li>
+                    <li><strong>Lembrete de Reteste:</strong> Enviado para incentivar novos testes</li>
+                  </ul>
                 </div>
               </div>
             </div>
