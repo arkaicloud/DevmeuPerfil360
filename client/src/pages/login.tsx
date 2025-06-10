@@ -49,7 +49,7 @@ export default function Login() {
         title: "Login realizado com sucesso!",
         description: `Bem-vindo, ${data.username}!`,
       });
-      navigate("/dashboard");
+      navigate(`/dashboard/${data.id}`);
     },
     onError: (error: Error) => {
       toast({
