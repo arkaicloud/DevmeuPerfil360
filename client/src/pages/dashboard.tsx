@@ -23,6 +23,7 @@ interface DashboardData {
     id: number;
     username: string;
     email: string;
+    whatsapp?: string; // Optional whatsapp
   };
   testResults: TestResult[];
 }
@@ -52,12 +53,18 @@ export default function Dashboard() {
     staleTime: 30000,
   });
 
+  const { data: user } = useQuery({
+    queryKey: [`/api/user/${userId}`],
+    enabled: !!userId,
+    staleTime: 30000,
+  });
+
   // Check if popup should be shown for 6+ month retest
   useEffect(() => {
     if (dashboardData?.testResults && dashboardData.testResults.length > 0 && needsRetesting()) {
       const lastShown = localStorage.getItem('lastRetestPopup');
       const today = new Date().toDateString();
-      
+
       // Show popup if not shown today
       if (lastShown !== today) {
         setShowRetestDialog(true);
@@ -208,7 +215,16 @@ export default function Dashboard() {
               variant="ghost"
               size="sm"
               className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
-              onClick={() => navigate("/")}
+              onClick={() => {
+                // Create session data from user info for compatibility
+                const mockGuestData = {
+                  name: user?.username || "",
+                  email: user?.email || "",
+                  whatsapp: user?.whatsapp || "",
+                };
+                sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+                navigate("/test");
+              }}
             >
               <Plus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
               <span className="hidden sm:inline">Novo Teste</span>
@@ -248,8 +264,15 @@ export default function Dashboard() {
                   </p>
                   <Button 
                     onClick={() => {
+                      // Create session data from user info for compatibility
+                      const mockGuestData = {
+                        name: user?.username || "",
+                        email: user?.email || "",
+                        whatsapp: user?.whatsapp || "",
+                      };
+                      sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
                       if (testLimits?.canTakeTest) {
-                        navigate("/");
+                        navigate("/test");
                       } else {
                         alert(testLimits?.reason || "Você atingiu o limite de testes disponíveis");
                       }
@@ -291,7 +314,16 @@ export default function Dashboard() {
             <CardContent className="p-4 md:p-6 pt-0">
               {testLimits.canTakeTest ? (
                 <Button 
-                  onClick={() => navigate("/")} 
+                    onClick={() => {
+                      // Create session data from user info for compatibility
+                      const mockGuestData = {
+                        name: user?.username || "",
+                        email: user?.email || "",
+                        whatsapp: user?.whatsapp || "",
+                      };
+                      sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+                      navigate("/test");
+                    }}
                   className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
                 >
                   <Brain className="w-4 h-4 mr-2" />
@@ -367,7 +399,16 @@ export default function Dashboard() {
                   Descubra seu perfil comportamental e potencialize seu desenvolvimento pessoal e profissional com nosso teste DISC.
                 </p>
                 <div className="space-y-3">
-                  <Button onClick={() => navigate("/")} className="psychology-gradient" size="default">
+                  <Button onClick={() => {
+                  // Create session data from user info for compatibility
+                  const mockGuestData = {
+                    name: user?.username || "",
+                    email: user?.email || "",
+                    whatsapp: user?.whatsapp || "",
+                  };
+                  sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+                  navigate("/test");
+                }} className="psychology-gradient" size="default">
                     <Brain className="w-4 h-4 mr-2" />
                     Fazer Primeiro Teste DISC
                   </Button>
@@ -399,13 +440,13 @@ export default function Dashboard() {
                           {format(new Date(result.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                         </div>
                       </div>
-                      
+
                       <div className="mb-3">
                         <p className="text-xs md:text-sm text-muted-foreground">
                           Perfil comportamental identificado
                         </p>
                       </div>
-                      
+
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           variant="outline"
@@ -518,7 +559,14 @@ export default function Dashboard() {
             <AlertDialogAction
               onClick={() => {
                 setShowRetestDialog(false);
-                navigate("/");
+                 // Create session data from user info for compatibility
+                 const mockGuestData = {
+                  name: user?.username || "",
+                  email: user?.email || "",
+                  whatsapp: user?.whatsapp || "",
+                };
+                sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+                navigate("/test");
               }}
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
             >
