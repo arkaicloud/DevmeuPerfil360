@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { discQuestions } from "@/lib/disc-questions";
-import { type DiscAnswer, type GuestTestData } from "@shared/schema";
+import { type DiscAnswer, type GuestTestData, type UserTestSubmission, type DiscTestSubmission } from "@shared/schema";
 import DiscQuestion from "@/components/disc-question";
 import TestProgress from "@/components/test-progress";
 import { secureStorage, validateSession, sanitizeInput, clientRateLimit } from "@/lib/security";
@@ -54,7 +54,7 @@ export default function Test() {
       // Check if user is logged in
       const currentUser = localStorage.getItem("currentUser");
       let endpoint = "/api/test/submit";
-      let payload = data;
+      let payload: any = data;
 
       if (currentUser) {
         try {

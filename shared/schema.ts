@@ -116,6 +116,12 @@ export const discTestSubmissionSchema = z.object({
   answers: z.array(discAnswerSchema),
 });
 
+// User test submission schema (for authenticated users)
+export const userTestSubmissionSchema = z.object({
+  userId: z.number(),
+  answers: z.array(discAnswerSchema),
+});
+
 // Registration schema
 export const registrationSchema = insertUserSchema.extend({
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
@@ -135,4 +141,5 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type GuestTestData = z.infer<typeof guestTestDataSchema>;
 export type DiscAnswer = z.infer<typeof discAnswerSchema>;
 export type DiscTestSubmission = z.infer<typeof discTestSubmissionSchema>;
+export type UserTestSubmission = z.infer<typeof userTestSubmissionSchema>;
 export type Registration = z.infer<typeof registrationSchema>;
