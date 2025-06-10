@@ -105,21 +105,21 @@ export default function Results() {
 
   const getDiscColor = (type: string) => {
     switch (type) {
-      case "D": return "bg-red-100 text-red-700 border-red-200";
-      case "I": return "bg-yellow-100 text-yellow-700 border-yellow-200";
-      case "S": return "bg-green-100 text-green-700 border-green-200";
-      case "C": return "bg-blue-100 text-blue-700 border-blue-200";
-      default: return "bg-gray-100 text-gray-700 border-gray-200";
+      case "D": return "bg-red-600 text-white border-red-600";
+      case "I": return "bg-orange-500 text-white border-orange-500";
+      case "S": return "bg-green-600 text-white border-green-600";
+      case "C": return "bg-blue-600 text-white border-blue-600";
+      default: return "bg-gray-600 text-white border-gray-600";
     }
   };
 
   const getScoreColor = (type: string) => {
     switch (type) {
-      case "D": return "bg-red-500";
-      case "I": return "bg-yellow-500";
-      case "S": return "bg-green-500";
-      case "C": return "bg-blue-500";
-      default: return "bg-gray-500";
+      case "D": return "bg-red-600";
+      case "I": return "bg-orange-500";
+      case "S": return "bg-green-600";
+      case "C": return "bg-blue-600";
+      default: return "bg-gray-600";
     }
   };
 

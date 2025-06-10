@@ -121,10 +121,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined> {
+    // Clean the WhatsApp number - remove spaces, dashes, parentheses
+    const cleanWhatsapp = whatsapp.replace(/[\s\-\(\)\+]/g, '');
+    
     const [result] = await db
       .select()
       .from(testResults)
-      .where(eq(testResults.guestWhatsapp, whatsapp))
+      .where(sql`REPLACE(REPLACE(REPLACE(REPLACE(${testResults.guestWhatsapp}, ' ', ''), '-', ''), '(', ''), ')', '') = ${cleanWhatsapp}`)
       .orderBy(desc(testResults.createdAt));
     return result || undefined;
   }
