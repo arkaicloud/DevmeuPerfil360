@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,13 +8,12 @@ import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, X } f
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Make sure to call `loadStripe` outside of a component's render to avoid
-// recreating the `Stripe` object on every render.
-let stripePromise: Promise<Stripe | null> | null = null;
+// Use global Stripe loaded via script tag
+let stripePromise: Promise<any> | null = null;
 
-const initializeStripe = (): Promise<Stripe | null> | null => {
-  // Check if we're in a browser environment
-  if (typeof window === 'undefined') {
+const initializeStripe = () => {
+  // Check if we're in a browser environment and Stripe is loaded
+  if (typeof window === 'undefined' || !window.Stripe) {
     return null;
   }
 
@@ -33,17 +31,20 @@ const initializeStripe = (): Promise<Stripe | null> | null => {
     }
     
     console.log('Initializing Stripe with key:', stripePublicKey.substring(0, 12) + '...');
-    return loadStripe(stripePublicKey);
+    return Promise.resolve(window.Stripe(stripePublicKey));
   } catch (error) {
     console.error('Failed to initialize Stripe:', error);
     return Promise.resolve(null);
   }
 };
 
-// Initialize Stripe only once
-if (typeof window !== 'undefined' && !stripePromise) {
-  stripePromise = initializeStripe();
-}
+// Initialize Stripe only once when window.Stripe is available
+const getStripePromise = () => {
+  if (!stripePromise) {
+    stripePromise = initializeStripe();
+  }
+  return stripePromise;
+};
 
 const CheckoutForm = ({ testId }: { testId: string }) => {
   const stripe = useStripe();
@@ -209,20 +210,46 @@ export default function Checkout() {
     }
 
     // Check if Stripe is properly configured
-    const checkStripeConfig = async () => {
-      if (!stripePromise) {
+    const checkStripeConfig = () => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      // Wait for Stripe to load if not available yet
+      if (!window.Stripe) {
+        const checkInterval = setInterval(() => {
+          if (window.Stripe) {
+            clearInterval(checkInterval);
+            initializeStripeCheck();
+          }
+        }, 100);
+
+        // Stop checking after 5 seconds
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          if (!window.Stripe) {
+            setStripeLoadError("Stripe.js não foi carregado. Verifique sua conexão com a internet e recarregue a página.");
+          }
+        }, 5000);
+        return;
+      }
+
+      initializeStripeCheck();
+    };
+
+    const initializeStripeCheck = () => {
+      const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+      if (!stripePublicKey) {
         setStripeLoadError("Sistema de pagamento não configurado. Verifique as variáveis de ambiente.");
         return;
       }
 
       try {
-        const stripe = await stripePromise;
-        if (!stripe) {
-          setStripeLoadError("Falha ao carregar Stripe.js. Verifique sua conexão com a internet.");
-        }
+        getStripePromise();
+        console.log('Stripe inicializado com sucesso');
       } catch (error) {
-        console.error('Stripe loading error:', error);
-        setStripeLoadError("Erro ao carregar sistema de pagamento. Tente recarregar a página.");
+        console.error('Stripe initialization error:', error);
+        setStripeLoadError("Erro ao inicializar sistema de pagamento. Tente recarregar a página.");
       }
     };
 
@@ -359,9 +386,9 @@ export default function Checkout() {
         </Card>
 
         {/* Payment Form */}
-        {stripePromise && clientSecret ? (
+        {getStripePromise() && clientSecret ? (
           <Elements 
-            stripe={stripePromise} 
+            stripe={getStripePromise()} 
             options={{ 
               clientSecret,
               appearance: {
@@ -378,7 +405,7 @@ export default function Checkout() {
           >
             <CheckoutForm testId={testId!} />
           </Elements>
-        ) : !stripePromise && clientSecret ? (
+        ) : !getStripePromise() && clientSecret ? (
           <Card>
             <CardContent className="p-6 text-center">
               <div className="space-y-4">
