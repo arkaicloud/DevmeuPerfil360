@@ -27,6 +27,12 @@ interface DashboardData {
   testResults: TestResult[];
 }
 
+interface TestLimits {
+  canTakeTest: boolean;
+  reason?: string;
+  testsRemaining?: number;
+}
+
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const params = useParams();
@@ -38,6 +44,12 @@ export default function Dashboard() {
     enabled: !!userId,
     retry: 1,
     staleTime: 30000, // 30 seconds
+  });
+
+  const { data: testLimits } = useQuery<TestLimits>({
+    queryKey: [`/api/user/${userId}/test-limits`],
+    enabled: !!userId,
+    staleTime: 30000,
   });
 
   // Check if popup should be shown for 6+ month retest
@@ -235,9 +247,16 @@ export default function Dashboard() {
                     Sua personalidade pode ter evoluído! Recomendamos refazer o teste a cada 6 meses.
                   </p>
                   <Button 
-                    onClick={() => navigate("/")} 
+                    onClick={() => {
+                      if (testLimits?.canTakeTest) {
+                        navigate("/");
+                      } else {
+                        alert(testLimits?.reason || "Você atingiu o limite de testes disponíveis");
+                      }
+                    }} 
                     size="sm"
                     className="bg-amber-600 hover:bg-amber-700 text-white"
+                    disabled={!testLimits?.canTakeTest}
                   >
                     <Brain className="w-4 h-4 mr-2" />
                     Fazer Novo Teste DISC

@@ -173,6 +173,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
 
+      // Check test limits before proceeding
+      const testLimits = await storage.checkUserTestLimits(parseInt(userId));
+      if (!testLimits.canTakeTest) {
+        return res.status(403).json({ 
+          message: testLimits.reason,
+          canTakeTest: false,
+          needsPremium: !user.isPremiumActive
+        });
+      }
+
+      console.log(`Usuário ${user.username} pode fazer teste. Testes restantes: ${testLimits.testsRemaining}`);
+
       // Calculate DISC profile
       const discResults = calculateDiscProfile(answers);
 
@@ -189,6 +201,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isPremium: false,
         paymentId: null,
       });
+
+      // Consume the test (decrement user's available tests)
+      await storage.consumeUserTest(parseInt(userId));
 
       console.log(`Teste criado com sucesso para usuário ${userId}: ${testResult.id}`);
 
@@ -351,13 +366,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Grant premium access with additional tests if user is registered
+      if (testResult.userId) {
+        await storage.grantPremiumAccess(testResult.userId, 2);
+        console.log(`Usuário ${testResult.userId} recebeu acesso premium com 2 testes adicionais`);
+      }
+
       console.log(`Teste ${testId} atualizado para premium com sucesso`);
 
       // Send premium upgrade email (non-blocking)
-      if (testResult.guestEmail) {
+      const emailTarget = testResult.guestEmail || (testResult.userId ? (await storage.getUser(testResult.userId))?.email : null);
+      const userName = testResult.guestName || (testResult.userId ? (await storage.getUser(testResult.userId))?.username : 'Usuário');
+      
+      if (emailTarget) {
         emailService.sendPremiumUpgradeEmail(
-          testResult.guestEmail,
-          testResult.guestName || 'Usuário',
+          emailTarget,
+          userName || 'Usuário',
           testResult.profileType,
           testId.toString()
         ).catch(error => {
