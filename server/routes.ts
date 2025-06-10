@@ -21,6 +21,17 @@ import { body, param, query, validationResult } from "express-validator";
 import { emailService } from "./email-service";
 import rateLimit from "express-rate-limit";
 import { v4 as uuidv4 } from "uuid";
+import { 
+  strictRateLimit,
+  authRateLimit,
+  securityHeaders,
+  validateInput,
+  threatDetection,
+  secureAuth,
+  sessionManager,
+  threatDetector,
+  DataEncryption
+} from "./security-middleware";
 // import puppeteer from "puppeteer"; // Disabled due to system dependencies
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -520,45 +531,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin authentication
+  // Admin authentication - Segurança reforçada
   app.post("/api/admin/login", [
-    sanitizeInput,
-    body('email').isEmail().withMessage('Email inválido'),
-    body('password').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres'),
+    authRateLimit,
+    validateInput,
+    threatDetection,
+    body('email').isEmail().normalizeEmail().withMessage('Email inválido'),
+    body('password').isLength({ min: 8 }).withMessage('Senha deve ter pelo menos 8 caracteres'),
     validateRequest
   ], async (req: any, res: any) => {
+    const ip = req.ip || req.connection.remoteAddress;
+    
     try {
       const { email, password } = req.body;
       
-      // Check admin credentials from environment variables
-      const adminEmail = process.env.ADMIN_EMAIL || "adm@meuperfil360.com.br";
-      const adminPassword = process.env.ADMIN_PASSWORD;
+      // Log tentativa de login
+      threatDetector.logActivity(ip, 'admin_login_attempt', { email });
       
-      if (!adminPassword) {
-        console.error("ADMIN_PASSWORD não definida nas variáveis de ambiente");
+      // Verificar credenciais admin com hash seguro
+      const adminEmail = process.env.ADMIN_EMAIL || "adm@meuperfil360.com.br";
+      const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+      
+      if (!adminPasswordHash) {
+        console.error("ADMIN_PASSWORD_HASH não definido");
+        threatDetector.logActivity(ip, 'login_failure', { reason: 'config_error' });
         return res.status(500).json({ message: "Configuração de admin inválida" });
       }
       
-      if (email !== adminEmail || password !== adminPassword) {
+      // Verificar email
+      if (email !== adminEmail) {
+        threatDetector.logActivity(ip, 'login_failure', { reason: 'invalid_email' });
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
+      
+      // Verificar senha com bcrypt
+      const isValidPassword = await bcrypt.compare(password, adminPasswordHash);
+      if (!isValidPassword) {
+        threatDetector.logActivity(ip, 'login_failure', { reason: 'invalid_password' });
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // Criar sessão segura
+      const sessionToken = sessionManager.createSession('admin', {
+        email,
+        role: 'admin',
+        loginTime: new Date().toISOString()
+      });
+
+      // Log sucesso
+      threatDetector.logActivity(ip, 'admin_login_success', { email });
 
       const adminData = {
         id: "admin",
         email: email,
         role: "admin",
-        loginTime: new Date().toISOString()
+        loginTime: new Date().toISOString(),
+        sessionToken: sessionToken
       };
 
       res.json(adminData);
     } catch (error: any) {
       console.error('Admin login error:', error);
+      threatDetector.logActivity(ip, 'login_failure', { reason: 'server_error' });
       res.status(500).json({ message: "Erro no login administrativo" });
     }
   });
 
-  // Admin dashboard stats
-  app.get("/api/admin/stats", async (req: any, res: any) => {
+  // Admin dashboard stats - Requer autenticação
+  app.get("/api/admin/stats", [secureAuth, strictRateLimit], async (req: any, res: any) => {
     try {
       // Get total users
       const totalUsers = await db.select({ count: sql<number>`count(*)` }).from(users);

@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
+import { securityHeaders, strictRateLimit, threatDetection, validateInput } from "./security-middleware";
 
 const app = express();
 
@@ -29,15 +30,21 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
-// CORS Configuration
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://meuperfil360.com.br', 'https://www.meuperfil360.com.br']
-    : true,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-}));
+  // Aplicar middlewares de segurança
+  app.use(securityHeaders);
+  app.use(strictRateLimit);
+  app.use(threatDetection);
+  app.use(validateInput);
+
+  // CORS configuration - mais restritivo
+  app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['https://meuperfil360.com.br', 'https://www.meuperfil360.com.br']
+      : ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  }));
 
 // Rate Limiting
 const limiter = rateLimit({
