@@ -18,6 +18,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
 import bcrypt from "bcrypt";
 import { body, param, query, validationResult } from "express-validator";
+import { emailService } from "./email-service";
 import rateLimit from "express-rate-limit";
 import { v4 as uuidv4 } from "uuid";
 // import puppeteer from "puppeteer"; // Disabled due to system dependencies
@@ -125,6 +126,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentId: null,
       });
 
+      // Send test completion email for guest users (non-blocking)
+      emailService.sendTestCompletionEmail(
+        guestData.email, 
+        guestData.name, 
+        discResults.profileType, 
+        testResult.id.toString()
+      ).catch(error => {
+        console.error('Erro ao enviar email de conclusão de teste para convidado:', error);
+      });
+
       res.json({
         testResultId: testResult.id,
         profile: discResults,
@@ -180,6 +191,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log(`Teste criado com sucesso para usuário ${userId}: ${testResult.id}`);
+
+      // Send test completion email (non-blocking)
+      emailService.sendTestCompletionEmail(
+        user.email, 
+        user.username, 
+        discResults.profileType, 
+        testResult.id.toString()
+      ).catch(error => {
+        console.error('Erro ao enviar email de conclusão de teste:', error);
+      });
 
       res.json({
         testResultId: testResult.id,
@@ -837,6 +858,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         ...userData,
         password: hashedPassword,
+      });
+
+      // Send welcome email (non-blocking)
+      emailService.sendWelcomeEmail(user.email, user.username).catch(error => {
+        console.error('Erro ao enviar email de boas-vindas:', error);
       });
 
       res.json({
