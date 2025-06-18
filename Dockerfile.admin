@@ -1,0 +1,22 @@
+# etapa de build
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# copia package.json para cache de dependências\COPY package.json package-lock.json ./
+RUN npm install
+
+# copia o código completo e roda o build\COPY . .
+RUN npm run build
+
+# etapa de runtime
+FROM node:18-alpine
+WORKDIR /app
+
+# copia os artefatos gerados para "dist"
+COPY --from=builder /app/dist /app/dist
+
+# expõe a porta onde o Express/API será servido
+EXPOSE 3001
+
+# inicia o servidor Node
+CMD ["node", "dist/index.js"]

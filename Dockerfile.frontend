@@ -1,0 +1,12 @@
+# Use Node para build
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY client/package*.json ./client/
+RUN cd client && npm install
+COPY client ./client
+RUN cd client && npm run build
+
+# Servidor estático leve
+FROM nginx:alpine
+COPY --from=builder /app/client/dist /usr/share/nginx/html
+EXPOSE 80
