@@ -212,13 +212,14 @@ export default function Test() {
     }));
   };
 
-  if (!guestData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner" />
-      </div>
-    );
-  }
+  // Remove the blocking condition - allow all users to take the test
+  // if (!guestData) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="spinner" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
