@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -16,6 +16,9 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Debug logs
+  console.log('CheckoutForm rendered:', { stripe: !!stripe, elements: !!elements });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,11 +87,13 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <PaymentElement 
-            options={{
-              layout: 'tabs'
-            }}
-          />
+          <div style={{ minHeight: '200px' }}>
+            <PaymentElement 
+              options={{
+                layout: 'tabs'
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -125,6 +130,24 @@ export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  const stripeOptions = useMemo(() => {
+    if (!clientSecret) return null;
+    
+    return {
+      clientSecret,
+      appearance: {
+        theme: 'stripe' as const,
+        variables: {
+          colorPrimary: '#3b82f6',
+          colorBackground: '#ffffff',
+          colorText: '#1f2937',
+          colorDanger: '#ef4444',
+          borderRadius: '8px',
+        },
+      },
+    };
+  }, [clientSecret]);
+
   useEffect(() => {
     const path = window.location.pathname;
     const id = path.split('/').pop();
@@ -151,6 +174,7 @@ export default function Checkout() {
         }
 
         const data = await response.json();
+        console.log('Payment intent created:', { clientSecret: data.clientSecret });
         setClientSecret(data.clientSecret);
       } catch (error: any) {
         console.error("Erro ao criar payment intent:", error);
@@ -268,22 +292,10 @@ export default function Checkout() {
         </Card>
 
         {/* Payment Form */}
-        {stripePromise && clientSecret ? (
+        {stripePromise && stripeOptions ? (
           <Elements 
             stripe={stripePromise} 
-            options={{ 
-              clientSecret,
-              appearance: {
-                theme: 'stripe',
-                variables: {
-                  colorPrimary: '#3b82f6',
-                  colorBackground: '#ffffff',
-                  colorText: '#1f2937',
-                  colorDanger: '#ef4444',
-                  borderRadius: '8px',
-                },
-              },
-            }}
+            options={stripeOptions}
           >
             <CheckoutForm testId={testId!} />
           </Elements>
