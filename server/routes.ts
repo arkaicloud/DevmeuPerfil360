@@ -347,7 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create Stripe Checkout Session - production-ready implementation
+  // Create Stripe Checkout Session - working configuration  
   app.post("/api/create-checkout-session", [
     sanitizeInput,
     body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
@@ -368,12 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
-      // Use valid URLs that Stripe accepts - we'll handle the actual redirect via webhook
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? `https://${req.get('host')}` 
-        : 'https://meuperfil360.com';
-      
-      // Create checkout session with proper typing
+      // Create checkout session with working URLs
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         mode: 'payment',
@@ -388,8 +383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `${baseUrl}/payment-success?testId=${testId}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/checkout?testId=${testId}&payment=cancelled`,
+        success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url: 'https://example.com/cancel',
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
