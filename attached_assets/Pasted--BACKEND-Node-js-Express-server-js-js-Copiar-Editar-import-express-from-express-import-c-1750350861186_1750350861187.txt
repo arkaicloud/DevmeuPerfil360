@@ -1,0 +1,142 @@
+📦 BACKEND (Node.js + Express)
+👉 server.js
+js
+Copiar
+Editar
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import Stripe from "stripe";
+import bodyParser from "body-parser";
+
+dotenv.config();
+
+const app = express();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+app.use(cors());
+app.use(express.json());
+
+// ✅ CRIAR SESSÃO DE CHECKOUT
+app.post("/create-checkout-session", async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "brl",
+            product_data: {
+              name: "Relatório DISC Premium",
+            },
+            unit_amount: 4700, // R$47,00
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "https://seusite.com/sucesso",
+      cancel_url: "https://seusite.com/cancelado",
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ✅ RECEBER CONFIRMAÇÃO DO STRIPE
+app.post("/webhook", bodyParser.raw({ type: "application/json" }), (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error("Webhook Error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    console.log("✅ Pagamento confirmado:", session.customer_email);
+    // Aqui você pode liberar o acesso ao relatório
+  }
+
+  res.send();
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+👉 .env
+ini
+Copiar
+Editar
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+🎨 FRONTEND (Vite ou HTML moderno)
+👉 index.html
+html
+Copiar
+Editar
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Relatório DISC Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Inter, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: linear-gradient(to right, #7c3aed, #4f46e5);
+        color: white;
+        margin: 0;
+      }
+
+      .btn {
+        background: #ffffff;
+        color: #4f46e5;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 9999px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: 0.3s;
+      }
+
+      .btn:hover {
+        background: #f1f1f1;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Desbloqueie seu Relatório Premium</h1>
+    <button class="btn" onclick="checkout()">Comprar por R$47</button>
+
+    <script>
+      async function checkout() {
+        const response = await fetch("http://localhost:3000/create-checkout-session", {
+          method: "POST",
+        });
+        const data = await response.json();
+        window.location.href = data.url;
+      }
+    </script>
+  </body>
+</html>
+✅ EXTRAS
+Testar Webhook local com stripe CLI:
+bash
+Copiar
+Editar
+stripe listen --forward-to localhost:3000/webhook
