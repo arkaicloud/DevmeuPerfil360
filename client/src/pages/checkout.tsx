@@ -8,40 +8,16 @@ import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, X } f
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Use global Stripe loaded via script tag
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialize Stripe with the public key
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+
 let stripePromise: Promise<any> | null = null;
 
-const initializeStripe = () => {
-  // Check if we're in a browser environment and Stripe is loaded
-  if (typeof window === 'undefined' || !window.Stripe) {
-    return null;
-  }
-
-  const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-  
-  if (!stripePublicKey) {
-    console.warn('VITE_STRIPE_PUBLIC_KEY not found in environment variables');
-    return Promise.resolve(null);
-  }
-  
-  try {
-    if (!stripePublicKey.startsWith('pk_')) {
-      console.error('Invalid Stripe public key format');
-      return Promise.resolve(null);
-    }
-    
-    console.log('Initializing Stripe with key:', stripePublicKey.substring(0, 12) + '...');
-    return Promise.resolve(window.Stripe(stripePublicKey));
-  } catch (error) {
-    console.error('Failed to initialize Stripe:', error);
-    return Promise.resolve(null);
-  }
-};
-
-// Initialize Stripe only once when window.Stripe is available
 const getStripePromise = () => {
-  if (!stripePromise) {
-    stripePromise = initializeStripe();
+  if (!stripePromise && stripePublicKey) {
+    stripePromise = loadStripe(stripePublicKey);
   }
   return stripePromise;
 };
