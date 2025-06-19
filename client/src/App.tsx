@@ -20,8 +20,9 @@ import NotFound from "@/pages/not-found";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-if (!clerkPubKey) {
-  throw new Error("Missing Publishable Key");
+// Temporary fallback while waiting for correct Clerk publishable key
+if (!clerkPubKey || clerkPubKey.startsWith('sk_') || clerkPubKey.includes('BEGIN PUBLIC KEY')) {
+  console.warn('Clerk publishable key missing or invalid. Running without Clerk authentication.');
 }
 
 function Router() {
@@ -45,17 +46,37 @@ function Router() {
 }
 
 function App() {
+  // Check if we have a valid Clerk publishable key
+  const hasValidClerkKey = clerkPubKey && 
+    clerkPubKey.startsWith('pk_') && 
+    !clerkPubKey.includes('BEGIN PUBLIC KEY') &&
+    !clerkPubKey.startsWith('sk_');
+
+  if (hasValidClerkKey) {
+    return (
+      <ClerkProvider publishableKey={clerkPubKey}>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <div className="mobile-container">
+              <Toaster />
+              <Router />
+            </div>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ClerkProvider>
+    );
+  }
+
+  // Fallback without Clerk for now
   return (
-    <ClerkProvider publishableKey={clerkPubKey}>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <div className="mobile-container">
-            <Toaster />
-            <Router />
-          </div>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <div className="mobile-container">
+          <Toaster />
+          <Router />
+        </div>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
