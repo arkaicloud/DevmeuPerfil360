@@ -1,26 +1,14 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, X } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-import { loadStripe } from '@stripe/stripe-js';
-
-// Initialize Stripe with the public key
-const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-
-let stripePromise: Promise<any> | null = null;
-
-const getStripePromise = () => {
-  if (!stripePromise && stripePublicKey) {
-    stripePromise = loadStripe(stripePublicKey);
-  }
-  return stripePromise;
-};
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
 const CheckoutForm = ({ testId }: { testId: string }) => {
   const stripe = useStripe();
@@ -28,15 +16,6 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [stripeError, setStripeError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!stripe) {
-      setStripeError('Stripe não foi carregado. Verifique sua conexão com a internet.');
-    } else {
-      setStripeError(null);
-    }
-  }, [stripe]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,15 +31,12 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
 
     setIsProcessing(true);
 
-    // Use redirect: 'if_required' para evitar problemas de redirecionamento em alguns ambientes
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       redirect: 'if_required',
     });
     
-    // Se bem-sucedido e não redirecionar, atualizamos o status premium e fazemos a navegação manualmente
     if (paymentIntent && paymentIntent.status === 'succeeded') {
-      // Atualizar o status premium do teste
       try {
         await fetch(`/api/test/upgrade/${testId}`, {
           method: "POST",
@@ -75,7 +51,6 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
           description: "Seu relatório premium foi liberado com sucesso!",
         });
         
-        // Redirecionar para a página de resultados com status atualizado
         navigate(`/results/${testId}?payment=success`);
         return;
       } catch (err) {
@@ -96,50 +71,22 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
         description: error.message || "Ocorreu um erro ao processar o pagamento.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Pagamento Realizado com Sucesso!",
-        description: "Obrigado pela sua compra! Redirecionando...",
-      });
-      
-      // Redirect will happen automatically via return_url
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {stripeError && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-red-600">
-              <X className="w-4 h-4" />
-              <p className="text-sm">{stripeError}</p>
-            </div>
-            <Button 
-              type="button"
-              onClick={() => window.location.reload()}
-              variant="outline"
-              size="sm"
-              className="mt-2"
-            >
-              🔄 Recarregar Página
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 psychology-blue" />
+            <CreditCard className="w-5 h-5 text-blue-600" />
             Dados do Pagamento
           </CardTitle>
         </CardHeader>
         <CardContent>
           <PaymentElement 
             options={{
-              layout: 'tabs',
-              paymentMethodOrder: ['card', 'ideal', 'sepa_debit']
+              layout: 'tabs'
             }}
           />
         </CardContent>
@@ -148,11 +95,14 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
       <Button 
         type="submit"
         disabled={!stripe || !elements || isProcessing}
-        className="w-full psychology-gradient btn-hover-lift"
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
         size="lg"
       >
         {isProcessing ? (
-          <div className="spinner" />
+          <div className="flex items-center">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            Processando...
+          </div>
         ) : (
           <>
             <Shield className="w-4 h-4 mr-2" />
@@ -174,7 +124,6 @@ export default function Checkout() {
   const [testId, setTestId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [stripeLoadError, setStripeLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -184,69 +133,29 @@ export default function Checkout() {
     } else {
       navigate("/");
     }
-
-    // Check if Stripe is properly configured
-    const checkStripeConfig = () => {
-      if (typeof window === 'undefined') {
-        return;
-      }
-
-      // Wait for Stripe to load if not available yet
-      if (!window.Stripe) {
-        const checkInterval = setInterval(() => {
-          if (window.Stripe) {
-            clearInterval(checkInterval);
-            initializeStripeCheck();
-          }
-        }, 100);
-
-        // Stop checking after 5 seconds
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          if (!window.Stripe) {
-            setStripeLoadError("Stripe.js não foi carregado. Verifique sua conexão com a internet e recarregue a página.");
-          }
-        }, 5000);
-        return;
-      }
-
-      initializeStripeCheck();
-    };
-
-    const initializeStripeCheck = () => {
-      const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-      if (!stripePublicKey) {
-        setStripeLoadError("Sistema de pagamento não configurado. Verifique as variáveis de ambiente.");
-        return;
-      }
-
-      try {
-        getStripePromise();
-        console.log('Stripe inicializado com sucesso');
-      } catch (error) {
-        console.error('Stripe initialization error:', error);
-        setStripeLoadError("Erro ao inicializar sistema de pagamento. Tente recarregar a página.");
-      }
-    };
-
-    checkStripeConfig();
   }, [navigate]);
 
   useEffect(() => {
     if (!testId) return;
 
-    // Create PaymentIntent as soon as the page loads
     const createPaymentIntent = async () => {
       try {
-        setIsLoading(true);
-        const response = await apiRequest("POST", "/api/create-payment-intent", { 
-          testResultId: parseInt(testId) 
+        const response = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ testId }),
         });
+
+        if (!response.ok) {
+          throw new Error("Falha ao criar intenção de pagamento");
+        }
+
         const data = await response.json();
         setClientSecret(data.clientSecret);
       } catch (error: any) {
+        console.error("Erro ao criar payment intent:", error);
         toast({
-          title: "Erro ao inicializar pagamento",
+          title: "Erro ao Inicializar Pagamento",
           description: error.message || "Não foi possível inicializar o pagamento.",
           variant: "destructive",
         });
@@ -262,8 +171,7 @@ export default function Checkout() {
   if (isLoading || !clientSecret) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-        {/* Header */}
-        <header className="psychology-gradient text-white p-4 safe-area-top">
+        <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -279,7 +187,7 @@ export default function Checkout() {
 
         <div className="h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="spinner mx-auto mb-4" />
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-muted-foreground">Preparando pagamento...</p>
           </div>
         </div>
@@ -287,11 +195,9 @@ export default function Checkout() {
     );
   }
 
-  // Make SURE to wrap the form in <Elements> which provides the stripe context.
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      {/* Header */}
-      <header className="psychology-gradient text-white p-4 safe-area-top">
+      <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Button
@@ -313,38 +219,38 @@ export default function Checkout() {
         </div>
       </header>
 
-      <div className="p-6">
+      <div className="container mx-auto p-4 max-w-2xl">
         {/* Order Summary */}
-        <Card className="mb-6 bg-gradient-to-br from-secondary/10 to-primary/10 border-secondary/20">
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Crown className="w-5 h-5 psychology-purple" />
+              <Crown className="w-5 h-5 text-yellow-600" />
               Resumo do Pedido
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Relatório DISC Completo</span>
-              <span className="font-medium">R$ 97,00</span>
-            </div>
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>Desconto aplicado (52%)</span>
-              <span className="text-accent">-R$ 50,00</span>
-            </div>
-            <div className="border-t pt-3 flex items-center justify-between">
-              <span className="font-bold text-foreground">Total</span>
-              <div className="text-right">
-                <div className="font-bold text-xl psychology-purple">R$ 47,00</div>
-                <Badge variant="secondary" className="bg-accent text-white text-xs">
-                  52% OFF - Oferta Limitada
-                </Badge>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Relatório DISC Completo</span>
+                <span className="font-medium">R$ 97,00</span>
               </div>
-            </div>
+              <div className="flex justify-between items-center text-green-600">
+                <span>Desconto aplicado (52%)</span>
+                <span>-R$ 50,00</span>
+              </div>
+              <hr />
+              <div className="flex justify-between items-center text-lg font-bold">
+                <span>Total</span>
+                <div className="flex items-center gap-2">
+                  <span>R$ 47,00</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    52% OFF - Oferta Limitada
+                  </Badge>
+                </div>
+              </div>
 
-            {/* Benefits included */}
-            <div className="pt-3 border-t">
-              <h4 className="font-medium text-foreground mb-3">Incluído no seu relatório:</h4>
-              <div className="space-y-2">
+              <div className="mt-4 space-y-2">
+                <p className="font-medium text-sm">Incluído no seu relatório:</p>
                 {[
                   "Análise detalhada de 15+ páginas",
                   "Dicas personalizadas de desenvolvimento",
@@ -352,7 +258,7 @@ export default function Checkout() {
                   "Comparação com outros perfis"
                 ].map((benefit, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 psychology-green flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     <span className="text-xs text-muted-foreground">{benefit}</span>
                   </div>
                 ))}
@@ -362,26 +268,26 @@ export default function Checkout() {
         </Card>
 
         {/* Payment Form */}
-        {getStripePromise() && clientSecret ? (
+        {stripePromise && clientSecret ? (
           <Elements 
-            stripe={getStripePromise()} 
+            stripe={stripePromise} 
             options={{ 
               clientSecret,
               appearance: {
                 theme: 'stripe',
                 variables: {
-                  colorPrimary: 'hsl(207, 90%, 54%)',
-                  colorBackground: 'hsl(0, 0%, 100%)',
-                  colorText: 'hsl(215, 25%, 20%)',
-                  colorDanger: 'hsl(0, 84%, 60%)',
-                  borderRadius: '12px',
+                  colorPrimary: '#3b82f6',
+                  colorBackground: '#ffffff',
+                  colorText: '#1f2937',
+                  colorDanger: '#ef4444',
+                  borderRadius: '8px',
                 },
               },
             }}
           >
             <CheckoutForm testId={testId!} />
           </Elements>
-        ) : !getStripePromise() && clientSecret ? (
+        ) : (
           <Card>
             <CardContent className="p-6 text-center">
               <div className="space-y-4">
@@ -389,62 +295,31 @@ export default function Checkout() {
                   <X className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-foreground">Erro ao carregar Stripe.js</h3>
+                  <h3 className="font-medium text-foreground">Erro ao carregar sistema de pagamento</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Não foi possível carregar o sistema de pagamento. Verifique sua conexão com a internet e tente novamente.
+                    Não foi possível carregar o Stripe. Verifique sua conexão e tente novamente.
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => window.location.reload()}
-                    variant="default"
-                    className="flex-1"
-                  >
-                    🔄 Tentar Novamente
-                  </Button>
-                  <Button 
-                    onClick={() => navigate(`/results/${testId}`)}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
-                  <div className="spinner w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-foreground">Carregando sistema de pagamento...</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Aguarde enquanto preparamos o checkout seguro.
-                  </p>
-                </div>
+                <Button 
+                  onClick={() => window.location.reload()}
+                  variant="default"
+                  className="mx-auto"
+                >
+                  🔄 Recarregar Página
+                </Button>
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Security Notice */}
-        <Card className="mt-6 bg-primary/5 border-primary/20">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <Shield className="w-5 h-5 psychology-blue mt-1 flex-shrink-0" />
-              <div>
-                <h4 className="font-medium text-foreground text-sm mb-1">Pagamento Seguro</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Seus dados estão protegidos com criptografia de nível bancário. 
-                  Não armazenamos informações do seu cartão.
-                </p>
-              </div>
-            </div>
+        <Card className="mt-6 bg-blue-50 border-blue-200">
+          <CardContent className="p-4 text-center">
+            <Shield className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+            <h4 className="font-medium text-blue-900 mb-1">Pagamento Seguro</h4>
+            <p className="text-xs text-blue-700">
+              Seus dados estão protegidos com criptografia de nível bancário. Não armazenamos informações do seu cartão.
+            </p>
           </CardContent>
         </Card>
       </div>

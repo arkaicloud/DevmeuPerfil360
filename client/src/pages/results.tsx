@@ -455,16 +455,29 @@ export default function Results() {
 
               <div className="space-y-3 mb-6">
                 {[
-                  "Análise detalhada de 15+ páginas",
-                  "Dicas personalizadas de desenvolvimento",
-                  "Export em PDF profissional",
-                  "Comparação com outros perfis"
+                  "Dicas práticas para desenvolver seu potencial comportamental",
+                  "Comparações entre perfis para descobrir seus diferenciais",
+                  "Exportação em PDF profissional – ideal para carreira e desenvolvimento",
+                  "Plano de ação em 4 semanas + livros, cursos e podcasts recomendados",
+                  "Evite autossabotagem com alertas do seu perfil sob pressão"
                 ].map((benefit, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 psychology-green flex-shrink-0" />
-                    <span className="text-sm text-foreground">{benefit}</span>
+                  <div key={index} className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 psychology-green flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-foreground leading-relaxed">{benefit}</span>
                   </div>
                 ))}
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 text-sm font-bold">💡</span>
+                  </div>
+                  <span className="text-sm font-medium text-blue-900">Ideal para usar em:</span>
+                </div>
+                <p className="text-sm text-blue-700 leading-relaxed">
+                  Processos seletivos, coaching, mentorias e crescimento pessoal
+                </p>
               </div>
 
               <div className="text-center mb-4">
