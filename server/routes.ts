@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
+import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { 
   discTestSubmissionSchema, 
@@ -194,7 +195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      console.log(`Usuário ${user.username} pode fazer teste. Testes restantes: ${testLimits.testsRemaining}`);
+      console.log(`Usuário ${user.email} pode fazer teste. Testes restantes: ${testLimits.testsRemaining}`);
 
       // Calculate DISC profile
       const discResults = calculateDiscProfile(answers);
@@ -203,7 +204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const testResult = await storage.createTestResult({
         userId: parseInt(userId),
         guestEmail: null,
-        guestName: user.username,
+        guestName: user.firstName || user.email,
         guestWhatsapp: null,
         testType: 'DISC',
         answers: answers,
@@ -221,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send test completion email (non-blocking)
       emailService.sendTestCompletionEmail(
         user.email, 
-        user.username, 
+        user.firstName || user.email, 
         discResults.profileType, 
         testResult.id.toString()
       ).catch(error => {
@@ -387,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send premium upgrade email (non-blocking)
       const emailTarget = testResult.guestEmail || (testResult.userId ? (await storage.getUser(testResult.userId))?.email : null);
-      const userName = testResult.guestName || (testResult.userId ? (await storage.getUser(testResult.userId))?.username : 'Usuário');
+      const userName = testResult.guestName || (testResult.userId ? (await storage.getUser(testResult.userId))?.firstName || (await storage.getUser(testResult.userId))?.email : 'Usuário');
       
       if (emailTarget) {
         emailService.sendPremiumUpgradeEmail(
@@ -516,7 +517,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         user: {
           id: user.id,
-          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email
         },
         testResults: formattedResults
@@ -612,7 +614,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get recent users
       const recentUsers = await db.select({
         id: users.id,
-        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
         email: users.email,
         createdAt: users.createdAt
       }).from(users).orderBy(desc(users.createdAt)).limit(10);
@@ -845,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Procurando usuário por email: ${email}`);
       const user = await storage.getUserByEmail(email);
       if (user) {
-        userName = user.username;
+        userName = user.firstName || user.email;
         console.log(`✅ Usuário encontrado: ${userName} (ID: ${user.id})`);
         
         // Get user's most recent test result
@@ -1234,8 +1237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User registration
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const validatedData = registrationSchema.parse(req.body);
-      const { confirmPassword, ...userData } = validatedData;
+      const userData = req.body;
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
@@ -1243,23 +1245,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Usuário já existe com este email" });
       }
 
-      // Hash password
-      const hashedPassword = await bcrypt.hash(userData.password!, 10);
-      
-      // Create user
+      // Create user with Clerk data (no password needed)
       const user = await storage.createUser({
-        ...userData,
-        password: hashedPassword,
+        clerkId: userData.clerkId,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        whatsapp: userData.whatsapp,
       });
 
       // Send welcome email (non-blocking)
-      emailService.sendWelcomeEmail(user.email, user.username).catch(error => {
+      emailService.sendWelcomeEmail(user.email, user.firstName || user.email).catch(error => {
         console.error('Erro ao enviar email de boas-vindas:', error);
       });
 
       res.json({
         id: user.id,
-        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         message: "Conta criada com sucesso",
       });
@@ -1283,28 +1286,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Tentativa de login para usuário: ${username}`);
 
-      // Try to find user by username first, then by email
-      let user = await storage.getUserByUsername(username);
-      if (!user) {
-        user = await storage.getUserByEmail(username);
-      }
+      // Try to find user by email (no username in Clerk system)
+      const user = await storage.getUserByEmail(username);
       
-      if (!user || !user.password) {
-        return res.status(401).json({ message: "Usuário ou senha incorretos" });
+      if (!user) {
+        return res.status(401).json({ message: "Usuário não encontrado" });
       }
 
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ message: "Usuário ou senha incorretos" });
-      }
-
-      console.log(`Login realizado com sucesso para usuário: ${username}`);
+      // Authentication is handled by Clerk, this endpoint is deprecated
+      console.log(`Login attempt for user: ${username} - redirecting to Clerk authentication`);
 
       res.json({
         id: user.id,
-        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
-        message: "Login realizado com sucesso",
+        message: "Use Clerk authentication for login",
+        redirectToClerk: true
       });
     } catch (error: any) {
       console.error("Erro no login:", error);
@@ -1328,16 +1326,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
 
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      
-      // Update user password
-      await storage.updateUserPassword(user.id, hashedPassword);
-
-      console.log(`Senha atualizada com sucesso para usuário: ${email}`);
+      // Password updates are handled by Clerk, not by our system
+      console.log(`Password update request for user: ${email} - redirecting to Clerk`);
 
       res.json({
-        message: "Senha atualizada com sucesso",
+        message: "Para alterar a senha, use a página de perfil do Clerk",
+        redirectToClerk: true
       });
     } catch (error: any) {
       console.error("Erro ao atualizar senha:", error);
@@ -3486,10 +3480,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Create test user
       const testUser = await storage.createUser({
-        username: 'admin',
+        clerkId: 'test_clerk_id',
         email: 'admin@test.com',
-        whatsapp: '+5511999999999',
-        password: await bcrypt.hash('admin123', 10)
+        firstName: 'Admin',
+        lastName: 'User',
+        whatsapp: '+5511999999999'
       });
 
       // Create sample test result

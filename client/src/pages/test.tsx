@@ -25,9 +25,11 @@ export default function Test() {
   const [guestData, setGuestData] = useState<GuestTestData | null>(null);
   const [isLoggedUser, setIsLoggedUser] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [completedAnswers, setCompletedAnswers] = useState<DiscAnswer[]>([]);
 
   useEffect(() => {
-    // Check if user is logged in first
+    // Check if user is logged in with Clerk or local storage
     const userData = localStorage.getItem("currentUser");
     if (userData) {
       try {
@@ -35,15 +37,15 @@ export default function Test() {
         setCurrentUser(user);
         setIsLoggedUser(true);
         
-        // For logged users, create mock guest data for compatibility
+        // For logged users, create guest data for compatibility
         const mockGuestData: GuestTestData = {
-          name: user.username,
+          name: user.firstName || user.username || "Usuario",
           email: user.email,
           whatsapp: user.whatsapp || "",
         };
         setGuestData(mockGuestData);
         
-        console.log(`Usuário logado detectado: ${user.username}`);
+        console.log(`Usuário logado detectado: ${user.email}`);
         return;
       } catch (error) {
         console.error("Error parsing user data:", error);
@@ -51,46 +53,44 @@ export default function Test() {
       }
     }
 
-    // If not logged in, check for guest data
-    if (!validateSession()) {
-      toast({
-        title: "Sessão expirada",
-        description: "Por favor, reinicie o teste.",
-        variant: "destructive",
-      });
-      navigate("/");
-      return;
-    }
-
+    // For guest users, check if they have guest data from the form
     const storedData = secureStorage.getItem("guestTestData");
-    if (!storedData) {
-      toast({
-        title: "Dados não encontrados",
-        description: "Por favor, preencha seus dados primeiro.",
-        variant: "destructive",
-      });
-      navigate("/");
-      return;
+    if (storedData) {
+      setGuestData(JSON.parse(storedData));
+      setIsLoggedUser(false);
+    } else {
+      // If no guest data, allow them to take the test anyway
+      // They'll be prompted to register at the end to save results
+      console.log("Iniciando teste como convidado sem dados salvos");
+      setIsLoggedUser(false);
     }
-    setGuestData(JSON.parse(storedData));
-    setIsLoggedUser(false);
   }, [navigate, toast]);
 
   const submitTestMutation = useMutation({
-    mutationFn: async (data: { guestData: GuestTestData; answers: DiscAnswer[] }) => {
+    mutationFn: async (answers: DiscAnswer[]) => {
       let endpoint = "/api/test/submit";
-      let payload: any = data;
+      let payload: any;
 
       // Use logged user data if available
       if (isLoggedUser && currentUser) {
-        console.log(`Enviando teste para usuário logado: ${currentUser.username} (ID: ${currentUser.id})`);
+        console.log(`Enviando teste para usuário logado: ${currentUser.email} (ID: ${currentUser.id})`);
         endpoint = "/api/test/submit-user";
         payload = {
           userId: currentUser.id,
-          answers: data.answers,
+          answers: answers,
         };
       } else {
+        // For guest users, create minimal guest data if needed
+        const tempGuestData = guestData || {
+          name: "Visitante",
+          email: `guest_${Date.now()}@temp.com`,
+          whatsapp: "",
+        };
         console.log("Enviando teste como convidado");
+        payload = {
+          guestData: tempGuestData,
+          answers: answers,
+        };
       }
 
       const response = await apiRequest("POST", endpoint, payload);
@@ -165,13 +165,8 @@ export default function Test() {
     setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
-      // Submit test
-      if (guestData) {
-        submitTestMutation.mutate({
-          guestData,
-          answers: updatedAnswers,
-        });
-      }
+      // Submit test - all users can complete the test
+      submitTestMutation.mutate(updatedAnswers);
     } else {
       // Go to next question
       setCurrentQuestionIndex(prev => prev + 1);
@@ -332,6 +327,8 @@ export default function Test() {
           </CardContent>
         </Card>
       </div>
+
+
     </div>
   );
 }
