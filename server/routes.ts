@@ -368,6 +368,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
+      // Determine base URL - use example.com for development as Stripe requires valid domains
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? `https://${req.get('host')}` 
+        : `https://example.com`;
+      
       // Create checkout session with proper typing
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -383,8 +388,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `${req.headers.origin}/results/${testId}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.origin}/checkout?testId=${testId}&payment=cancelled`,
+        success_url: `${baseUrl}/results/${testId}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/checkout?testId=${testId}&payment=cancelled`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
