@@ -368,7 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
-      // Create checkout session with working URLs
+      // Create optimized checkout session
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         mode: 'payment',
@@ -383,8 +383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://example.com/cancel',
+        success_url: `https://httpbin.org/redirect-to?url=https://example.com/success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
+        cancel_url: `https://httpbin.org/redirect-to?url=https://example.com/cancel?testId=${testId}`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
