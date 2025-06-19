@@ -1,0 +1,83 @@
+ Sirva seu front-end como estático do Express
+No seu server.js, adicione logo no topo (antes de qualquer rota):
+
+js
+Copiar
+Editar
+// server.js
+import path from "path";
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import Stripe from "stripe";
+import bodyParser from "body-parser";
+
+dotenv.config();
+const app = express();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// 1️⃣ Sirve todo arquivo em public/ como estático
+app.use(express.static(path.resolve("public")));
+
+app.use(cors());
+app.use(express.json());
+Então crie uma pasta public/ no seu projeto e coloque ali o index.html e seus assets (CSS, JS).
+
+2. Use caminho relativo no fetch
+Não aponte para localhost:3000, pois no Replit seu domínio é algo como https://<seu-projeto>.username.repl.co. Em vez disso:
+
+js
+Copiar
+Editar
+// public/index.html (ou seu main.js)
+<button id="btn-checkout">Comprar R$47</button>
+
+<script src="https://js.stripe.com/v3"></script>
+<script>
+  const stripe = Stripe("pk_test_xxx");
+  document.getElementById("btn-checkout")
+    .addEventListener("click", async () => {
+      try {
+        // 2️⃣ fetch RELATIVO: usa sempre o mesmo host
+        const res = await fetch("/create-checkout-session", { method: "POST" });
+        const { sessionId } = await res.json();
+        
+        // 3️⃣ redireciona via Stripe.js
+        await stripe.redirectToCheckout({ sessionId });
+      } catch (err) {
+        console.error("Erro no checkout:", err);
+        alert("Não foi possível iniciar o pagamento");
+      }
+    });
+</script>
+3. Rota de criação de sessão devolvendo sessionId
+Altere sua rota para retornar só o ID, em vez de url:
+
+js
+Copiar
+Editar
+// server.js (continuação)
+app.post("/create-checkout-session", async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card", "pix"],
+      mode: "payment",
+      line_items: [{
+        price_data: {
+          currency: "brl",
+          product_data: { name: "Relatório DISC Premium" },
+          unit_amount: 4700
+        },
+        quantity: 1
+      }],
+      success_url: `${req.headers.origin}/sucesso`,
+      cancel_url: `${req.headers.origin}/cancelado`,
+    });
+
+    // 4️⃣ devolve SÓ o sessionId
+    res.json({ sessionId: session.id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
