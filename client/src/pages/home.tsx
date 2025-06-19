@@ -76,8 +76,11 @@ export default function Home() {
     // Initialize secure session
     initializeSecureSession();
 
-    // Store data securely
-    secureStorage.setItem("guestTestData", JSON.stringify(sanitizedData));
+    // Store data securely in localStorage
+    localStorage.setItem("guestTestData", JSON.stringify(sanitizedData));
+    
+    console.log("Dados salvos no localStorage:", sanitizedData);
+    
     navigate("/test");
   };
 
@@ -362,8 +365,3 @@ export default function Home() {
     </div>
   );
 }
-```
-
-```
-// Stripe imports removidos da home page
-```

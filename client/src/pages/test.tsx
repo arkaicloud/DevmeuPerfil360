@@ -54,10 +54,19 @@ export default function Test() {
     }
 
     // For guest users, check if they have guest data from the form
-    const storedData = secureStorage.getItem("guestTestData");
+    const storedData = localStorage.getItem("guestTestData");
+    console.log("Dados recuperados do localStorage:", storedData);
+    
     if (storedData) {
-      setGuestData(JSON.parse(storedData));
-      setIsLoggedUser(false);
+      try {
+        const parsedData = JSON.parse(storedData);
+        console.log("Dados parseados:", parsedData);
+        setGuestData(parsedData);
+        setIsLoggedUser(false);
+      } catch (error) {
+        console.error("Erro ao parsear dados do convidado:", error);
+        setIsLoggedUser(false);
+      }
     } else {
       // If no guest data, allow them to take the test anyway
       // They'll be prompted to register at the end to save results
