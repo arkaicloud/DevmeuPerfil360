@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import bcrypt from "bcrypt";
@@ -345,6 +345,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Find test error:", error);
       res.status(500).json({ message: "Erro ao buscar teste" });
     }
+  });
+
+  // Create Stripe Checkout Session - production-ready implementation
+  app.post("/api/create-checkout-session", [
+    sanitizeInput,
+    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    body('amount').isInt({ min: 1 }).withMessage('Valor inválido'),
+    body('paymentMethod').isIn(['card', 'pix']).withMessage('Método de pagamento inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const { testId, amount, paymentMethod } = req.body;
+      
+      console.log(`Criando sessão Stripe para teste ${testId} - ${paymentMethod} - R$${amount / 100}`);
+      
+      // Verify test exists
+      const testResult = await storage.getTestResult(testId);
+      if (!testResult) {
+        return res.status(404).json({ error: "Teste não encontrado" });
+      }
+      
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      
+      // Configure payment methods based on selection
+      const paymentMethodTypes = paymentMethod === 'pix' ? ['card'] : ['card']; // Stripe supports PIX via card for Brazil
+      
+      const sessionConfig = {
+        payment_method_types: paymentMethodTypes,
+        mode: 'payment',
+        line_items: [
+          {
+            price_data: {
+              currency: 'brl',
+              product_data: {
+                name: 'Relatório DISC Premium',
+                description: `Análise comportamental completa - Perfil ${testResult.profileType}`,
+              },
+              unit_amount: amount,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${req.headers.origin}/results/${testId}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}/checkout?testId=${testId}&payment=cancelled`,
+        metadata: {
+          testId: testId.toString(),
+          paymentMethod: paymentMethod,
+        },
+        customer_email: testResult.guestEmail || undefined,
+      };
+      
+      // Add PIX-specific configuration if available
+      if (paymentMethod === 'pix') {
+        (sessionConfig as any).payment_method_options = {
+          card: {
+            installments: {
+              enabled: false,
+            },
+          },
+        };
+      }
+      
+      const session = await stripe.checkout.sessions.create(sessionConfig);
+      
+      console.log(`Sessão Stripe criada: ${session.id}`);
+      
+      res.json({ url: session.url, sessionId: session.id });
+    } catch (error: any) {
+      console.error("Stripe checkout session error:", error);
+      res.status(500).json({ 
+        error: "Erro ao criar sessão de pagamento",
+        details: error.message 
+      });
+    }
+  });
+
+  // Webhook endpoint for Stripe events
+  app.post("/api/webhook", express.raw({ type: 'application/json' }), async (req: any, res: any) => {
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    
+    let event;
+    
+    try {
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err: any) {
+      console.error('Webhook signature verification failed:', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    
+    try {
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const testId = parseInt(session.metadata.testId);
+        
+        console.log(`✅ Pagamento confirmado via webhook para teste: ${testId}`);
+        
+        // Create payment record
+        const payment = await storage.createPayment({
+          stripePaymentIntentId: session.payment_intent || session.id,
+          amount: session.amount_total,
+          currency: session.currency,
+          status: 'succeeded',
+          testResultId: testId,
+        });
+        
+        // Upgrade test to premium
+        await storage.updateTestResultPremium(testId, payment.stripePaymentIntentId);
+        
+        console.log(`Teste ${testId} atualizado para premium via webhook`);
+      }
+    } catch (error: any) {
+      console.error('Webhook processing error:', error);
+    }
+    
+    res.json({ received: true });
   });
 
   // Confirm payment - new simplified Stripe integration

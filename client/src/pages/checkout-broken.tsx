@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, Smartphone, Copy, Check } from 'lucide-react';
 
 export default function Checkout() {
   const [, navigate] = useLocation();
@@ -21,7 +20,6 @@ export default function Checkout() {
     name: 'Teste Card'
   });
   const [pixQrCode, setPixQrCode] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   // Get test ID from URL
   const testId = new URLSearchParams(window.location.search).get('testId');
@@ -78,42 +76,94 @@ export default function Checkout() {
 
     try {
       if (paymentMethod === 'pix') {
-        // Create PIX payment using Stripe Checkout
-        const response = await fetch('/api/create-checkout-session', {
+        // Handle PIX payment
+        const pixResponse = await fetch('/api/create-pix-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             testId: parseInt(testId!),
             amount: pricing?.promocionalPrice ? parseInt(pricing.promocionalPrice) * 100 : 4700,
-            paymentMethod: 'pix'
           }),
         });
 
-        if (!response.ok) {
-          throw new Error('Falha ao criar sessão de pagamento PIX');
+        if (!pixResponse.ok) {
+          throw new Error('Falha ao criar pagamento PIX');
         }
 
-        const { url } = await response.json();
-        window.location.href = url;
+        const { qrCode, paymentId } = await pixResponse.json();
+        setPixQrCode(qrCode);
+        
+        toast({
+          title: "PIX Gerado!",
+          description: "Escaneie o QR code ou copie o código para pagar",
+        });
         
       } else {
-        // Create card payment using Stripe Checkout
-        const response = await fetch('/api/create-checkout-session', {
+        // Handle card payment  
+        const paymentResponse = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             testId: parseInt(testId!),
             amount: pricing?.promocionalPrice ? parseInt(pricing.promocionalPrice) * 100 : 4700,
+            currency: 'brl',
             paymentMethod: 'card'
           }),
         });
 
-        if (!response.ok) {
-          throw new Error('Falha ao criar sessão de pagamento');
+        if (!paymentResponse.ok) {
+          const errorData = await paymentResponse.json();
+          throw new Error(errorData.error || 'Falha ao criar intenção de pagamento');
         }
 
-        const { url } = await response.json();
-        window.location.href = url;
+        const { clientSecret } = await paymentResponse.json();
+
+        // Process card payment with Stripe
+        const confirmResponse = await fetch('/api/confirm-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientSecret,
+            paymentMethod: {
+              card: {
+                number: cardData.number.replace(/\s/g, ''),
+                exp_month: parseInt(cardData.expiry.split('/')[0]),
+                exp_year: parseInt('20' + cardData.expiry.split('/')[1]),
+                cvc: cardData.cvc,
+              },
+              billing_details: {
+                name: cardData.name,
+              },
+            },
+          }),
+        });
+
+        if (!confirmResponse.ok) {
+          throw new Error('Falha ao processar pagamento');
+        }
+
+        const result = await confirmResponse.json();
+
+        if (result.success) {
+          // Upgrade test to premium
+          const upgradeResponse = await fetch(`/api/test/upgrade/${testId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentIntentId: result.paymentIntentId }),
+          });
+
+          if (upgradeResponse.ok) {
+            toast({
+              title: "Pagamento Aprovado!",
+              description: "Seu relatório premium foi liberado com sucesso!",
+            });
+            navigate(`/results/${testId}?payment=success`);
+          } else {
+            throw new Error('Falha ao atualizar teste para premium');
+          }
+        } else {
+          throw new Error(result.error || 'Pagamento não foi aprovado');
+        }
       }
     } catch (error: any) {
       console.error('Payment error:', error);
@@ -152,7 +202,7 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
-      <div className="max-w-4xl mx-auto pt-8">
+      <div className="max-w-2xl mx-auto pt-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Finalizar Pagamento
@@ -228,7 +278,9 @@ export default function Checkout() {
                       }`}
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <CreditCard className="w-6 h-6" />
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
                         <span className="font-medium">Cartão</span>
                         <span className="text-xs text-gray-500">Débito/Crédito</span>
                       </div>
@@ -243,7 +295,9 @@ export default function Checkout() {
                       }`}
                     >
                       <div className="flex flex-col items-center space-y-2">
-                        <Smartphone className="w-6 h-6" />
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
                         <span className="font-medium">PIX</span>
                         <span className="text-xs text-gray-500">Instantâneo</span>
                       </div>
@@ -251,41 +305,90 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                {/* Information based on payment method */}
-                {paymentMethod === 'pix' ? (
+                {/* PIX QR Code Display */}
+                {paymentMethod === 'pix' && pixQrCode && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="text-center">
-                      <Smartphone className="w-12 h-12 text-green-600 mx-auto mb-3" />
-                      <h4 className="font-medium text-green-800 mb-2">Pagamento via PIX</h4>
-                      <p className="text-sm text-green-700 mb-4">
-                        Você será redirecionado para uma página segura do Stripe para gerar seu PIX.
-                        O pagamento é processado instantaneamente.
-                      </p>
-                      <div className="bg-white rounded-lg p-3 border">
-                        <p className="text-xs text-gray-600">
-                          ✓ Seguro e criptografado<br/>
-                          ✓ Confirmação automática<br/>
-                          ✓ Sem taxas adicionais
-                        </p>
+                      <h4 className="font-medium text-green-800 mb-3">PIX Gerado com Sucesso!</h4>
+                      <div className="bg-white p-4 rounded-lg mb-3">
+                        <div className="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center">
+                          <span className="text-gray-500 text-sm">QR Code PIX</span>
+                        </div>
                       </div>
+                      <div className="bg-gray-100 p-3 rounded-lg mb-3">
+                        <p className="text-xs font-mono break-all text-gray-700">{pixQrCode}</p>
+                      </div>
+                      <p className="text-sm text-green-700">
+                        Escaneie o QR code ou copie o código PIX para realizar o pagamento
+                      </p>
                     </div>
                   </div>
-                ) : (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="text-center">
-                      <CreditCard className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                      <h4 className="font-medium text-blue-800 mb-2">Pagamento com Cartão</h4>
-                      <p className="text-sm text-blue-700 mb-4">
-                        Você será redirecionado para uma página segura do Stripe para inserir os dados do cartão.
-                        Aceitamos Visa, Mastercard, Elo e outros.
+                )}
+
+                {/* Card Payment Form */}
+                {paymentMethod === 'card' && !pixQrCode && (
+                  <div className="space-y-4">
+                    <div>
+                  <Label htmlFor="cardName">Nome no Cartão</Label>
+                  <Input
+                    id="cardName"
+                    value={cardData.name}
+                    onChange={(e) => setCardData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Nome completo"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="cardNumber">Número do Cartão</Label>
+                  <Input
+                    id="cardNumber"
+                    value={cardData.number}
+                    onChange={(e) => setCardData(prev => ({ 
+                      ...prev, 
+                      number: formatCardNumber(e.target.value) 
+                    }))}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="expiry">Validade</Label>
+                    <Input
+                      id="expiry"
+                      value={cardData.expiry}
+                      onChange={(e) => setCardData(prev => ({ 
+                        ...prev, 
+                        expiry: formatExpiry(e.target.value) 
+                      }))}
+                      placeholder="MM/AA"
+                      maxLength={5}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="cvc">CVC</Label>
+                    <Input
+                      id="cvc"
+                      value={cardData.cvc}
+                      onChange={(e) => setCardData(prev => ({ 
+                        ...prev, 
+                        cvc: e.target.value.replace(/\D/g, '') 
+                      }))}
+                      placeholder="123"
+                      maxLength={4}
+                      required
+                    />
+                  </div>
+                </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-blue-800">
+                        <span className="font-medium">Para teste:</span> Use o cartão 4242 4242 4242 4242
                       </p>
-                      <div className="bg-white rounded-lg p-3 border">
-                        <p className="text-xs text-gray-600">
-                          ✓ Checkout seguro Stripe<br/>
-                          ✓ Dados protegidos por SSL<br/>
-                          ✓ Parcelamento disponível
-                        </p>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -301,11 +404,10 @@ export default function Checkout() {
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Processando...
                     </>
+                  ) : paymentMethod === 'pix' ? (
+                    pixQrCode ? 'Aguardando Pagamento PIX...' : 'Gerar PIX'
                   ) : (
-                    <>
-                      {paymentMethod === 'pix' ? <Smartphone className="w-4 h-4 mr-2" /> : <CreditCard className="w-4 h-4 mr-2" />}
-                      {`Pagar R$ ${pricing?.promocionalPrice || '47'},00 via ${paymentMethod.toUpperCase()}`}
-                    </>
+                    `Finalizar Pagamento - R$ ${pricing?.promocionalPrice || '47'},00`
                   )}
                 </Button>
               </form>

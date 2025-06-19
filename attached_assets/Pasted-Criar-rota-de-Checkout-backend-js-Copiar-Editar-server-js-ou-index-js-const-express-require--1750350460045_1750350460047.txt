@@ -1,0 +1,100 @@
+Criar rota de Checkout (backend)
+js
+Copiar
+Editar
+// server.js ou index.js
+const express = require("express");
+const Stripe = require("stripe");
+const app = express();
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+app.use(express.json());
+
+app.post("/create-checkout-session", async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "brl",
+          product_data: {
+            name: "Relatório DISC Premium",
+          },
+          unit_amount: 4700, // R$47,00 em centavos
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: "https://seudominio.com/sucesso",
+    cancel_url: "https://seudominio.com/cancelado",
+  });
+
+  res.json({ url: session.url });
+});
+🖱️ 5. Botão no frontend
+html
+Copiar
+Editar
+<button onclick="checkout()">Comprar Relatório</button>
+
+<script>
+  async function checkout() {
+    const response = await fetch('/create-checkout-session', { method: 'POST' });
+    const data = await response.json();
+    window.location.href = data.url;
+  }
+</script>
+🔁 6. Configurar Webhook para liberar acesso
+No Stripe Dashboard:
+
+Vá em Developers > Webhooks
+
+Crie um endpoint apontando para:
+
+arduino
+Copiar
+Editar
+https://seuprojeto.repl.co/webhook
+Selecione o evento:
+
+checkout.session.completed
+
+No backend:
+
+js
+Copiar
+Editar
+const endpointSecret = "whsec_xxx"; // chave do webhook
+
+app.post("/webhook", express.raw({ type: "application/json" }), (request, response) => {
+  const sig = request.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+  } catch (err) {
+    console.error("Webhook error", err.message);
+    return response.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const email = session.customer_details.email;
+    console.log(`✅ Pagamento confirmado para: ${email}`);
+    // Liberar relatório no seu sistema aqui
+  }
+
+  response.send();
+});
+⚠️ Importante: Para webhook funcionar no Replit, o endpoint precisa aceitar express.raw() — ou use ngrok para testes locais.
+
+🔒 7. Proteja o acesso ao relatório
+Após pagamento confirmado, você pode:
+
+Liberar acesso no banco de dados
+
+Redirecionar para uma rota com autenticação
+
+Enviar o PDF por e-mail
+
