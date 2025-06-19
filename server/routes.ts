@@ -366,48 +366,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Teste não encontrado" });
       }
       
-      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
-      // Configure payment methods based on selection
-      const paymentMethodTypes = paymentMethod === 'pix' ? ['card'] : ['card']; // Stripe supports PIX via card for Brazil
-      
-      const sessionConfig = {
-        payment_method_types: paymentMethodTypes,
+      // Create checkout session with proper typing
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
         mode: 'payment',
-        line_items: [
-          {
-            price_data: {
-              currency: 'brl',
-              product_data: {
-                name: 'Relatório DISC Premium',
-                description: `Análise comportamental completa - Perfil ${testResult.profileType}`,
-              },
-              unit_amount: amount,
+        line_items: [{
+          price_data: {
+            currency: 'brl',
+            product_data: {
+              name: 'Relatório DISC Premium',
+              description: `Análise comportamental completa - Perfil ${testResult.profileType}`,
             },
-            quantity: 1,
+            unit_amount: amount,
           },
-        ],
+          quantity: 1,
+        }],
         success_url: `${req.headers.origin}/results/${testId}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}/checkout?testId=${testId}&payment=cancelled`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
         },
-        customer_email: testResult.guestEmail || undefined,
-      };
-      
-      // Add PIX-specific configuration if available
-      if (paymentMethod === 'pix') {
-        (sessionConfig as any).payment_method_options = {
-          card: {
-            installments: {
-              enabled: false,
-            },
-          },
-        };
-      }
-      
-      const session = await stripe.checkout.sessions.create(sessionConfig);
+      });
       
       console.log(`Sessão Stripe criada: ${session.id}`);
       
@@ -424,12 +406,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Webhook endpoint for Stripe events
   app.post("/api/webhook", express.raw({ type: 'application/json' }), async (req: any, res: any) => {
     const sig = req.headers['stripe-signature'];
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || 'test';
     
     let event;
     
     try {
-      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err: any) {
       console.error('Webhook signature verification failed:', err.message);
@@ -438,16 +420,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        const testId = parseInt(session.metadata.testId);
+        const session: any = event.data.object;
+        const testId = parseInt(session.metadata?.testId || '0');
         
         console.log(`✅ Pagamento confirmado via webhook para teste: ${testId}`);
         
         // Create payment record
         const payment = await storage.createPayment({
-          stripePaymentIntentId: session.payment_intent || session.id,
-          amount: session.amount_total,
-          currency: session.currency,
+          stripePaymentIntentId: (session.payment_intent as string) || session.id,
+          amount: session.amount_total || 4700,
+          currency: session.currency || 'brl',
           status: 'succeeded',
           testResultId: testId,
         });
