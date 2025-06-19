@@ -143,7 +143,7 @@ export default function Checkout() {
         const response = await fetch("/api/create-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ testId }),
+          body: JSON.stringify({ testResultId: parseInt(testId) }),
         });
 
         if (!response.ok) {
