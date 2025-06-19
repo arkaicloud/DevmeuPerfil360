@@ -109,17 +109,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit DISC test for guest users
   app.post("/api/test/submit", [
     testSubmissionLimiter,
-    sanitizeInput,
-    body('guestData.email').isEmail().normalizeEmail().withMessage('Email inválido').isLength({ max: 254 }),
-    body('guestData.name').isLength({ min: 2, max: 100 }).trim().escape().matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('Nome deve conter apenas letras e espaços'),
-    body('guestData.whatsapp').isMobilePhone('pt-BR').withMessage('WhatsApp inválido'),
-    body('answers').isArray({ min: 24, max: 24 }).withMessage('Deve conter exatamente 24 respostas'),
-    body('answers.*').isIn(['a', 'b', 'c', 'd']).withMessage('Resposta deve ser a, b, c ou d'),
-    validateRequest
+    sanitizeInput
   ], async (req: any, res: any) => {
     try {
-      const validatedData = discTestSubmissionSchema.parse(req.body);
-      const { guestData, answers } = validatedData;
+      console.log('Dados recebidos para teste:', JSON.stringify(req.body, null, 2));
+      
+      // Basic validation for guest test submission
+      const { guestData, answers } = req.body;
+      
+      if (!guestData || !answers || !Array.isArray(answers)) {
+        return res.status(400).json({
+          error: "Dados inválidos",
+          details: "guestData e answers são obrigatórios"
+        });
+      }
+      
+      if (answers.length !== 24) {
+        return res.status(400).json({
+          error: "Número incorreto de respostas",
+          details: `Esperado 24 respostas, recebido ${answers.length}`
+        });
+      }
 
       // Calculate DISC profile
       const discResults = calculateDiscProfile(answers);

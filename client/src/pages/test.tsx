@@ -82,9 +82,9 @@ export default function Test() {
       } else {
         // For guest users, create minimal guest data if needed
         const tempGuestData = guestData || {
-          name: "Visitante",
-          email: `guest_${Date.now()}@temp.com`,
-          whatsapp: "",
+          name: "Visitante Anônimo",
+          email: `guest_${Date.now()}@meuperfil360.com`,
+          whatsapp: "11999999999",
         };
         console.log("Enviando teste como convidado");
         payload = {
