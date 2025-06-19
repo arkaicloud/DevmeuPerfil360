@@ -1,14 +1,12 @@
 
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, X } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, Loader2, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.

@@ -133,6 +133,7 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - **Data Encryption**: Sensitive information protection
 
 ## Changelog
+- June 19, 2025: **CHECKOUT MODERNIZED** - Replaced old checkout with modern, responsive interface that fixes API errors and improves payment flow
 - June 19, 2025: **PAYMENT TEST PAGE CREATED** - Added /payment-test with both simulated and real Stripe options to bypass browser issues
 - June 19, 2025: **STRIPE CHECKOUT FULLY FUNCTIONAL** - Fixed URL validation issues, checkout sessions now working perfectly
 - June 19, 2025: **STRIPE CHECKOUT PRODUCTION-READY** - Implemented Stripe Checkout Sessions with PIX and card options
