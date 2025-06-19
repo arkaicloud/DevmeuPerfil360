@@ -16,7 +16,6 @@ import {
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
-import bcrypt from "bcrypt";
 import { body, param, query, validationResult } from "express-validator";
 import { emailService } from "./email-service";
 import rateLimit from "express-rate-limit";
@@ -27,11 +26,11 @@ import {
   securityHeaders,
   validateInput,
   threatDetection,
-  secureAuth,
   sessionManager,
   threatDetector,
   DataEncryption
 } from "./security-middleware";
+import { requireAuth, optionalAuth, type AuthenticatedRequest } from "./clerk-middleware";
 // import puppeteer from "puppeteer"; // Disabled due to system dependencies
 
 if (!process.env.STRIPE_SECRET_KEY) {

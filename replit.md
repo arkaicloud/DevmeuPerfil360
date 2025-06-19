@@ -133,7 +133,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - **Data Encryption**: Sensitive information protection
 
 ## Changelog
-- June 18, 2025. Initial setup
+- June 19, 2025: Successfully migrated from Replit Agent to standard Replit environment
+- June 19, 2025: Integrated Clerk authentication system replacing custom auth
+- June 19, 2025: Updated database schema to work with Clerk user management
+- June 19, 2025: Modified frontend components to use Clerk authentication
+- June 18, 2025: Initial setup
 
 ## User Preferences
 

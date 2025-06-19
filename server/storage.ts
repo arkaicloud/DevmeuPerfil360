@@ -16,7 +16,7 @@ import { eq, desc, sql } from "drizzle-orm";
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByClerkId(clerkId: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId?: string): Promise<User>;
@@ -48,8 +48,8 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+  async getUserByClerkId(clerkId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.clerkId, clerkId));
     return user || undefined;
   }
 
@@ -233,16 +233,7 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async updateUserPassword(userId: number, hashedPassword: string) {
-    const [result] = await db
-      .update(users)
-      .set({ 
-        password: hashedPassword
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    return result;
-  }
+
 
   // Payment operations
   async createPayment(payment: InsertPayment): Promise<Payment> {

@@ -5,10 +5,11 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
+  clerkId: text("clerk_id").notNull().unique(), // Clerk user ID
   email: text("email").notNull().unique(),
-  whatsapp: text("whatsapp").notNull(),
-  password: text("password"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  whatsapp: text("whatsapp"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   freeTestsUsed: integer("free_tests_used").default(0),
@@ -125,13 +126,13 @@ export const userTestSubmissionSchema = z.object({
   answers: z.array(discAnswerSchema),
 });
 
-// Registration schema
-export const registrationSchema = insertUserSchema.extend({
-  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Senhas não coincidem",
-  path: ["confirmPassword"],
+// Registration schema (simplified for Clerk)
+export const registrationSchema = z.object({
+  clerkId: z.string(),
+  email: z.string().email("Email inválido"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  whatsapp: z.string().min(10, "WhatsApp deve ter pelo menos 10 dígitos").optional(),
 });
 
 // Types
