@@ -377,8 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           amount: amount,
           currency: 'brl',
           status: 'succeeded',
-          testResultId: testId,
-          paymentMethod: 'card_fallback'
+          testResultId: testId
         });
         
         // Upgrade test to premium
