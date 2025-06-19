@@ -133,11 +133,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - **Data Encryption**: Sensitive information protection
 
 ## Changelog
+- June 19, 2025: Successfully resolved Stripe PaymentElement rendering issues with timeout mechanism
+- June 19, 2025: Implemented automatic user data population in registration modal
 - June 19, 2025: Fixed Stripe integration with complete reconstruction of payment flow
 - June 19, 2025: Resolved payment intent creation errors (corrected parameter mapping)
 - June 19, 2025: Improved premium upgrade messaging with detailed benefits
+- June 19, 2025: Enhanced CSP configuration for Stripe domains (q.stripe.com)
 - June 19, 2025: Temporarily disabled Clerk due to initialization conflicts
-- June 19, 2025: Enhanced CSP configuration for better security
 - June 19, 2025: Successfully migrated from Replit Agent to standard Replit environment
 - June 19, 2025: Integrated Clerk authentication system replacing custom auth
 - June 19, 2025: Updated database schema to work with Clerk user management

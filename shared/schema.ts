@@ -126,13 +126,16 @@ export const userTestSubmissionSchema = z.object({
   answers: z.array(discAnswerSchema),
 });
 
-// Registration schema (simplified for Clerk)
+// Registration schema for custom auth
 export const registrationSchema = z.object({
-  clerkId: z.string(),
+  username: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido"),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
   whatsapp: z.string().min(10, "WhatsApp deve ter pelo menos 10 dígitos").optional(),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
 // Types

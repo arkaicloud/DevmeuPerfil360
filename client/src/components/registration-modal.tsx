@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,15 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
       confirmPassword: "",
     },
   });
+
+  // Update form fields when guestData changes
+  useEffect(() => {
+    if (guestData) {
+      form.setValue("username", guestData.name || "");
+      form.setValue("email", guestData.email || "");
+      form.setValue("whatsapp", guestData.whatsapp || "");
+    }
+  }, [guestData, form]);
 
   const registerMutation = useMutation({
     mutationFn: async (data: Registration) => {
