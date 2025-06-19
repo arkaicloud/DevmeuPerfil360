@@ -437,18 +437,18 @@ setInterval(() => {
   const now = Date.now();
 
   // Limpar cache de ameaças antigas
-  for (const [key, timestamp] of threatCache.entries()) {
+  Array.from(threatCache.entries()).forEach(([key, timestamp]) => {
     if (now - timestamp > 600000) { // 10 minutos
       threatCache.delete(key);
     }
-  }
+  });
 
   // Limpar rate limits expirados
-  for (const [ip, data] of rateLimits.entries()) {
+  Array.from(rateLimits.entries()).forEach(([ip, data]) => {
     if (now > data.resetTime) {
       rateLimits.delete(ip);
     }
-  }
+  });
 }, 600000); // 10 minutos
 
 // Aplicar middlewares de segurança

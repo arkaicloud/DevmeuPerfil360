@@ -1,124 +1,52 @@
+# Lista de Verificação para Produção - MeuPerfil360
 
-# 🚀 Checklist de Produção - MeuPerfil360
+## ✅ Configurações de Domínio
+- [x] URLs Stripe atualizadas para www.meuperfil360.com.br
+- [x] CORS configurado para domínio de produção
+- [x] Arquivo .env.production criado
 
-## 🔒 Segurança
+## ✅ Correções de Código
+- [x] Erros TypeScript corrigidos no security-middleware
+- [x] Páginas de checkout antigas removidas
+- [x] Configuração de target ES2020 no tsconfig
 
-### Credenciais e Chaves
-- [ ] ✅ Gerar nova senha de admin com hash bcrypt forte ($2b$12$...)
-- [ ] ✅ Configurar chaves reais do Stripe (live keys)
-- [ ] ✅ Gerar chave de criptografia aleatória (32+ caracteres)
-- [ ] ✅ Configurar secrets de sessão únicos
-- [ ] ✅ Verificar que não há chaves de teste em produção
+## 🔄 Pendente - Secrets de Produção
+- [ ] STRIPE_SECRET_KEY (produção)
+- [ ] VITE_STRIPE_PUBLIC_KEY (produção)
+- [ ] ADMIN_PASSWORD
+- [ ] JWT_SECRET
+- [ ] ENCRYPTION_KEY
+- [ ] SESSION_SECRET
 
-### Rate Limiting
-- [ ] ✅ Rate limiting rigoroso configurado (5 tentativas admin/15min)
-- [ ] ✅ Rate limiting geral configurado (100 req/15min)
-- [ ] ✅ Rate limiting para operações sensíveis (5 req/15min)
+## ✅ Segurança
+- [x] Helmet configurado com CSP
+- [x] Rate limiting implementado
+- [x] CORS restritivo para domínio de produção
+- [x] Validação de entrada configurada
 
-### Headers de Segurança
-- [ ] ✅ HSTS configurado (31536000 segundos)
-- [ ] ✅ CSP rigoroso configurado
-- [ ] ✅ X-Frame-Options: DENY
-- [ ] ✅ X-Content-Type-Options: nosniff
+## 🔄 Banco de Dados
+- [x] PostgreSQL configurado
+- [x] Migrations prontas
+- [ ] Backup de produção configurado
 
-## 🗄️ Banco de Dados
+## ✅ Pagamentos
+- [x] Stripe Checkout Sessions funcionais
+- [x] URLs de sucesso/cancelamento atualizadas
+- [x] Webhook endpoints configurados
+- [x] Simulação de pagamento para testes
 
-### Configuração
-- [ ] ⚠️ Migrar para PostgreSQL em produção
-- [ ] ⚠️ Configurar SSL/TLS obrigatório
-- [ ] ⚠️ Configurar backups automáticos
-- [ ] ⚠️ Testar conexão e performance
+## 🔄 Email
+- [x] Sistema de email configurado
+- [ ] Templates de produção validados
+- [ ] SMTP de produção configurado
 
-### Dados Sensíveis
-- [ ] ✅ Criptografia de dados pessoais implementada
-- [ ] ✅ Logs não expõem dados sensíveis
-- [ ] ✅ Implementado direito ao esquecimento (LGPD)
+## 🔄 Deploy
+- [ ] Build de produção testado
+- [ ] Variáveis de ambiente configuradas
+- [ ] SSL/HTTPS verificado
+- [ ] Performance otimizada
 
-## 📧 Email
-
-### Configuração SMTP
-- [ ] ⚠️ Configurar serviço de email em produção (SendGrid/SES)
-- [ ] ⚠️ Configurar domínio verificado
-- [ ] ⚠️ Testar entrega de emails
-- [ ] ⚠️ Configurar templates de email
-
-## 💳 Pagamentos
-
-### Stripe
-- [ ] ⚠️ Configurar webhooks em produção
-- [ ] ⚠️ Testar fluxo completo de pagamento
-- [ ] ⚠️ Configurar tratamento de disputes
-- [ ] ⚠️ Verificar compliance PCI
-
-## 🔍 Monitoramento
-
-### Logs e Métricas
-- [ ] ✅ Sistema de monitoramento implementado
-- [ ] ✅ Alertas de segurança configurados
-- [ ] ⚠️ Configurar agregação de logs externos
-- [ ] ⚠️ Configurar alertas via email/SMS
-
-### Performance
-- [ ] ⚠️ Configurar CDN para assets estáticos
-- [ ] ⚠️ Configurar compressão gzip
-- [ ] ⚠️ Otimizar queries de banco
-- [ ] ⚠️ Configurar cache Redis (opcional)
-
-## 🌐 Deploy
-
-### Replit Deploy
-- [ ] ✅ Configurar variáveis de ambiente no Replit
-- [ ] ⚠️ Configurar domínio customizado (www.meuperfil360.com.br)
-- [ ] ⚠️ Verificar registros DNS (A record e TXT record)
-- [ ] ⚠️ Testar SSL automático no domínio personalizado
-- [ ] ⚠️ Verificar CORS funciona com domínio personalizado
-- [ ] ⚠️ Testar autoscaling
-
-### Testes Finais
-- [ ] ⚠️ Teste completo de fluxo de usuário
-- [ ] ⚠️ Teste de performance sob carga
-- [ ] ⚠️ Teste de recovery de falhas
-- [ ] ⚠️ Teste de backup e restore
-
-## 📋 Compliance
-
-### LGPD/GDPR
-- [ ] ✅ Política de privacidade implementada
-- [ ] ✅ Consentimento de cookies
-- [ ] ✅ Direito ao esquecimento implementado
-- [ ] ⚠️ Auditoria de conformidade
-
-### Documentação
-- [ ] ⚠️ Documentar APIs críticas
-- [ ] ⚠️ Manual de operação
-- [ ] ⚠️ Plano de contingência
-- [ ] ⚠️ Procedimentos de backup
-
----
-
-## ⚡ Comandos Rápidos
-
-### Verificar Segurança
-```bash
-node deploy-production.js
-```
-
-### Deploy no Replit
-```bash
-# 1. Configurar .env.production
-# 2. Executar verificações
-# 3. Deploy via Replit Deployments
-```
-
-### Monitoramento
-```bash
-# Verificar logs de segurança
-grep "SECURITY" logs/
-
-# Verificar métricas
-curl /api/admin/metrics
-```
-
----
-
-**Status**: ✅ Implementado | ⚠️ Pendente | ❌ Crítico
+## Status Atual
+- Sistema preparado para produção
+- Aguardando chaves Stripe de produção
+- Pronto para deploy após configuração de secrets

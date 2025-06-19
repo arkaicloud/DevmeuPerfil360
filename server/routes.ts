@@ -383,8 +383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `https://httpbin.org/redirect-to?url=https://example.com/success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
-        cancel_url: `https://httpbin.org/redirect-to?url=https://example.com/cancel?testId=${testId}`,
+        success_url: `https://www.meuperfil360.com.br/payment-success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
+        cancel_url: `https://www.meuperfil360.com.br/checkout?testId=${testId}&payment=cancelled`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,

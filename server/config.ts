@@ -1,7 +1,16 @@
 
 // Configuração segura e validação de variáveis de ambiente
 export const config = {
-  // Verificar variáveis críticas
+  // Configuração para produção
+  domain: process.env.NODE_ENV === 'production' 
+    ? 'https://www.meuperfil360.com.br' 
+    : 'http://localhost:5000',
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['https://www.meuperfil360.com.br', 'https://meuperfil360.com.br'] 
+      : ['http://localhost:5000', 'http://127.0.0.1:5000'],
+    credentials: true,
+  },
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
