@@ -17,9 +17,6 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Debug logs
-  console.log('CheckoutForm rendered:', { stripe: !!stripe, elements: !!elements });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -87,7 +84,7 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div style={{ minHeight: '200px' }}>
+          <div className="min-h-[200px]">
             <PaymentElement 
               options={{
                 layout: 'tabs'
@@ -123,30 +120,34 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
   );
 };
 
+const StripeWrapper = ({ testId, clientSecret }: { testId: string; clientSecret: string }) => {
+  const stripeOptions = useMemo(() => ({
+    clientSecret,
+    appearance: {
+      theme: 'stripe' as const,
+      variables: {
+        colorPrimary: '#3b82f6',
+        colorBackground: '#ffffff',
+        colorText: '#1f2937',
+        colorDanger: '#ef4444',
+        borderRadius: '8px',
+      },
+    },
+  }), [clientSecret]);
+
+  return (
+    <Elements stripe={stripePromise} options={stripeOptions}>
+      <CheckoutForm testId={testId} />
+    </Elements>
+  );
+};
+
 export default function Checkout() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [testId, setTestId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
-  const stripeOptions = useMemo(() => {
-    if (!clientSecret) return null;
-    
-    return {
-      clientSecret,
-      appearance: {
-        theme: 'stripe' as const,
-        variables: {
-          colorPrimary: '#3b82f6',
-          colorBackground: '#ffffff',
-          colorText: '#1f2937',
-          colorDanger: '#ef4444',
-          borderRadius: '8px',
-        },
-      },
-    };
-  }, [clientSecret]);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -174,7 +175,6 @@ export default function Checkout() {
         }
 
         const data = await response.json();
-        console.log('Payment intent created:', { clientSecret: data.clientSecret });
         setClientSecret(data.clientSecret);
       } catch (error: any) {
         console.error("Erro ao criar payment intent:", error);
@@ -276,29 +276,37 @@ export default function Checkout() {
               <div className="mt-4 space-y-2">
                 <p className="font-medium text-sm">Incluído no seu relatório:</p>
                 {[
-                  "Análise detalhada de 15+ páginas",
-                  "Dicas personalizadas de desenvolvimento",
-                  "Export em PDF profissional",
-                  "Comparação com outros perfis"
+                  "Dicas práticas para desenvolver seu potencial comportamental",
+                  "Comparações entre perfis para descobrir seus diferenciais",
+                  "Exportação em PDF profissional – ideal para carreira e desenvolvimento",
+                  "Plano de ação em 4 semanas + livros, cursos e podcasts recomendados",
+                  "Evite autossabotagem com alertas do seu perfil sob pressão"
                 ].map((benefit, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span className="text-xs text-muted-foreground">{benefit}</span>
+                  <div key={index} className="flex items-start space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-xs text-muted-foreground leading-relaxed">{benefit}</span>
                   </div>
                 ))}
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                <div className="flex items-center space-x-2 mb-1">
+                  <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 text-xs font-bold">💡</span>
+                  </div>
+                  <span className="text-xs font-medium text-blue-900">Ideal para usar em:</span>
+                </div>
+                <p className="text-xs text-blue-700 leading-relaxed ml-7">
+                  Processos seletivos, coaching, mentorias e crescimento pessoal
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Payment Form */}
-        {stripePromise && stripeOptions ? (
-          <Elements 
-            stripe={stripePromise} 
-            options={stripeOptions}
-          >
-            <CheckoutForm testId={testId!} />
-          </Elements>
+        {testId && clientSecret ? (
+          <StripeWrapper testId={testId} clientSecret={clientSecret} />
         ) : (
           <Card>
             <CardContent className="p-6 text-center">
