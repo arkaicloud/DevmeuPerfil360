@@ -68,7 +68,9 @@ export default function Home() {
   });
 
   const onSubmit = (data: GuestTestData) => {
-    sessionStorage.setItem("guestTestData", JSON.stringify(data));
+    console.log("Dados do formulário recebidos:", data);
+    localStorage.setItem("guestTestData", JSON.stringify(data));
+    console.log("Dados salvos no localStorage:", data);
     navigate("/test");
   };
 
@@ -81,7 +83,8 @@ export default function Home() {
     };
 
     // Store the data for compatibility with test flow
-    sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+    localStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
+    console.log("Dados de usuário logado salvos:", mockGuestData);
 
     // Go directly to test without showing form
     navigate("/test");
