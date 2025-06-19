@@ -403,6 +403,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset test to non-premium for testing
+  app.post("/api/test/:testId/reset-premium", [
+    sanitizeInput,
+    param('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const testId = parseInt(req.params.testId);
+      
+      // Update test back to non-premium for testing
+      await storage.updateTestResultPremium(testId, null as any);
+      
+      console.log(`Teste ${testId} resetado para não-premium`);
+      
+      res.json({ 
+        success: true, 
+        message: "Teste resetado para não-premium",
+        testId: testId
+      });
+      
+    } catch (error: any) {
+      console.error("Reset premium error:", error);
+      res.status(500).json({ 
+        error: "Erro ao resetar teste",
+        details: error.message 
+      });
+    }
+  });
+
   // Development payment simulation endpoint
   app.post("/api/simulate-payment", [
     sanitizeInput,

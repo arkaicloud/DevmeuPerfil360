@@ -221,11 +221,11 @@ export class DatabaseStorage implements IStorage {
     return results;
   }
 
-  async updateTestResultPremium(id: number, paymentId: string): Promise<TestResult> {
+  async updateTestResultPremium(id: number, paymentId: string | null): Promise<TestResult> {
     const [result] = await db
       .update(testResults)
       .set({ 
-        isPremium: true,
+        isPremium: paymentId !== null,
         paymentId: paymentId 
       })
       .where(eq(testResults.id, id))
