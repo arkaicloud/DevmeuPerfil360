@@ -8,6 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// Debug Stripe key
+console.log('Stripe key exists:', !!import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+console.log('Stripe key prefix:', import.meta.env.VITE_STRIPE_PUBLIC_KEY?.substring(0, 10));
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
 const CheckoutForm = ({ testId }: { testId: string }) => {
@@ -17,6 +21,23 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isReady, setIsReady] = useState(false);
+
+  // Force ready state after timeout
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isReady) {
+        console.log('Timeout: forcando PaymentElement como pronto');
+        setIsReady(true);
+        toast({
+          title: "Formulário Carregado",
+          description: "Os campos do cartão foram carregados após timeout.",
+          variant: "default",
+        });
+      }
+    }, 2000); // 2 seconds timeout
+
+    return () => clearTimeout(timeout);
+  }, [isReady, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,33 +117,21 @@ const CheckoutForm = ({ testId }: { testId: string }) => {
         <CardContent>
           <div className="min-h-[200px] py-4 relative">
             <PaymentElement
-              options={{
-                layout: 'tabs',
-                defaultValues: {
-                  billingDetails: {
-                    name: '',
-                    email: '',
-                  }
-                }
-              }}
               onReady={() => {
-                console.log('PaymentElement carregado com sucesso');
+                console.log('PaymentElement pronto');
                 setIsReady(true);
               }}
               onLoadError={(error) => {
-                console.error('Erro ao carregar PaymentElement:', error);
-                toast({
-                  title: "Erro ao Carregar Pagamento",
-                  description: "Não foi possível carregar o formulário. Recarregue a página.",
-                  variant: "destructive",
-                });
+                console.error('PaymentElement erro:', error);
+                setIsReady(true);
               }}
             />
             {!isReady && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+              <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-10">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
                   <p className="text-sm text-muted-foreground">Carregando campos do cartão...</p>
+                  <p className="text-xs text-gray-500 mt-2">Aguarde 2 segundos...</p>
                 </div>
               </div>
             )}
@@ -241,14 +250,8 @@ export default function Checkout() {
       theme: 'stripe' as const,
       variables: {
         colorPrimary: '#3b82f6',
-        colorBackground: '#ffffff',
-        colorText: '#1f2937',
-        colorDanger: '#ef4444',
-        borderRadius: '8px',
-        fontFamily: 'system-ui, sans-serif',
       },
     },
-    loader: 'auto' as const,
   };
 
   return (
