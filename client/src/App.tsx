@@ -20,7 +20,7 @@ import NotFound from "@/pages/not-found";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-// Temporary fallback while waiting for correct Clerk publishable key
+// Temporarily disable Clerk due to initialization issues
 if (!clerkPubKey || clerkPubKey.startsWith('sk_') || clerkPubKey.includes('BEGIN PUBLIC KEY')) {
   console.warn('Clerk publishable key missing or invalid. Running without Clerk authentication.');
 }
@@ -46,11 +46,8 @@ function Router() {
 }
 
 function App() {
-  // Check if we have a valid Clerk publishable key
-  const hasValidClerkKey = clerkPubKey && 
-    clerkPubKey.startsWith('pk_') && 
-    !clerkPubKey.includes('BEGIN PUBLIC KEY') &&
-    !clerkPubKey.startsWith('sk_');
+  // Temporarily disable Clerk to focus on core functionality
+  const hasValidClerkKey = false; // Disabled due to initialization issues
 
   if (hasValidClerkKey) {
     return (
