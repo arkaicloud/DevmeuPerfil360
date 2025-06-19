@@ -489,14 +489,16 @@ export default function Results() {
                 <p className="text-xs text-muted-foreground mt-1">Oferta por tempo limitado</p>
               </div>
 
-              <Button 
-                onClick={() => setShowPaymentModal(true)}
-                className="w-full sm:w-auto bg-gradient-to-r from-secondary to-primary text-white btn-hover-lift"
-                size="default"
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                Desbloquear Relatório Completo
-              </Button>
+              <div className="flex justify-center">
+                <Button 
+                  onClick={() => setShowPaymentModal(true)}
+                  className="w-full sm:w-auto bg-gradient-to-r from-secondary to-primary text-white btn-hover-lift"
+                  size="default"
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Desbloquear Relatório Completo
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
