@@ -32,6 +32,7 @@ function Router() {
       <Route path="/test" component={Test} />
       <Route path="/results/:id" component={Results} />
       <Route path="/checkout/:testId" component={Checkout} />
+      <Route path="/checkout" component={Checkout} />
       <Route path="/dashboard/:userId" component={Dashboard} />
       <Route path="/find-results" component={FindResults} />
       <Route path="/login" component={Login} />
