@@ -10,6 +10,7 @@ import Results from "@/pages/results";
 import Checkout from "@/pages/checkout";
 import Dashboard from "@/pages/dashboard";
 import FindResults from "@/pages/find-results";
+import PaymentSuccess from "@/pages/payment-success";
 import Login from "@/pages/login";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard-new";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/results/:id" component={Results} />
       <Route path="/checkout/:testId" component={Checkout} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/dashboard/:userId" component={Dashboard} />
       <Route path="/find-results" component={FindResults} />
       <Route path="/login" component={Login} />

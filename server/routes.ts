@@ -368,10 +368,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
-      // Determine base URL - use example.com for development as Stripe requires valid domains
+      // Use valid URLs that Stripe accepts - we'll handle the actual redirect via webhook
       const baseUrl = process.env.NODE_ENV === 'production' 
         ? `https://${req.get('host')}` 
-        : `https://example.com`;
+        : 'https://meuperfil360.com';
       
       // Create checkout session with proper typing
       const session = await stripe.checkout.sessions.create({
@@ -388,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `${baseUrl}/results/${testId}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${baseUrl}/payment-success?testId=${testId}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/checkout?testId=${testId}&payment=cancelled`,
         metadata: {
           testId: testId.toString(),
@@ -403,6 +403,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Stripe checkout session error:", error);
       res.status(500).json({ 
         error: "Erro ao criar sessão de pagamento",
+        details: error.message 
+      });
+    }
+  });
+
+  // Development payment simulation endpoint
+  app.post("/api/simulate-payment", [
+    sanitizeInput,
+    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    body('sessionId').isLength({ min: 10, max: 100 }).withMessage('Session ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const { testId, sessionId } = req.body;
+      
+      console.log(`Simulando pagamento para teste ${testId} com sessão ${sessionId}`);
+      
+      // Verify test exists
+      const testResult = await storage.getTestResult(testId);
+      if (!testResult) {
+        return res.status(404).json({ error: "Teste não encontrado" });
+      }
+      
+      // Create payment record
+      const payment = await storage.createPayment({
+        stripePaymentIntentId: sessionId,
+        amount: 4700,
+        currency: 'brl',
+        status: 'succeeded',
+        testResultId: testId,
+      });
+      
+      // Upgrade test to premium
+      await storage.updateTestResultPremium(testId, sessionId);
+      
+      // Grant premium access if user is registered
+      if (testResult.userId) {
+        await storage.grantPremiumAccess(testResult.userId, 2);
+        console.log(`Usuário ${testResult.userId} recebeu acesso premium com 2 testes adicionais`);
+      }
+      
+      console.log(`Pagamento simulado processado com sucesso para teste ${testId}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Pagamento simulado processado com sucesso",
+        testId: testId,
+        paymentId: payment.id
+      });
+      
+    } catch (error: any) {
+      console.error("Payment simulation error:", error);
+      res.status(500).json({ 
+        error: "Erro ao simular pagamento",
         details: error.message 
       });
     }
