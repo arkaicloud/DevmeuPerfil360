@@ -80,15 +80,31 @@ export default function Test() {
           answers: answers,
         };
       } else {
-        // For guest users, create minimal guest data if needed
-        const tempGuestData = guestData || {
+        // For guest users, use real data from localStorage or create minimal data
+        let realGuestData = guestData;
+        
+        // Try to get real data from localStorage if not already available
+        if (!realGuestData) {
+          const storedData = localStorage.getItem("guestTestData");
+          if (storedData) {
+            try {
+              realGuestData = JSON.parse(storedData);
+            } catch (error) {
+              console.error("Error parsing stored guest data:", error);
+            }
+          }
+        }
+        
+        // Use real data or fallback to minimal data
+        const finalGuestData = realGuestData || {
           name: "Visitante Anônimo",
           email: `guest_${Date.now()}@meuperfil360.com`,
           whatsapp: "11999999999",
         };
-        console.log("Enviando teste como convidado");
+        
+        console.log("Enviando teste como convidado com dados:", finalGuestData);
         payload = {
-          guestData: tempGuestData,
+          guestData: finalGuestData,
           answers: answers,
         };
       }
