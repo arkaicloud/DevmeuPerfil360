@@ -211,28 +211,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Só mostra o botão "Novo Teste" se o usuário pode fazer testes */}
-            {testLimits?.canTakeTest && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
-                onClick={() => {
-                  // Create session data from user info for compatibility
-                  const mockGuestData = {
-                    name: user?.username || "",
-                    email: user?.email || "",
-                    whatsapp: user?.whatsapp || "",
-                  };
-                  sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
-                  navigate("/test");
-                }}
-              >
-                <Plus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                
-                <span className="sm:hidden">Novo</span>
-              </Button>
-            )}
+            
             {/* Se não pode fazer testes, mostra botão de upgrade */}
             {!testLimits?.canTakeTest && (
               <Button
