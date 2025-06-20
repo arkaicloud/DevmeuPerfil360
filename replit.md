@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **PREMIUM UPGRADE POPUP SYSTEM** - Dashboard popup encouraging non-premium users to upgrade
+  - **Smart Detection**: Popup appears for users with non-premium tests only once per day
+  - **Premium Benefits**: Lists complete premium features (analysis, action plan, career recommendations)
+  - **Direct Checkout**: "Fazer Upgrade Premium" button navigates directly to checkout page
+  - **Non-intrusive**: Daily frequency limit with localStorage tracking to avoid spam
+  - **Professional Design**: Purple gradient styling with crown icon for premium feel
 - June 20, 2025: **PREMIUM EMAIL PDF LINK ENHANCED** - Direct PDF download link in premium upgrade emails
   - **Direct PDF Access**: Premium upgrade email now includes direct link to `/api/test/result/{id}/pdf`
   - **Enhanced Button**: Improved "Baixar Relatório Premium (PDF)" button styling and visibility

@@ -41,6 +41,7 @@ export default function Dashboard() {
   const params = useParams();
   const userId = params.userId;
   const [showRetestDialog, setShowRetestDialog] = useState(false);
+  const [showPremiumUpgradeDialog, setShowPremiumUpgradeDialog] = useState(false);
 
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
     queryKey: [`/api/user/${userId}/dashboard`],
@@ -78,6 +79,24 @@ export default function Dashboard() {
       if (lastShown !== today) {
         setShowRetestDialog(true);
         localStorage.setItem('lastRetestPopup', today);
+      }
+    }
+  }, [dashboardData]);
+
+  // Check if premium upgrade popup should be shown
+  useEffect(() => {
+    if (dashboardData?.testResults && dashboardData.testResults.length > 0) {
+      const hasNonPremiumTests = dashboardData.testResults.some(test => !test.isPremium);
+      
+      if (hasNonPremiumTests) {
+        const lastShown = localStorage.getItem('lastPremiumUpgradePopup');
+        const today = new Date().toDateString();
+
+        // Show popup if not shown today
+        if (lastShown !== today) {
+          setShowPremiumUpgradeDialog(true);
+          localStorage.setItem('lastPremiumUpgradePopup', today);
+        }
       }
     }
   }, [dashboardData]);
@@ -585,6 +604,49 @@ export default function Dashboard() {
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
             >
               {testLimits?.canTakeTest ? "Fazer Novo Teste Agora" : "Upgrade Premium"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Premium Upgrade Popup Dialog */}
+      <AlertDialog open={showPremiumUpgradeDialog} onOpenChange={setShowPremiumUpgradeDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-purple-700">
+              <Crown className="w-5 h-5" />
+              Desbloqueie Seu Potencial Completo!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600">
+              Você já fez seu teste DISC básico! Agora descubra insights mais profundos com nosso relatório premium.
+              <br /><br />
+              <strong>Com o Premium você recebe:</strong>
+              <br />• Análise comportamental completa
+              <br />• Plano de ação personalizado de 4 semanas
+              <br />• Recomendações de carreira específicas
+              <br />• Estratégias de comunicação e liderança
+              <br />• Relatório em PDF para download
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowPremiumUpgradeDialog(false)}
+            >
+              Talvez Depois
+            </Button>
+            <AlertDialogAction
+              onClick={() => {
+                setShowPremiumUpgradeDialog(false);
+                // Navigate to checkout with the most recent test
+                const latestTest = dashboardData?.testResults?.[0];
+                if (latestTest) {
+                  navigate(`/checkout/${latestTest.id}`);
+                }
+              }}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              Fazer Upgrade Premium
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
