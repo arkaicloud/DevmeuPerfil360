@@ -66,35 +66,42 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      {/* Header */}
-      <header className="psychology-gradient text-white p-4 safe-area-top">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
+      {/* Barra de Navegação Superior */}
+      <nav className="bg-gradient-to-r from-purple-700 via-purple-600 to-blue-600 text-white shadow-xl border-b-2 border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo e Título */}
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shadow-lg">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight">MeuPerfil360</h1>
+                <p className="text-sm opacity-90">Plataforma de Avaliação DISC</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold">MeuPerfil360</h1>
-              <p className="text-xs opacity-90">Faça seu Login</p>
+            
+            {/* Botão Início */}
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="secondary"
+                className="bg-white text-purple-700 hover:bg-gray-100 font-semibold px-6 py-2 rounded-full shadow-md transition-all duration-200 hover:shadow-lg"
+                onClick={() => navigate("/")}
+              >
+                ← Início
+              </Button>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20"
-            onClick={() => navigate("/")}
-          >
-            Início
-          </Button>
         </div>
-      </header>
+      </nav>
 
-      <div className="p-6">
+      {/* Conteúdo Principal */}
+      <div className="flex-1 p-6 pt-8">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <LogIn className="w-12 h-12 psychology-blue mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-foreground mb-2">Acesse sua conta</h2>
-            <p className="text-muted-foreground text-sm">
+            <LogIn className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Acesse sua conta</h2>
+            <p className="text-gray-600 text-sm">
               Entre para ver seus testes e relatórios
             </p>
           </div>
