@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ interface RegistrationModalProps {
 
 export default function RegistrationModal({ isOpen, onClose, guestData }: RegistrationModalProps) {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const form = useForm<Registration>({
     resolver: zodResolver(registrationSchema),
@@ -52,10 +54,14 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
     onSuccess: (data) => {
       toast({
         title: "Conta criada com sucesso!",
-        description: "Você pode agora fazer login e acessar seus testes.",
+        description: "Redirecionando para seu dashboard...",
       });
       onClose();
-      // Could redirect to login or dashboard here
+      
+      // Redirect to user dashboard
+      setTimeout(() => {
+        setLocation(`/dashboard/${data.id}`);
+      }, 1000);
     },
     onError: (error: any) => {
       toast({
