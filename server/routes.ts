@@ -1962,7 +1962,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           <title>Relatório Premium DISC - ${testResult.guestName || 'Usuário'}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            @page { size: A4; margin: 15mm; }
+            @page { 
+              size: A4; 
+              margin: 20mm 15mm; 
+              orphans: 3; 
+              widows: 3; 
+            }
             * { 
               -webkit-print-color-adjust: exact !important; 
               color-adjust: exact !important; 
@@ -1971,11 +1976,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             body { 
               font-family: Arial, sans-serif; 
-              line-height: 1.5; 
+              line-height: 1.4; 
               color: #333; 
               margin: 0; 
-              padding: 0; 
+              padding: 10px; 
               background: white; 
+              font-size: 12px;
+              max-width: 100%;
+              overflow-wrap: break-word;
+              word-wrap: break-word;
             }
             .header { 
               background: #4f46e5; 
@@ -2008,19 +2017,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             .section { 
               background: #f8fafc; 
-              border: 2px solid #e2e8f0; 
-              border-radius: 8px; 
-              padding: 20px; 
-              margin: 20px 0; 
+              border: 1px solid #e2e8f0; 
+              border-radius: 6px; 
+              padding: 15px; 
+              margin: 10px 0; 
               page-break-inside: avoid; 
+              max-width: 100%;
+              overflow: hidden;
             }
             .section-title { 
-              font-size: 26px; font-weight: 700; color: #2b6cb0; 
-              margin-bottom: 25px; padding: 18px 0 18px 55px;
-              border-bottom: 2px solid #e2e8f0; position: relative;
-              background: linear-gradient(90deg, #f7fafc 0%, #ffffff 100%);
-              border-radius: 10px; margin-left: -35px; margin-right: -35px;
-              margin-top: -35px; padding-top: 28px;
+              font-size: 18px; 
+              font-weight: 700; 
+              color: #2b6cb0; 
+              margin-bottom: 12px; 
+              padding: 8px 0;
+              border-bottom: 1px solid #e2e8f0; 
+              word-wrap: break-word;
+              overflow-wrap: break-word;
             }
             .section-title::before {
               content: ''; position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
@@ -2030,41 +2043,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .disc-table { 
               width: 100%; 
               border-collapse: collapse; 
-              margin: 15px 0; 
+              margin: 8px 0; 
               background: white; 
+              font-size: 11px;
+              page-break-inside: avoid;
             }
             .disc-table th { 
               background: #4f46e5; 
               color: white; 
-              padding: 12px; 
+              padding: 8px 6px; 
               font-weight: bold; 
               border: 1px solid white; 
+              font-size: 10px;
             }
             .disc-table td { 
-              padding: 12px; 
+              padding: 8px 6px; 
               border: 1px solid #ddd; 
               text-align: center; 
+              word-wrap: break-word;
+              max-width: 120px;
             }
             .disc-d { background: linear-gradient(135deg, #e53e3e, #c53030); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(229,62,62,0.3); }
             .disc-i { background: linear-gradient(135deg, #dd6b20, #c05621); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(221,107,32,0.3); }
             .disc-s { background: linear-gradient(135deg, #38a169, #2f855a); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(56,161,105,0.3); }
             .disc-c { background: linear-gradient(135deg, #3182ce, #2c5aa0); color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(49,130,206,0.3); }
             .progress-container { 
-              margin: 15px 0; 
+              margin: 8px 0; 
               background: white; 
-              padding: 15px; 
-              border-radius: 5px; 
+              padding: 10px; 
+              border-radius: 4px; 
+              page-break-inside: avoid;
             }
             .progress-label { 
               font-weight: bold; 
-              margin-bottom: 8px; 
+              margin-bottom: 5px; 
               display: flex; 
               justify-content: space-between; 
+              font-size: 11px;
+              word-wrap: break-word;
             }
             .progress-bar { 
               background: #f1f5f9; 
-              height: 30px; 
-              border-radius: 15px; 
+              height: 20px; 
+              border-radius: 10px; 
               border: 1px solid #d1d5db; 
               overflow: hidden; 
             }
@@ -2082,26 +2103,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .quote-box { 
               background: linear-gradient(135deg, #f0f9ff, #e0f2fe); 
               border: 1px solid #0ea5e9; 
-              border-radius: 12px; 
-              padding: 25px; 
-              margin: 20px 0; 
-              position: relative;
-              box-shadow: 0 4px 20px rgba(14, 165, 233, 0.1);
+              border-radius: 6px; 
+              padding: 12px; 
+              margin: 8px 0; 
+              page-break-inside: avoid;
+              font-size: 11px;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
             }
             .intro-box {
               background: linear-gradient(135deg, #fef3c7, #fde68a);
               border: 1px solid #f59e0b;
-              border-radius: 12px;
-              padding: 30px;
-              margin: 25px 0;
+              border-radius: 6px;
+              padding: 15px;
+              margin: 10px 0;
               text-align: center;
-              box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1);
+              page-break-inside: avoid;
+              font-size: 12px;
             }
             .intro-box h3 {
               color: #92400e;
-              font-size: 22px;
-              margin-bottom: 15px;
+              font-size: 16px;
+              margin-bottom: 10px;
               font-weight: 700;
+              word-wrap: break-word;
+            }
+            
+            /* Responsive text handling */
+            ul, ol {
+              padding-left: 20px;
+              margin: 8px 0;
+              page-break-inside: avoid;
+            }
+            li {
+              margin: 3px 0;
+              font-size: 11px;
+              line-height: 1.3;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+              page-break-inside: avoid;
+            }
+            p {
+              margin: 6px 0;
+              font-size: 12px;
+              line-height: 1.4;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+            }
+            h1, h2, h3, h4 {
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+              margin: 8px 0 6px 0;
             }
             
             /* New Sections Styling */

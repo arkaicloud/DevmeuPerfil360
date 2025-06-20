@@ -353,103 +353,102 @@ export async function generatePremiumPDF(testResult: TestResult): Promise<void> 
   const margin = 20;
   const contentWidth = pageWidth - 2 * margin;
   
-  // Helper function to add text with automatic line breaks
-  const addText = (text: string, fontSize: number = 12, isBold: boolean = false) => {
+  // Helper function to add text with automatic line breaks and better spacing
+  const addText = (text: string, fontSize: number = 12, isBold: boolean = false, extraSpacing: number = 0) => {
     pdf.setFontSize(fontSize);
     pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
     
-    const lines = pdf.splitTextToSize(text, contentWidth);
+    const lines = pdf.splitTextToSize(text, contentWidth - 10); // Extra margin for safety
+    const lineHeight = fontSize * 0.6; // Better line height calculation
+    const totalHeight = lines.length * lineHeight + extraSpacing;
     
-    // Check if we need a new page
-    if (yPosition + (lines.length * fontSize * 0.5) > pdf.internal.pageSize.getHeight() - 20) {
+    // Check if we need a new page with better margin calculation
+    if (yPosition + totalHeight > pdf.internal.pageSize.getHeight() - 30) {
       pdf.addPage();
-      yPosition = 20;
+      yPosition = 25; // Start with more margin on new page
     }
     
     pdf.text(lines, margin, yPosition);
-    yPosition += lines.length * fontSize * 0.5 + 5;
+    yPosition += totalHeight + 8; // Better spacing between elements
   };
   
-  // Header
-  addText(`RELATÓRIO DISC PREMIUM`, 20, true);
-  addText(`${guestName}`, 16, true);
-  addText(`Perfil ${config.dominantFactor} - ${config.percentage}%`, 14);
-  yPosition += 10;
+  // Header with better spacing
+  addText(`RELATÓRIO DISC PREMIUM`, 20, true, 5);
+  addText(`${guestName}`, 16, true, 3);
+  addText(`Perfil ${config.dominantFactor} - ${config.percentage}%`, 14, false, 10);
   
   // Profile Description
-  addText(`SEU PERFIL COMPORTAMENTAL`, 16, true);
-  addText(config.description, 12);
-  yPosition += 10;
+  addText(`SEU PERFIL COMPORTAMENTAL`, 16, true, 5);
+  addText(config.description, 12, false, 10);
   
   // Strengths
-  addText(`PRINCIPAIS PONTOS FORTES`, 14, true);
+  addText(`PRINCIPAIS PONTOS FORTES`, 14, true, 5);
   config.strengths.forEach(strength => {
-    addText(`• ${strength}`, 11);
+    addText(`• ${strength}`, 11, false, 2);
   });
-  yPosition += 10;
+  yPosition += 5;
   
   // Development Areas
-  addText(`ÁREAS DE DESENVOLVIMENTO`, 14, true);
+  addText(`ÁREAS DE DESENVOLVIMENTO`, 14, true, 5);
   config.developmentAreas.forEach(area => {
-    addText(`• ${area}`, 11);
+    addText(`• ${area}`, 11, false, 2);
   });
-  yPosition += 10;
+  yPosition += 5;
   
   // Under Pressure
-  addText(`COMPORTAMENTO SOB PRESSÃO`, 14, true);
-  addText(config.underPressure, 12);
-  yPosition += 10;
+  addText(`COMPORTAMENTO SOB PRESSÃO`, 14, true, 5);
+  addText(config.underPressure, 12, false, 10);
   
   // Support Factors
-  addText(`FATORES DE APOIO`, 14, true);
+  addText(`FATORES DE APOIO`, 14, true, 5);
   config.supportFactors.forEach(factor => {
-    addText(`• ${factor}`, 11);
+    addText(`• ${factor}`, 11, false, 2);
   });
-  yPosition += 10;
+  yPosition += 5;
   
   // Career Recommendations
-  addText(`CARREIRAS E FUNÇÕES IDEAIS`, 14, true);
+  addText(`CARREIRAS E FUNÇÕES IDEAIS`, 14, true, 5);
   config.careers.forEach(career => {
-    addText(`• ${career}`, 11);
+    addText(`• ${career}`, 11, false, 2);
   });
-  yPosition += 10;
+  yPosition += 5;
   
   // Resources
-  addText(`RECURSOS RECOMENDADOS`, 14, true);
-  addText(`Livros:`, 12, true);
+  addText(`RECURSOS RECOMENDADOS`, 14, true, 5);
+  addText(`Livros:`, 12, true, 3);
   config.resources.books.forEach(book => {
-    addText(`• ${book}`, 11);
+    addText(`• ${book}`, 11, false, 1);
   });
   
-  addText(`Podcasts:`, 12, true);
+  addText(`Podcasts:`, 12, true, 3);
   config.resources.podcasts.forEach(podcast => {
-    addText(`• ${podcast}`, 11);
+    addText(`• ${podcast}`, 11, false, 1);
   });
   
-  addText(`Cursos:`, 12, true);
+  addText(`Cursos:`, 12, true, 3);
   config.resources.courses.forEach(course => {
-    addText(`• ${course}`, 11);
+    addText(`• ${course}`, 11, false, 1);
   });
-  yPosition += 10;
+  yPosition += 8;
   
   // Action Plan
-  addText(`PLANO DE AÇÃO DE 4 SEMANAS`, 14, true);
+  addText(`PLANO DE AÇÃO DE 4 SEMANAS`, 14, true, 5);
   actionPlan.forEach((week, index) => {
-    addText(`Semana ${index + 1}:`, 12, true);
-    addText(week, 11);
+    addText(`Semana ${index + 1}:`, 12, true, 2);
+    addText(week.replace(/^Semana \d+: /, ''), 11, false, 5);
   });
-  yPosition += 10;
+  yPosition += 8;
   
   // Reflection Questions
-  addText(`PERGUNTAS PARA REFLEXÃO SEMANAL`, 14, true);
+  addText(`PERGUNTAS PARA REFLEXÃO SEMANAL`, 14, true, 5);
   questions.forEach((question, index) => {
-    addText(`Semana ${index + 1}: ${question}`, 11);
+    addText(`Semana ${index + 1}: ${question}`, 11, false, 3);
   });
-  yPosition += 10;
+  yPosition += 8;
   
   // Sabotage Patterns
-  addText(`SABOTADORES INCONSCIENTES`, 14, true);
-  addText(`Como pessoa com perfil ${config.dominantFactor} dominante, esteja atento a estes padrões:`, 12);
+  addText(`SABOTADORES INCONSCIENTES`, 14, true, 5);
+  addText(`Como pessoa com perfil ${config.dominantFactor} dominante, esteja atento a estes padrões:`, 12, false, 5);
   
   const sabotagePatterns = profileType === 'D' ? [
     'Impaciência excessiva: Tomar decisões rápidas demais sem considerar todas as variáveis',
@@ -470,13 +469,14 @@ export async function generatePremiumPDF(testResult: TestResult): Promise<void> 
   ];
   
   sabotagePatterns.forEach(pattern => {
-    addText(`• ${pattern}`, 11);
+    addText(`• ${pattern}`, 11, false, 3);
   });
   
-  // Footer
-  yPosition += 20;
-  addText(`Este relatório foi gerado especificamente para seu perfil ${config.dominantFactor} dominante.`, 10);
-  addText(`Use-o como guia para seu desenvolvimento pessoal e profissional contínuo.`, 10);
+  // Footer with proper spacing
+  yPosition += 15;
+  addText(`Este relatório foi gerado especificamente para seu perfil ${config.dominantFactor} dominante.`, 10, false, 2);
+  addText(`Use-o como guia para seu desenvolvimento pessoal e profissional contínuo.`, 10, false, 5);
+  addText(`© 2025 MeuPerfil360 - Todos os direitos reservados`, 9, false, 0);
   
   // Download PDF
   const fileName = `relatorio-disc-premium-${guestName.replace(/\s+/g, '-').toLowerCase()}.pdf`;

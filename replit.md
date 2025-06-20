@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **PDF RESPONSIVENESS OPTIMIZED** - Resolved content cutting issues in premium PDF reports
+  - Improved page margins (20mm top/bottom, 15mm left/right) with proper orphans/widows control
+  - Optimized font sizes: body 12px, headings 16-18px, lists 11px for better readability
+  - Added comprehensive word-wrap and overflow-wrap rules to prevent text cutting
+  - Enhanced table responsiveness with smaller padding and max-width constraints
+  - Implemented page-break-inside: avoid for sections to prevent awkward breaks
 - June 20, 2025: **DASHBOARD ROUTING FIXED** - Corrected dashboard route configuration to accept user ID parameter
   - Updated AppFixed.tsx route from `/dashboard` to `/dashboard/:userId` to match component expectations
   - Dashboard now loads correctly after user registration with proper user data
