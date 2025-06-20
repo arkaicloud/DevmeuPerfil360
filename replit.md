@@ -132,6 +132,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - **Rate Limiting**: DDoS protection
 - **Data Encryption**: Sensitive information protection
 
+## Credenciais de Administrador
+
+**Acesso ao Painel Administrativo:**
+- URL: `/admin/login`
+- Email: `adm@meuperfil360.com.br`
+- Senha: `admin123456`
+
 ## Changelog
 - June 20, 2025: **SECURITY HARDENING COMPLETE** - Comprehensive security audit implemented with critical vulnerability fixes
   - Reactivated all security middlewares (rate limiting, threat detection, input validation)
