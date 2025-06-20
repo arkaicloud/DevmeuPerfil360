@@ -92,27 +92,26 @@ export default function Test() {
           answers: answers,
         };
       } else {
-        // For guest users, use real data from localStorage or create minimal data
-        let realGuestData = guestData;
+        // For guest users, always get fresh data from localStorage
+        const storedData = localStorage.getItem("guestTestData");
+        let finalGuestData = guestData;
         
-        // Try to get real data from localStorage if not already available
-        if (!realGuestData) {
-          const storedData = localStorage.getItem("guestTestData");
-          if (storedData) {
-            try {
-              realGuestData = JSON.parse(storedData);
-            } catch (error) {
-              console.error("Error parsing stored guest data:", error);
+        if (storedData) {
+          try {
+            const parsedData = JSON.parse(storedData);
+            // Use stored data if available and valid
+            if (parsedData && parsedData.name && parsedData.email) {
+              finalGuestData = parsedData;
             }
+          } catch (error) {
+            console.error("Error parsing stored guest data:", error);
           }
         }
         
-        // Use real data or fallback to minimal data
-        const finalGuestData = realGuestData || {
-          name: "Visitante Anônimo",
-          email: `guest_${Date.now()}@meuperfil360.com`,
-          whatsapp: "11999999999",
-        };
+        // If still no valid data, this shouldn't happen but we'll handle it
+        if (!finalGuestData || !finalGuestData.name || !finalGuestData.email) {
+          throw new Error("Dados do usuário não encontrados. Por favor, recomece o teste.");
+        }
         
         // Enviando teste como convidado - dados removidos do log por segurança
         payload = {
