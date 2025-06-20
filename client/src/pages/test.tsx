@@ -325,11 +325,7 @@ export default function Test() {
       </header>
 
       <div className="p-4 md:p-6">
-        {/* Motivation Banner */}
-        <MotivationBanner 
-          currentQuestion={currentQuestionIndex + 1}
-          totalQuestions={discQuestions.length}
-        />
+
 
         {/* Desktop Progress - Hidden on Mobile */}
         <div className="hidden md:block mb-6">
@@ -433,11 +429,7 @@ export default function Test() {
         </Card>
       </div>
 
-      {/* Progress Milestone Overlay */}
-      <ProgressMilestone 
-        currentQuestion={currentQuestionIndex + 1}
-        totalQuestions={discQuestions.length}
-      />
+
     </div>
   );
 }
