@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **POST-CHECKOUT REDIRECT FIXED** - Corrected 404 error after successful payment completion
+  - **Success URL Configuration**: Updated Stripe checkout to use dynamic domain from config (development vs production)
+  - **Payment Flow**: After successful payment, users are redirected to results page with premium access
+  - **Route Corrections**: Fixed checkout route to accept testId parameter and corrected navigation paths
+  - **Environment Support**: Dynamic URLs work correctly in both development (localhost) and production domains
 - June 20, 2025: **VPS DEPLOY READY** - Complete deployment guide and scripts created for production VPS
   - **Comprehensive Guide**: Detailed DEPLOY_VPS_GUIDE.md with step-by-step instructions
   - **Production Scripts**: ecosystem.config.js, deploy.sh, backup.sh, install-vps.sh

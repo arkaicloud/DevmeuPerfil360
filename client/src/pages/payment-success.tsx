@@ -36,16 +36,16 @@ export default function PaymentSuccess() {
             console.log('Payment simulation successful:', data);
             // Redirect to results after processing
             setTimeout(() => {
-              navigate(`/results/${testIdParam}?payment=success`);
+              navigate(`/results/${testIdParam}`);
             }, 2000);
           } else {
             console.error('Payment simulation failed:', data);
-            navigate(`/results/${testIdParam}?payment=error`);
+            navigate(`/results/${testIdParam}`);
           }
         })
         .catch(error => {
           console.error('Payment processing error:', error);
-          navigate(`/results/${testIdParam}?payment=error`);
+          navigate(`/results/${testIdParam}`);
         });
       }
     } else {

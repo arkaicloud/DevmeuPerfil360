@@ -415,8 +415,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `https://www.meuperfil360.com.br/payment-success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
-        cancel_url: `https://www.meuperfil360.com.br/checkout?testId=${testId}&payment=cancelled`,
+        success_url: `${config.domain}/payment-success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
+        cancel_url: `${config.domain}/checkout/${testId}?payment=cancelled`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
