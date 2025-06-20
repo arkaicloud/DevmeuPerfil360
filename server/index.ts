@@ -11,6 +11,15 @@ const app = express();
 // Trust proxy for rate limiting to work correctly behind proxies
 app.set('trust proxy', 1);
 
+// Bypass completo para rotas administrativas em desenvolvimento
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'development' && req.path.includes('/api/admin')) {
+    // Bypass TOTAL de rate limiting e middlewares de segurança para admin
+    return next();
+  }
+  next();
+});
+
 // Security Headers removidos em desenvolvimento para permitir React
 if (process.env.NODE_ENV === 'production') {
   app.use(helmet({

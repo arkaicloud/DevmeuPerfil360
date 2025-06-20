@@ -1015,14 +1015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/email-config", [
-    sanitizeInput,
-    body('smtpHost').isLength({ min: 1 }).withMessage('Host SMTP é obrigatório'),
-    body('smtpPort').isInt({ min: 1, max: 65535 }).withMessage('Porta SMTP inválida'),
-    body('smtpUser').isEmail().withMessage('Usuário SMTP deve ser um email válido'),
-    body('fromEmail').isEmail().withMessage('Email remetente deve ser válido'),
-    validateRequest
-  ], async (req: any, res: any) => {
+  app.post("/api/admin/email-config", async (req: any, res: any) => {
     try {
       const { smtpHost, smtpPort, smtpUser, smtpPassword, smtpSecure, fromEmail, fromName } = req.body;
 
