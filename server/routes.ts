@@ -1094,6 +1094,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para servir páginas da aplicação
+  app.get("/api/page/:page", async (req: Request, res: Response) => {
+    const { page } = req.params;
+    
+    // Conteúdo das páginas principais
+    const pages: Record<string, string> = {
+      'home': `
+        <div style="text-align: center;">
+          <h2>Bem-vindo ao MeuPerfil360</h2>
+          <p style="font-size: 18px; margin: 20px 0;">Descubra seu perfil comportamental com nosso teste DISC completo</p>
+          <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 30px 0;">
+            <h3>Características do Teste DISC:</h3>
+            <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+              <li>✅ Teste comportamental validado cientificamente</li>
+              <li>✅ Resultado imediato e detalhado</li>
+              <li>✅ Análise completa do seu perfil</li>
+              <li>✅ Relatório premium disponível</li>
+            </ul>
+          </div>
+          <a href="/test" style="background: #0066cc; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 18px; display: inline-block;">Iniciar Teste Gratuito</a>
+        </div>
+      `,
+      'test': `
+        <div>
+          <h2>Teste DISC Comportamental</h2>
+          <p>Complete as perguntas abaixo para descobrir seu perfil comportamental.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <button onclick="window.location.href='/results'" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Simular Resultado</button>
+          </div>
+        </div>
+      `,
+      'results': `
+        <div>
+          <h2>Seus Resultados DISC</h2>
+          <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Seu Perfil: Dominante (D)</h3>
+            <p>Você demonstra características de liderança e determinação.</p>
+          </div>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="/checkout" style="background: #0066cc; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px;">Relatório Premium</a>
+          </div>
+        </div>
+      `,
+      '404': `
+        <div style="text-align: center;">
+          <h2>Página não encontrada</h2>
+          <p>A página que você procura não existe.</p>
+          <a href="/" style="color: #0066cc;">Voltar ao início</a>
+        </div>
+      `
+    };
+
+    const content = pages[page] || pages['404'];
+    res.send(content);
+  });
+
   // Public endpoint to get current pricing
   app.get("/api/pricing", async (req: any, res: any) => {
     try {

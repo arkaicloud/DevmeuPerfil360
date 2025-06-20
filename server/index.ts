@@ -40,20 +40,26 @@ app.use(helmet({
   xssFilter: true,
 }));
 
-  // Middlewares de segurança - CSP desabilitado em desenvolvimento
+  // Middlewares de segurança com configurações específicas para desenvolvimento
+  app.use(securityHeaders); // Agora com CSP flexível para Replit
   if (process.env.NODE_ENV === 'production') {
-    app.use(securityHeaders);
     app.use(strictRateLimit);
     app.use(threatDetection);
     app.use(validateInput);
   }
-  // Desenvolvimento sem restrições CSP para permitir Vite/React
 
-  // CORS configuration for production domain
+  // CORS configuration incluindo domínios Replit
   app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
       ? ['https://www.meuperfil360.com.br', 'https://meuperfil360.com.br']
-      : ['http://localhost:5000', 'http://127.0.0.1:5000'],
+      : [
+          'http://localhost:5000', 
+          'http://127.0.0.1:5000',
+          /\.replit\.dev$/,
+          /\.replit\.app$/,
+          /\.repl\.co$/,
+          'https://5188fea3-be00-4777-95f5-87454a0954f0-00-1aijxvoxqrkob.worf.replit.dev'
+        ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']

@@ -1,9 +1,13 @@
 import React from "react";
-import { Switch, Route } from "wouter";
+import { createRoot } from "react-dom/client";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Switch, Route } from "wouter";
+import { Toaster } from "@/components/ui/toaster";
+import "./index.css";
+
+// Import pages
 import Home from "@/pages/home-responsive";
 import Test from "@/pages/test";
 import Results from "@/pages/results";
@@ -26,15 +30,15 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/test" component={Test} />
-      <Route path="/results/:id" component={Results} />
+      <Route path="/results" component={Results} />
       <Route path="/checkout" component={CheckoutModern} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/find-results" component={FindResults} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/payment-test" component={PaymentTest} />
       <Route path="/stripe-direct" component={StripeDirect} />
-      <Route path="/dashboard/:userId" component={Dashboard} />
-      <Route path="/find-results" component={FindResults} />
       <Route path="/login" component={Login} />
-      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
@@ -45,7 +49,6 @@ function Router() {
 }
 
 function App() {
-  // Sistema funcionando sem Clerk
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -58,4 +61,8 @@ function App() {
   );
 }
 
-export default App;
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);

@@ -27,27 +27,37 @@ export const authRateLimit = rateLimit({
   }
 });
 
-// Middleware de segurança de headers
+// Middleware de segurança de headers - CSP flexível para desenvolvimento
 export const securityHeaders = helmet({
-  contentSecurityPolicy: {
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://*.clerk.accounts.dev", "https://*.clerk.dev"],
-      imgSrc: ["'self'", "data:", "https:", "https://*.clerk.accounts.dev", "https://*.clerk.dev"],
-      connectSrc: ["'self'", "https://api.stripe.com", "https://*.clerk.accounts.dev", "https://*.clerk.dev", "wss://*.clerk.dev"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      defaultSrc: ["'self'", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.stripe.com", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+      imgSrc: ["'self'", "data:", "https:", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+      connectSrc: ["'self'", "https://api.stripe.com", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "meuperfil360.com.br", "www.meuperfil360.com.br"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      frameSrc: ["'self'", "https://js.stripe.com"],
     },
-  },
+  } : {
+    directives: {
+      defaultSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "*.replit.dev", "*.replit.app", "*.repl.co"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "*.replit.dev", "*.replit.app", "*.repl.co", "https://replit.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "*.replit.dev", "*.replit.app", "*.repl.co"],
+      imgSrc: ["'self'", "data:", "https:", "*.replit.dev", "*.replit.app", "*.repl.co"],
+      connectSrc: ["'self'", "*.replit.dev", "*.replit.app", "*.repl.co", "ws:", "wss:"],
+      fontSrc: ["'self'", "*.replit.dev", "*.replit.app", "*.repl.co"],
+      frameSrc: ["'self'", "*.replit.dev", "*.replit.app", "*.repl.co"],
+    },
+  }, // CSP flexível para desenvolvimento
   crossOriginEmbedderPolicy: false,
-  hsts: {
+  hsts: process.env.NODE_ENV === 'production' ? {
     maxAge: 31536000,
     includeSubDomains: true,
     preload: true
-  }
+  } : false
 });
 
 // Classe para gerenciamento seguro de sessões
