@@ -34,6 +34,7 @@ function Router() {
       <Route path="/stripe-direct" component={StripeDirect} />
       <Route path="/login" component={Login} />
       <Route path="/admin" component={AdminLogin} />
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
