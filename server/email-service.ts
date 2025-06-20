@@ -221,7 +221,8 @@ class EmailService {
   async sendWelcomeEmail(to: string, userName: string): Promise<boolean> {
     const variables = {
       userName: userName,
-      loginUrl: process.env.VITE_APP_URL || 'https://meuperfil360.replit.app',
+      loginUrl: 'https://www.meuperfil.com.br/login',
+      dashboardUrl: 'https://www.meuperfil.com.br/login',
       supportEmail: 'suporte@meuperfil360.com.br'
     };
     
