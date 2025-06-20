@@ -80,48 +80,66 @@ export default function Test() {
 
   const submitTestMutation = useMutation({
     mutationFn: async (answers: DiscAnswer[]) => {
+      // Pre-validate data before API call for faster feedback
       let endpoint = "/api/test/submit";
       let payload: any;
 
       // Use logged user data if available
       if (isLoggedUser && currentUser) {
-        // Enviando teste para usuário logado - dados sensíveis removidos do log
         endpoint = "/api/test/submit-user";
         payload = {
           userId: currentUser.id,
           answers: answers,
         };
       } else {
-        // For guest users, always get fresh data from localStorage
+        // For guest users, get data efficiently
         const storedData = localStorage.getItem("guestTestData");
         let finalGuestData = guestData;
         
         if (storedData) {
           try {
             const parsedData = JSON.parse(storedData);
-            // Use stored data if available and valid
-            if (parsedData && parsedData.name && parsedData.email) {
+            if (parsedData?.name && parsedData?.email) {
               finalGuestData = parsedData;
             }
           } catch (error) {
-            console.error("Error parsing stored guest data:", error);
+            throw new Error("Dados corrompidos. Por favor, recomece o teste.");
           }
         }
         
-        // If still no valid data, this shouldn't happen but we'll handle it
-        if (!finalGuestData || !finalGuestData.name || !finalGuestData.email) {
+        if (!finalGuestData?.name || !finalGuestData?.email) {
           throw new Error("Dados do usuário não encontrados. Por favor, recomece o teste.");
         }
         
-        // Enviando teste como convidado - dados removidos do log por segurança
         payload = {
           guestData: finalGuestData,
           answers: answers,
         };
       }
 
-      const response = await apiRequest("POST", endpoint, payload);
-      return response.json();
+      // Optimized API request with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       // Clear guest data from sessionStorage
@@ -385,7 +403,10 @@ export default function Test() {
               size="lg"
             >
               {submitTestMutation.isPending ? (
-                <div className="spinner" />
+                <>
+                  <div className="spinner mr-2" />
+                  {isLastQuestion ? "Processando Teste..." : "Carregando..."}
+                </>
               ) : isLastQuestion ? (
                 "Finalizar Teste"
               ) : (

@@ -134,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     sanitizeInput
   ], async (req: any, res: any) => {
     try {
-      console.log('Dados recebidos para teste:', JSON.stringify(req.body, null, 2));
+      // Log removido para otimização de performance
       
       // Basic validation for guest test submission
       const { guestData, answers } = req.body;
@@ -170,20 +170,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentId: null,
       });
 
-      // Send test completion email for guest users (non-blocking)
-      emailService.sendTestCompletionEmail(
-        guestData.email, 
-        guestData.name, 
-        discResults.profileType, 
-        testResult.id.toString()
-      ).catch(error => {
-        console.error('Erro ao enviar email de conclusão de teste para convidado:', error);
-      });
-
+      // Send response immediately for better UX
       res.json({
         testResultId: testResult.id,
         profile: discResults,
         isPremium: false,
+      });
+
+      // Send test completion email asynchronously (truly non-blocking)
+      setImmediate(() => {
+        emailService.sendTestCompletionEmail(
+          guestData.email, 
+          guestData.name, 
+          discResults.profileType, 
+          testResult.id.toString()
+        ).catch(error => {
+          console.error('Erro ao enviar email de conclusão de teste para convidado:', error);
+        });
       });
     } catch (error: any) {
       console.error('Test submission error:', error);
@@ -209,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "UserId e answers são obrigatórios" });
       }
 
-      console.log(`Criando teste para usuário registrado ID: ${userId}`);
+      // Log removido para otimização de performance
 
       // Verify user exists
       const user = await storage.getUser(parseInt(userId));
@@ -227,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      console.log(`Usuário ${user.email} pode fazer teste. Testes restantes: ${testLimits.testsRemaining}`);
+      // Log removido para otimização de performance
 
       // Calculate DISC profile
       const discResults = calculateDiscProfile(answers);
@@ -249,22 +252,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Consume the test (decrement user's available tests)
       await storage.consumeUserTest(parseInt(userId));
 
-      console.log(`Teste criado com sucesso para usuário ${userId}: ${testResult.id}`);
+      // Log removido para otimização de performance
 
-      // Send test completion email (non-blocking)
-      emailService.sendTestCompletionEmail(
-        user.email, 
-        user.firstName || user.email, 
-        discResults.profileType, 
-        testResult.id.toString()
-      ).catch(error => {
-        console.error('Erro ao enviar email de conclusão de teste:', error);
-      });
-
+      // Send response immediately for better UX
       res.json({
         testResultId: testResult.id,
         profile: discResults,
         isPremium: false,
+      });
+
+      // Send test completion email asynchronously (truly non-blocking)
+      setImmediate(() => {
+        emailService.sendTestCompletionEmail(
+          user.email, 
+          user.firstName || user.email, 
+          discResults.profileType, 
+          testResult.id.toString()
+        ).catch(error => {
+          console.error('Erro ao enviar email de conclusão de teste:', error);
+        });
       });
     } catch (error: any) {
       console.error('User test submission error:', error);
