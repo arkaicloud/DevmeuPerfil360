@@ -140,11 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
-- June 20, 2025: **ERROR 404 RESOLVED** - Fixed frontend query configuration causing test result access failures
-  - Corrected React Query configuration with proper retry mechanism and stale time
-  - Enhanced error handling in results page with specific 404 detection and user guidance
-  - Improved query client settings to handle authentication and network errors gracefully
+- June 20, 2025: **ERROR 404 RESOLVED** - Fixed frontend routing configuration causing test result access failures
+  - Corrected missing route parameter `:id` in AppFixed.tsx for `/results/:id` path
+  - Enhanced React Query configuration with proper retry mechanism and stale time
+  - Improved error handling in results page with specific 404 detection and user guidance
   - Verified test data integrity in database (test ID 8 for atorquato51@gmail.com exists and accessible)
+  - All API endpoints working correctly, frontend now matches backend routing structure
 - June 20, 2025: **EMAIL TEMPLATES SYSTEM FIXED** - Corrected template names, validation errors, and database constraints
   - Updated template identifiers: boas_vindas_cadastro, teste_concluido, upgrade_premium, lembrete_reteste
   - Fixed middleware validation blocking email test functionality

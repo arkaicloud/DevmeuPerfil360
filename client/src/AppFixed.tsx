@@ -25,7 +25,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/test" component={Test} />
-      <Route path="/results" component={Results} />
+      <Route path="/results/:id" component={Results} />
       <Route path="/checkout" component={CheckoutModern} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/find-results" component={FindResults} />
