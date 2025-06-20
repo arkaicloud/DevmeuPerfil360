@@ -106,6 +106,28 @@ const pdfLimiter = rateLimit({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Check if user exists by email - Early route
+  app.get("/api/user/check-email", [
+    query('email').isEmail().withMessage('Email inválido'),
+    validateRequest
+  ], async (req: Request, res: Response) => {
+    try {
+      const { email } = req.query;
+      const user = await storage.getUserByEmail(email as string);
+      
+      res.json({ 
+        exists: !!user,
+        hasAccount: !!user
+      });
+    } catch (error: any) {
+      console.error('Check email error:', error);
+      res.status(500).json({ 
+        error: "Erro ao verificar email",
+        exists: false
+      });
+    }
+  });
+
   // Submit DISC test for guest users
   app.post("/api/test/submit", [
     testSubmissionLimiter,
@@ -290,6 +312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isPremium: testResult.isPremium || false,
         createdAt: testResult.createdAt,
         guestName: testResult.guestName || 'Usuário',
+        guestEmail: testResult.guestEmail || null,
       });
     } catch (error: any) {
       res.status(500).json({ message: "Erro ao buscar resultado" });

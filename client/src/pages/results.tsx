@@ -24,6 +24,7 @@ interface TestResult {
   isPremium: boolean;
   createdAt: string;
   guestName: string;
+  guestEmail?: string;
 }
 
 export default function Results() {
@@ -32,6 +33,7 @@ export default function Results() {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [testId, setTestId] = useState<string | null>(null);
   const [guestName, setGuestName] = useState<string | null>(null);
+  const [userExists, setUserExists] = useState<boolean | null>(null);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -58,6 +60,40 @@ export default function Results() {
     queryKey: [`/api/test/result/${testId}`],
     enabled: !!testId,
   });
+
+  // Check if user exists when test result is loaded
+  useEffect(() => {
+    const checkUserExists = async () => {
+      if (testResult?.guestEmail) {
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              username: testResult.guestEmail, 
+              password: 'dummy-check' 
+            })
+          });
+          
+          // If we get a 401 with specific message about password, user exists
+          // If we get a 401 with user not found, user doesn't exist
+          if (response.status === 401) {
+            const errorText = await response.text();
+            setUserExists(errorText.includes('Senha incorreta') || errorText.includes('password'));
+          } else {
+            setUserExists(false);
+          }
+        } catch (error) {
+          console.error("Erro ao verificar usuário:", error);
+          setUserExists(false);
+        }
+      }
+    };
+
+    if (testResult) {
+      checkUserExists();
+    }
+  }, [testResult]);
   
   const { toast } = useToast();
   
@@ -307,7 +343,7 @@ export default function Results() {
             <div className="w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
               <Trophy className="w-6 h-6 md:w-8 md:h-8 text-white" />
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Parabéns, {guestName || testResult.guestName || 'Usuário'}!</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Parabéns, {testResult.guestName || 'Usuário'}!</h2>
             <p className="text-sm md:text-base text-muted-foreground mb-4">Seu teste foi concluído com sucesso</p>
           </div>
         </div>
@@ -507,14 +543,34 @@ export default function Results() {
         {/* Action Buttons */}
         <div className="responsive-container">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
-            onClick={() => setShowRegistrationModal(true)}
-            className="w-full sm:w-auto bg-accent text-white btn-hover-lift"
-            size="default"
-          >
-            <UserPlus className="w-4 h-4 mr-2" />
-            Criar Conta Gratuita
-          </Button>
+          {userExists === true ? (
+            <Button 
+              onClick={() => navigate("/login")}
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white btn-hover-lift"
+              size="default"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Fazer Login
+            </Button>
+          ) : userExists === false ? (
+            <Button 
+              onClick={() => setShowRegistrationModal(true)}
+              className="w-full sm:w-auto bg-accent text-white btn-hover-lift"
+              size="default"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Criar Conta Gratuita
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => setShowRegistrationModal(true)}
+              className="w-full sm:w-auto bg-accent text-white btn-hover-lift"
+              size="default"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Criar Conta Gratuita
+            </Button>
+          )}
           
           <Button 
             onClick={handleShareResults}
@@ -540,7 +596,10 @@ export default function Results() {
         </div>
 
           <p className="text-center mobile-text text-muted-foreground mt-4">
-            Crie sua conta gratuita para salvar seus resultados e fazer novos testes
+            {userExists === true 
+              ? "Faça login para acessar seus resultados salvos e fazer novos testes"
+              : "Crie sua conta gratuita para salvar seus resultados e fazer novos testes"
+            }
           </p>
         </div>
       </div>
