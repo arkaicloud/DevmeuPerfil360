@@ -1996,7 +1996,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ]
           },
           C: {
-            title: "Perfil Conscencioso (C)",
+            title: "Perfil Conformidade (C)",
             characteristics: [
               "Analítico e orientado por dados",
               "Preciso e atento aos detalhes",

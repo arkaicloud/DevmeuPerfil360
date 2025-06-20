@@ -140,6 +140,10 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **DISC TERMINOLOGY CORRECTED** - Updated "Conscencioso" to "Conformidade" across entire system
+  - **Frontend Updates**: Results page, dashboard, and all user-facing components now show "Conformidade"
+  - **Backend Updates**: Email service, PDF generation, and API responses use correct terminology
+  - **Consistent Naming**: All DISC profiles now use standardized names (Dominância, Influência, Estabilidade, Conformidade)
 - June 20, 2025: **POST-CHECKOUT REDIRECT FIXED** - Corrected 404 error after successful payment completion
   - **Success URL Configuration**: Updated Stripe checkout to use dynamic domain from config (development vs production)
   - **Payment Flow**: After successful payment, users are redirected to results page with premium access

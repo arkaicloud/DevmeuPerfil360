@@ -218,7 +218,7 @@ export default function Results() {
         };
       case "C":
         return {
-          name: "Conscencioso",
+          name: "Conformidade",
           description: "Você é analítico, preciso e orientado por qualidade. Gosta de seguir procedimentos e busca a excelência.",
           color: "blue",
         };

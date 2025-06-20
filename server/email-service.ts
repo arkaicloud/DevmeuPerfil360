@@ -236,7 +236,7 @@ class EmailService {
       'D': 'Dominante',
       'I': 'Influente', 
       'S': 'Estável',
-      'C': 'Conscencioso'
+      'C': 'Conformidade'
     };
 
     // Smart URL routing: direct links for registered users, fallback for guests
@@ -268,7 +268,7 @@ class EmailService {
       'D': 'Dominante',
       'I': 'Influente',
       'S': 'Estável', 
-      'C': 'Conscencioso'
+      'C': 'Conformidade'
     };
 
     // PDF URL with email parameter for guest access

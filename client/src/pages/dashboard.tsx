@@ -136,7 +136,7 @@ export default function Dashboard() {
       case "D": return "Dominante";
       case "I": return "Influente";
       case "S": return "Estável";
-      case "C": return "Conscencioso";
+      case "C": return "Conformidade";
       default: return "Misto";
     }
   };
