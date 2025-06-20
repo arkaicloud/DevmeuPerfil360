@@ -216,24 +216,24 @@ Equipe MeuPerfil360
     <div className="min-h-screen bg-gray-50">
       <AdminNav onLogout={handleLogout} />
 
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="p-4 sm:p-6 max-w-full mx-auto">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Template List */}
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Templates</CardTitle>
+          <Card className="xl:col-span-1 w-full">
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-lg sm:text-xl">Templates</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+            <CardContent className="px-4 sm:px-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
                 {Object.values(templates).map((template) => (
                   <Button
                     key={template.id}
                     variant={selectedTemplate === template.id ? "default" : "outline"}
-                    className="w-full justify-start"
+                    className="w-full justify-start text-sm"
                     onClick={() => setSelectedTemplate(template.id)}
                   >
-                    <Mail className="w-4 h-4 mr-2" />
-                    {template.name}
+                    <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">{template.name}</span>
                   </Button>
                 ))}
               </div>
@@ -241,16 +241,17 @@ Equipe MeuPerfil360
           </Card>
 
           {/* Template Editor */}
-          <Card className="lg:col-span-3">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Editando: {currentTemplate?.name}
-                <div className="flex gap-2">
+          <Card className="xl:col-span-3 w-full">
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <span className="text-lg sm:text-xl truncate">Editando: {currentTemplate?.name}</span>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handlePreview}
                     disabled={previewMutation.isPending}
+                    className="w-full sm:w-auto"
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     Preview
@@ -259,7 +260,7 @@ Equipe MeuPerfil360
                     size="sm"
                     onClick={handleSave}
                     disabled={saveMutation.isPending}
-                    className="bg-gradient-to-r from-green-600 to-green-700"
+                    className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700"
                   >
                     <Save className="w-4 h-4 mr-2" />
                     Salvar
@@ -267,7 +268,7 @@ Equipe MeuPerfil360
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 px-4 sm:px-6">
               <div className="space-y-2">
                 <Label htmlFor="subject">Assunto do Email</Label>
                 <Input
@@ -275,6 +276,7 @@ Equipe MeuPerfil360
                   value={currentTemplate?.subject || ""}
                   onChange={(e) => updateTemplate("subject", e.target.value)}
                   placeholder="Assunto do email..."
+                  className="w-full"
                 />
               </div>
 
@@ -285,17 +287,17 @@ Equipe MeuPerfil360
                   value={currentTemplate?.content || ""}
                   onChange={(e) => updateTemplate("content", e.target.value)}
                   placeholder="Conteúdo do email..."
-                  rows={15}
-                  className="font-mono text-sm"
+                  rows={12}
+                  className="font-mono text-sm w-full min-h-[300px]"
                 />
               </div>
 
               <Card className="bg-blue-50">
-                <CardHeader>
+                <CardHeader className="px-4 sm:px-6">
                   <CardTitle className="text-sm">Variáveis Disponíveis</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                <CardContent className="px-4 sm:px-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
                     {currentTemplate?.variables.map((variable) => (
                       <code key={variable} className="bg-white px-2 py-1 rounded">
                         {`{{${variable}}}`}

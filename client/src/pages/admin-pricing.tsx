@@ -81,21 +81,21 @@ export default function AdminPricing() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav onLogout={handleLogout} />
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center gap-3 mb-6">
+      <div className="p-4 sm:p-6 max-w-full lg:max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
           <DollarSign className="w-8 h-8 text-green-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Configuração de Preços</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Configuração de Preços</h1>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="w-full">
+          <CardHeader className="px-4 sm:px-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Settings className="w-5 h-5" />
               Configurações de Preço Premium
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          <CardContent className="space-y-6 px-4 sm:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="regularPrice">Preço Regular (R$)</Label>
                 <Input
@@ -107,6 +107,7 @@ export default function AdminPricing() {
                     regularPrice: e.target.value
                   }))}
                   placeholder="97"
+                  className="w-full"
                 />
                 <p className="text-sm text-gray-500">
                   Preço normal do relatório premium
@@ -124,6 +125,7 @@ export default function AdminPricing() {
                     promocionalPrice: e.target.value
                   }))}
                   placeholder="47"
+                  className="w-full"
                 />
                 <p className="text-sm text-gray-500">
                   Preço com desconto promocional
@@ -131,7 +133,7 @@ export default function AdminPricing() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg gap-4">
               <div className="space-y-1">
                 <Label htmlFor="promotionActive">Promoção Ativa</Label>
                 <p className="text-sm text-gray-500">
@@ -145,6 +147,7 @@ export default function AdminPricing() {
                   ...prev,
                   isPromotionActive: checked
                 }))}
+                className="self-start sm:self-center"
               />
             </div>
 
