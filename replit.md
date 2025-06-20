@@ -140,6 +140,14 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **EMAIL TEMPLATES SYSTEM FIXED** - Corrected template names, validation errors, and database constraints
+  - Updated template identifiers: boas_vindas_cadastro, teste_concluido, upgrade_premium, lembrete_reteste
+  - Fixed middleware validation blocking email test functionality
+  - Resolved database constraint issues with ON CONFLICT specifications
+  - Cleaned up excessive logging while maintaining essential error tracking
+- June 20, 2025: **ADMIN PANEL LAYOUT CORRECTED** - Fixed navbar overlap issues affecting all administrative pages
+  - Dashboard, email config, pricing, and templates pages now display properly
+  - Added responsive margin (lg:ml-64) to prevent content being hidden behind sidebar
 - June 20, 2025: **SECURITY HARDENING COMPLETE** - Comprehensive security audit implemented with critical vulnerability fixes
   - Reactivated all security middlewares (rate limiting, threat detection, input validation)
   - Removed all console.log statements exposing sensitive user data, payment info, and authentication tokens

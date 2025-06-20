@@ -1219,15 +1219,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Send test emails to specific users
   app.post("/api/admin/send-test-email", [
-    sanitizeInput,
     body('email').isEmail().withMessage('Email deve ser válido'),
     body('emailType').isIn(['boas_vindas_cadastro', 'teste_concluido', 'upgrade_premium', 'lembrete_reteste']).withMessage('Tipo de email inválido'),
-    validateRequest
+    (req: any, res: any, next: any) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ error: 'Dados inválidos fornecidos', details: errors.array() });
+      }
+      next();
+    }
   ], async (req: any, res: any) => {
     try {
       const { email, emailType } = req.body;
-      
-      console.log(`Enviando email de teste do tipo ${emailType} para ${email}`);
       
       // Try to find real user data
       let userName = 'Usuário Teste';
@@ -1235,11 +1238,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let resultId = '123';
       
       // Look for existing user by email
-      console.log(`Procurando usuário por email: ${email}`);
       const user = await storage.getUserByEmail(email);
       if (user) {
         userName = user.firstName || user.email;
-        console.log(`✅ Usuário encontrado: ${userName} (ID: ${user.id})`);
         
         // Get user's most recent test result
         const testResults = await storage.getTestResultsByUser(user.id);
@@ -1247,41 +1248,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const latestTest = testResults[0];
           profileType = latestTest.profileType;
           resultId = latestTest.id.toString();
-          console.log(`✅ Teste mais recente encontrado: ${profileType}, ID: ${resultId}`);
-        } else {
-          console.log(`ℹ️ Nenhum teste encontrado para o usuário ${userName}`);
         }
       } else {
-        console.log(`❌ Usuário não encontrado por email, procurando como convidado...`);
         // Look for guest test results by email
         const guestTest = await storage.getTestResultByGuest(email);
         if (guestTest) {
           userName = guestTest.guestName || 'Usuário Teste';
           profileType = guestTest.profileType;
           resultId = guestTest.id.toString();
-          console.log(`✅ Teste de convidado encontrado: ${userName}, ${profileType}`);
-        } else {
-          console.log(`❌ Nenhum dado encontrado para ${email}, usando dados padrão`);
         }
       }
       
       let emailSent = false;
       
       switch (emailType) {
-        case 'welcome':
+        case 'boas_vindas_cadastro':
           emailSent = await emailService.sendWelcomeEmail(email, userName);
           break;
-        case 'test_completion':
+        case 'teste_concluido':
           emailSent = await emailService.sendTestCompletionEmail(email, userName, profileType, resultId);
           break;
-        case 'premium_upgrade':
+        case 'upgrade_premium':
           emailSent = await emailService.sendPremiumUpgradeEmail(email, userName, profileType, resultId);
           break;
-        case 'retest_reminder':
+        case 'lembrete_reteste':
           emailSent = await emailService.sendRetestReminderEmail(email, userName, 180);
           break;
         default:
-          return res.status(400).json({ message: "Tipo de email não suportado" });
+          return res.status(400).json({ message: `Tipo de email "${emailType}" não suportado` });
       }
       
       if (emailSent) {

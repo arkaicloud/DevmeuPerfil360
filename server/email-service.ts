@@ -226,7 +226,7 @@ class EmailService {
     };
     
     console.log(`Enviando email de boas-vindas para: ${to}`);
-    return await this.sendTemplateEmail(to, 'welcome', variables);
+    return await this.sendTemplateEmail(to, 'boas_vindas_cadastro', variables);
   }
 
   async sendTestCompletionEmail(to: string, userName: string, profileType: string, resultId: string): Promise<boolean> {
@@ -246,7 +246,7 @@ class EmailService {
     };
     
     console.log(`Enviando email de conclusão de teste para: ${to}`);
-    return await this.sendTemplateEmail(to, 'test_completion', variables);
+    return await this.sendTemplateEmail(to, 'teste_concluido', variables);
   }
 
   async sendPremiumUpgradeEmail(to: string, userName: string, profileType: string, resultId: string): Promise<boolean> {
@@ -266,7 +266,7 @@ class EmailService {
     };
     
     console.log(`Enviando email de upgrade premium para: ${to}`);
-    return await this.sendTemplateEmail(to, 'premium_upgrade', variables);
+    return await this.sendTemplateEmail(to, 'upgrade_premium', variables);
   }
 
   async sendRetestReminderEmail(to: string, userName: string, daysSinceLastTest: number): Promise<boolean> {
@@ -277,7 +277,7 @@ class EmailService {
     };
     
     console.log(`Enviando lembrete de reteste para: ${to}`);
-    return await this.sendTemplateEmail(to, 'retest_reminder', variables);
+    return await this.sendTemplateEmail(to, 'lembrete_reteste', variables);
   }
 }
 
