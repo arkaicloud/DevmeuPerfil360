@@ -115,12 +115,14 @@ Equipe MeuPerfil360
     }
   }, [navigate]);
 
-  const { data: existingTemplates } = useQuery<Record<string, EmailTemplate>>({
+  const { data: existingTemplates, isLoading } = useQuery<Record<string, EmailTemplate>>({
     queryKey: ["/api/admin/email-templates"],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (existingTemplates) {
+    if (existingTemplates && Object.keys(existingTemplates).length > 0) {
       setTemplates(existingTemplates);
     }
   }, [existingTemplates]);
@@ -140,6 +142,28 @@ Equipe MeuPerfil360
       toast({
         title: "Erro ao salvar",
         description: error.message || "Erro ao salvar templates",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const initTemplatesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/init-email-templates", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Templates inicializados",
+        description: "Templates padrão foram criados com sucesso",
+      });
+      // Refetch templates after initialization
+      window.location.reload();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao inicializar",
+        description: error.message || "Erro ao inicializar templates",
         variant: "destructive",
       });
     },
@@ -207,6 +231,10 @@ Equipe MeuPerfil360
     previewMutation.mutate(selectedTemplate);
   };
 
+  const handleInitTemplates = () => {
+    initTemplatesMutation.mutate();
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     navigate('/admin/login');
@@ -224,19 +252,37 @@ Equipe MeuPerfil360
               <CardTitle className="text-lg sm:text-xl">Templates</CardTitle>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
-                {Object.values(templates).map((template) => (
+              {isLoading ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                </div>
+              ) : Object.keys(templates).length === 0 ? (
+                <div className="text-center py-8">
+                  <Mail className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500 mb-4">Nenhum template encontrado</p>
                   <Button
-                    key={template.id}
-                    variant={selectedTemplate === template.id ? "default" : "outline"}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setSelectedTemplate(template.id)}
+                    onClick={handleInitTemplates}
+                    disabled={initTemplatesMutation.isPending}
+                    className="w-full"
                   >
-                    <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">{template.name}</span>
+                    {initTemplatesMutation.isPending ? "Inicializando..." : "Criar Templates Padrão"}
                   </Button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
+                  {Object.values(templates).map((template) => (
+                    <Button
+                      key={template.id}
+                      variant={selectedTemplate === template.id ? "default" : "outline"}
+                      className="w-full justify-start text-sm"
+                      onClick={() => setSelectedTemplate(template.id)}
+                    >
+                      <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{template.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

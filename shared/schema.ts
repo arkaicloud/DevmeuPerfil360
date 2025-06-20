@@ -75,7 +75,7 @@ export const adminConfigs = pgTable("admin_configs", {
 // Email templates table
 export const emailTemplates = pgTable("email_templates", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).unique().notNull(),
   subject: varchar("subject", { length: 500 }).notNull(),
   content: text("content").notNull(),
   variables: text("variables").array(),
