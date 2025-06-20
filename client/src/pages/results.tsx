@@ -32,6 +32,7 @@ export default function Results() {
   const [, navigate] = useLocation();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [testId, setTestId] = useState<string | null>(null);
   const [guestName, setGuestName] = useState<string | null>(null);
   const [userExists, setUserExists] = useState<boolean | null>(null);
@@ -88,12 +89,16 @@ export default function Results() {
             
             // If user doesn't exist, automatically open registration modal
             if (!userExistsButWrongPassword && errorText.includes('Usuário não encontrado')) {
+              setIsUserRegistered(false);
               setTimeout(() => {
                 setShowRegistrationModal(true);
               }, 1000); // Small delay to let the page load
+            } else {
+              setIsUserRegistered(true);
             }
           } else {
             setUserExists(false);
+            setIsUserRegistered(false);
             // If unable to determine, auto-open registration as fallback
             setTimeout(() => {
               setShowRegistrationModal(true);
@@ -102,6 +107,7 @@ export default function Results() {
         } catch (error) {
           console.error("Erro ao verificar usuário:", error);
           setUserExists(false);
+          setIsUserRegistered(false);
           // On error, auto-open registration as fallback
           setTimeout(() => {
             setShowRegistrationModal(true);
@@ -369,10 +375,37 @@ export default function Results() {
         </div>
 
         {/* DISC Profile Results */}
-        <div className="max-w-7xl mx-auto">
-          <Card className="shadow-lg border-0 mb-4 md:mb-6">
+        <div className="max-w-7xl mx-auto relative">
+          <Card className="shadow-lg border-0 mb-4 md:mb-6 relative">
             <CardContent className="p-4 md:p-6">
               <h3 className="text-lg md:text-xl font-bold text-foreground mb-4 text-center">Seu Perfil DISC</h3>
+              
+              {/* Privacy Protection Overlay para usuários não cadastrados */}
+              {!isUserRegistered && (
+                <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-lg flex flex-col items-center justify-center z-10 p-6">
+                  <div className="text-center max-w-md">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Shield className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Resultados Protegidos</h3>
+                    <p className="text-gray-600 mb-4 text-sm">
+                      Para sua segurança e privacidade, os resultados detalhados estão protegidos. 
+                      Crie sua conta gratuita em 30 segundos para acessar.
+                    </p>
+                    <div className="space-y-2">
+                      <Button 
+                        onClick={() => setShowRegistrationModal(true)}
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      >
+                        🔓 Criar Conta e Ver Resultados
+                      </Button>
+                      <p className="text-xs text-gray-500">
+                        Grátis • Seus dados já estão preenchidos • Leva 30 segundos
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Profile Type with Custom Icon */}
               <div className="text-center mb-4 md:mb-6">
