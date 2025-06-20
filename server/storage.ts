@@ -10,7 +10,7 @@ import {
   type Payment,
   type InsertPayment 
 } from "@shared/schema";
-import { db } from "./db";
+import { db, withRetry } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
@@ -44,18 +44,24 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return await withRetry(async () => {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user || undefined;
+    });
   }
 
   async getUserByClerkId(clerkId: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.clerkId, clerkId));
-    return user || undefined;
+    return await withRetry(async () => {
+      const [user] = await db.select().from(users).where(eq(users.clerkId, clerkId));
+      return user || undefined;
+    });
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || undefined;
+    return await withRetry(async () => {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user || undefined;
+    });
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -192,12 +198,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTestResultByGuest(email: string): Promise<TestResult | undefined> {
-    const [result] = await db
-      .select()
-      .from(testResults)
-      .where(eq(testResults.guestEmail, email))
-      .orderBy(desc(testResults.createdAt));
-    return result || undefined;
+    return await withRetry(async () => {
+      const [result] = await db
+        .select()
+        .from(testResults)
+        .where(eq(testResults.guestEmail, email))
+        .orderBy(desc(testResults.createdAt));
+      return result || undefined;
+    });
   }
 
   async getTestResultByWhatsApp(whatsapp: string): Promise<TestResult | undefined> {
@@ -278,11 +286,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllAdminConfigs(): Promise<Record<string, string>> {
-    const configs = await db.select().from(adminConfigs);
-    return configs.reduce((acc, config) => {
-      acc[config.key] = config.value || '';
-      return acc;
-    }, {} as Record<string, string>);
+    return await withRetry(async () => {
+      const configs = await db.select().from(adminConfigs);
+      return configs.reduce((acc, config) => {
+        acc[config.key] = config.value || '';
+        return acc;
+      }, {} as Record<string, string>);
+    });
   }
 }
 
