@@ -141,9 +141,10 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 
 ## Changelog
 - June 20, 2025: **PDF RESPONSIVENESS OPTIMIZED** - Resolved content cutting issues in premium PDF reports
-  - Improved page margins (20mm top/bottom, 15mm left/right) with proper orphans/widows control
-  - Optimized font sizes: body 12px, headings 16-18px, lists 11px for better readability
-  - Added comprehensive word-wrap and overflow-wrap rules to prevent text cutting
+  - Fixed "Plano de Ação Personalizado de 4 Semanas" table cutting with optimized cell sizing
+  - Action table headers reduced to 10px font with 80px max-width and proper word-wrap
+  - Table cells optimized with 10px font, 200px max-width, and overflow-wrap protection
+  - Week badges resized to 9px font with compact 4px padding for better table fit
   - Enhanced table responsiveness with smaller padding and max-width constraints
   - Implemented page-break-inside: avoid for sections to prevent awkward breaks
 - June 20, 2025: **DASHBOARD ROUTING FIXED** - Corrected dashboard route configuration to accept user ID parameter

@@ -2284,28 +2284,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .action-table { 
               width: 100%; 
               border-collapse: collapse; 
-              margin: 20px 0; 
+              margin: 10px 0; 
               background: white; 
-              border-radius: 12px;
+              border-radius: 6px;
               overflow: hidden;
-              box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+              page-break-inside: avoid;
+              font-size: 11px;
             }
             .action-table th { 
-              background: linear-gradient(135deg, #667eea, #764ba2); 
+              background: #667eea; 
               color: white; 
-              padding: 18px; 
+              padding: 8px 6px; 
               font-weight: 700; 
-              font-size: 16px;
+              font-size: 10px;
               text-transform: uppercase;
-              letter-spacing: 0.5px;
-              border: none;
+              letter-spacing: 0.3px;
+              border: 1px solid #ddd;
+              word-wrap: break-word;
+              max-width: 80px;
             }
             .action-table td { 
-              padding: 18px; 
-              border: none;
+              padding: 8px 6px; 
+              border: 1px solid #ddd;
               border-bottom: 1px solid #f1f5f9;
               vertical-align: top; 
-              line-height: 1.6;
+              line-height: 1.3;
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+              max-width: 200px;
+              font-size: 10px;
             }
             .action-table tbody tr:nth-child(even) {
               background: #f8fafc;
@@ -2314,16 +2321,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               background: #e2e8f0;
             }
             .week-badge { 
-              background: linear-gradient(135deg, #f59e0b, #d97706); 
+              background: #f59e0b; 
               color: white; 
-              padding: 10px 16px; 
-              border-radius: 20px; 
+              padding: 4px 8px; 
+              border-radius: 12px; 
               font-weight: 700; 
               display: inline-block; 
-              box-shadow: 0 3px 10px rgba(245,158,11,0.3);
-              font-size: 14px;
+              font-size: 9px;
               text-transform: uppercase;
-              letter-spacing: 0.5px;
+              letter-spacing: 0.2px;
+              white-space: nowrap;
             }
             .warning-box { 
               background: #fef3c7; 
