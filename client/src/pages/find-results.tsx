@@ -33,6 +33,46 @@ export default function FindResults() {
 
   const findResultMutation = useMutation({
     mutationFn: async (data: FindResultFormData) => {
+      // First, check if user exists in the system
+      let userExists = false;
+      if (data.identifier.includes('@')) {
+        try {
+          const loginResponse = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              username: data.identifier, 
+              password: 'dummy-check' 
+            })
+          });
+          
+          if (loginResponse.ok) {
+            const responseData = await loginResponse.json();
+            // If login succeeds or redirects to Clerk, user exists
+            userExists = true;
+          } else if (loginResponse.status === 401) {
+            const errorText = await loginResponse.text();
+            // If error mentions password, user exists but password is wrong
+            userExists = errorText.includes('Senha incorreta') || errorText.includes('password');
+          }
+        } catch (error) {
+          console.log("User check failed, continuing with normal flow");
+        }
+      }
+
+      // If user exists, redirect to login with a message
+      if (userExists) {
+        toast({
+          title: "Usuário encontrado!",
+          description: "Você já tem uma conta. Faça login para acessar seus resultados.",
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+        return { redirectToLogin: true };
+      }
+
+      // If user doesn't exist, proceed with normal test search
       const response = await fetch("/api/test/find", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -44,6 +84,9 @@ export default function FindResults() {
       return response.json();
     },
     onSuccess: (data) => {
+      if (data.redirectToLogin) {
+        return; // Don't navigate, already handled above
+      }
       if (data.testResultId) {
         navigate(`/results/${data.testResultId}`);
       } else {
