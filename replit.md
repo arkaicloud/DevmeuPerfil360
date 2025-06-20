@@ -140,13 +140,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
-- June 20, 2025: **STREAMLINED MOBILE PROGRESS SYSTEM** - Clean mobile-friendly progress visualization without interruptions
-  - **Enhanced Header Progress**: Circular progress ring with percentage display in mobile header
-  - **Stage Visualization**: 4-stage system (Início, Desenvolvimento, Aprofundamento, Conclusão) with visual indicators
-  - **Non-intrusive Design**: Removed popup celebrations and banners that interrupted test flow
-  - **Multi-layered Feedback**: Desktop timeline view, mobile dots, progress bars, and stage badges
+- June 20, 2025: **MOBILE PROGRESS GUIDANCE RESTORED** - Added subtle progress orientations without disruptive popups
+  - **Stage Guidance Banner**: Integrated blue gradient banner showing current stage and description
+  - **Header Progress Ring**: Circular progress indicator with stage name display
+  - **4-Stage System**: Início, Desenvolvimento, Aprofundamento, Conclusão with visual dots
+  - **Non-intrusive Design**: Guidance appears naturally in interface without blocking user flow
   - **Real-time Updates**: All progress elements update smoothly with question transitions
-  - **Uninterrupted Experience**: Clean interface keeps users focused on test completion
+  - **Enhanced Mobile UX**: Stage information always visible but never interrupting test completion
 - June 20, 2025: **PERFORMANCE OPTIMIZATION** - Dramatically improved test submission speed and user experience
   - **Async Email Processing**: Moved email sending to background using setImmediate() for instant response
   - **Frontend Optimizations**: Added request timeout (15s), pre-validation, and efficient data handling

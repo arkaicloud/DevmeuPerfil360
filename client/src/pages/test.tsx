@@ -11,9 +11,7 @@ import { discQuestions } from "@/lib/disc-questions";
 import { type DiscAnswer, type GuestTestData, type UserTestSubmission, type DiscTestSubmission } from "@shared/schema";
 import DiscQuestion from "@/components/disc-question";
 import TestProgress from "@/components/test-progress";
-import ProgressMilestone from "@/components/progress-milestone";
 import MobileProgressRing from "@/components/mobile-progress-ring";
-import MotivationBanner from "@/components/motivation-banner";
 import { secureStorage, validateSession, sanitizeInput, clientRateLimit } from "@/lib/security";
 
 export default function Test() {
@@ -30,6 +28,35 @@ export default function Test() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [completedAnswers, setCompletedAnswers] = useState<DiscAnswer[]>([]);
+
+  const getStageInfo = (stage: number) => {
+    const stages = {
+      1: {
+        name: "Início",
+        description: "Conhecendo seu perfil inicial"
+      },
+      2: {
+        name: "Desenvolvimento", 
+        description: "Identificando padrões comportamentais"
+      },
+      3: {
+        name: "Aprofundamento",
+        description: "Refinando sua análise DISC"
+      },
+      4: {
+        name: "Conclusão",
+        description: "Finalizando seu perfil completo"
+      }
+    };
+    return stages[stage as keyof typeof stages] || stages[1];
+  };
+
+  // Progress calculations
+  const progress = ((currentQuestionIndex + 1) / discQuestions.length) * 100;
+  const currentStage = progress <= 25 ? 1 : progress <= 50 ? 2 : progress <= 75 ? 3 : 4;
+  const currentQuestion = discQuestions[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === discQuestions.length - 1;
+  const canProceed = currentAnswer.most && currentAnswer.least && currentAnswer.most !== currentAnswer.least;
 
   useEffect(() => {
     // Check if user is logged in with Clerk or local storage
@@ -48,7 +75,6 @@ export default function Test() {
         };
         setGuestData(mockGuestData);
         
-        // Usuário logado detectado - log removido por segurança
         return;
       } catch (error) {
         console.error("Error parsing user data:", error);
@@ -58,12 +84,10 @@ export default function Test() {
 
     // For guest users, check if they have guest data from the form
     const storedData = localStorage.getItem("guestTestData");
-    // Dados recuperados do localStorage - log removido por segurança
     
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
-        // Dados parseados - log removido por segurança
         setGuestData(parsedData);
         setIsLoggedUser(false);
       } catch (error) {
@@ -72,8 +96,6 @@ export default function Test() {
       }
     } else {
       // If no guest data, allow them to take the test anyway
-      // They'll be prompted to register at the end to save results
-      // Iniciando teste como convidado - log removido por segurança
       setIsLoggedUser(false);
     }
   }, [navigate, toast]);
@@ -146,33 +168,22 @@ export default function Test() {
       sessionStorage.removeItem("guestTestData");
       
       // Navigate based on user type
-      if (isLoggedUser && currentUser) {
-        // For logged users, go to dashboard and show success message
-        toast({
-          title: "Teste concluído com sucesso!",
-          description: `Seu perfil ${data.profile?.profileType || ''} foi identificado. Confira seu dashboard.`,
-        });
-        navigate(`/dashboard/${currentUser.id}`);
+      if (isLoggedUser) {
+        navigate(`/results/${data.testResultId}`);
       } else {
-        // For guests, go to results page
+        // For guest users, navigate to results immediately
         navigate(`/results/${data.testResultId}`);
       }
     },
     onError: (error: any) => {
-      // Handle test limit errors specifically
-      if (error.message && error.message.includes("limite de testes")) {
+      console.error("Erro ao enviar teste:", error);
+      
+      if (error.name === 'AbortError') {
         toast({
-          title: "Limite de testes atingido",
-          description: error.message,
+          title: "Timeout",
+          description: "O teste está demorando para processar. Tente novamente.",
           variant: "destructive",
         });
-        
-        // Redirect to dashboard or home based on user type
-        if (isLoggedUser && currentUser) {
-          navigate(`/dashboard/${currentUser.id}`);
-        } else {
-          navigate("/");
-        }
       } else {
         toast({
           title: "Erro ao enviar teste",
@@ -182,11 +193,6 @@ export default function Test() {
       }
     },
   });
-
-  const currentQuestion = discQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / discQuestions.length) * 100;
-  const isLastQuestion = currentQuestionIndex === discQuestions.length - 1;
-  const canProceed = currentAnswer.most && currentAnswer.least && currentAnswer.most !== currentAnswer.least;
 
   const handleNext = () => {
     if (!canProceed) return;
@@ -257,15 +263,6 @@ export default function Test() {
     }));
   };
 
-  // Remove the blocking condition - allow all users to take the test
-  // if (!guestData) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="spinner" />
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
@@ -296,26 +293,18 @@ export default function Test() {
             <div className="flex items-center space-x-3">
               <MobileProgressRing progress={progress} size={36} strokeWidth={3} />
               <div>
-                <div className="text-xs font-medium text-white/90">
+                <p className="text-sm font-medium">
                   Pergunta {currentQuestionIndex + 1} de {discQuestions.length}
-                </div>
-                <div className="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white/90 mt-1">
-                  {(() => {
-                    const progressPercent = ((currentQuestionIndex + 1) / discQuestions.length) * 100;
-                    if (progressPercent <= 25) return "Início";
-                    if (progressPercent <= 50) return "Desenvolvimento";  
-                    if (progressPercent <= 75) return "Aprofundamento";
-                    return "Conclusão";
-                  })()}
-                </div>
+                </p>
+                <p className="text-xs opacity-75">
+                  {getStageInfo(currentStage).name}
+                </p>
               </div>
             </div>
             
-            {/* Stage Indicators */}
-            <div className="flex space-x-1">
+            {/* Stage dots */}
+            <div className="flex space-x-2">
               {[1, 2, 3, 4].map((stage) => {
-                const progressPercent = ((currentQuestionIndex + 1) / discQuestions.length) * 100;
-                const currentStage = progressPercent <= 25 ? 1 : progressPercent <= 50 ? 2 : progressPercent <= 75 ? 3 : 4;
                 return (
                   <div
                     key={stage}
@@ -343,8 +332,6 @@ export default function Test() {
       </header>
 
       <div className="p-4 md:p-6">
-
-
         {/* Desktop Progress - Hidden on Mobile */}
         <div className="hidden md:block mb-6">
           <TestProgress 
@@ -358,8 +345,23 @@ export default function Test() {
         <Card className="shadow-lg border-0 mb-4 md:mb-8">
           <CardContent className="p-4 md:p-6">
             <div className="text-center mb-4 md:mb-6">
-              {/* Mobile: Compact question header */}
+              {/* Mobile: Compact question header with progress guidance */}
               <div className="md:hidden mb-3">
+                {/* Stage guidance banner - subtle and integrated */}
+                <div className="mb-3 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-3 border-blue-400">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-blue-700 font-medium">
+                      {getStageInfo(currentStage).name}
+                    </div>
+                    <div className="text-xs text-blue-600">
+                      {Math.round(progress)}% concluído
+                    </div>
+                  </div>
+                  <div className="text-xs text-blue-600 mt-1">
+                    {getStageInfo(currentStage).description}
+                  </div>
+                </div>
+                
                 <h3 className="text-base font-semibold text-foreground mb-2">
                   {currentQuestion.text}
                 </h3>
@@ -430,27 +432,7 @@ export default function Test() {
             )}
           </div>
         </div>
-        
-        {/* Spacer for fixed bottom buttons on mobile */}
-        <div className="h-32 md:h-0" />
-
-        {/* Help Notice */}
-        <Card className="mt-6 bg-amber-50 border-amber-200">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-2">
-              <Lightbulb className="w-5 h-5 text-amber-600 mt-1 flex-shrink-0" />
-              <div>
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  <strong>Dica:</strong> Responda instintivamente, sem pensar muito. 
-                  Não há respostas certas ou erradas - seja honesto consigo mesmo.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
-
-
     </div>
   );
 }
