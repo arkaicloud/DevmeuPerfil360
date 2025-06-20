@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **LOGGED USER AUTHENTICATION FIX** - Corrected registration modal behavior for authenticated users
+  - **Smart Authentication Check**: System now properly detects logged-in users from localStorage
+  - **No Duplicate Registration**: Logged users no longer see unnecessary registration prompts
+  - **Results Access**: Authenticated users can view test results without interruption
+  - **Guest vs User Logic**: Clear distinction between guest users and authenticated sessions
+  - **Seamless Experience**: Logged users maintain their session throughout the results flow
 - June 20, 2025: **MOBILE PROGRESS GUIDANCE RESTORED** - Added subtle progress orientations without disruptive popups
   - **Stage Guidance Banner**: Integrated blue gradient banner showing current stage and description
   - **Header Progress Ring**: Circular progress indicator with stage name display

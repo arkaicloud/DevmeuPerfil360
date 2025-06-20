@@ -47,7 +47,21 @@ export default function Results() {
       navigate("/");
     }
 
-    // Recuperar nome real do usuário do armazenamento local
+    // Check if user is already logged in
+    const userData = localStorage.getItem("currentUser");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setIsUserRegistered(true);
+        setGuestName(user.firstName || user.username || user.email);
+        return; // Skip guest data check if user is logged in
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("currentUser");
+      }
+    }
+
+    // Recuperar nome real do usuário do armazenamento local (only for guests)
     const guestData = localStorage.getItem("guestTestData");
     if (guestData) {
       try {
@@ -69,6 +83,20 @@ export default function Results() {
   // Check if user exists when test result is loaded (for find-results flow only)
   useEffect(() => {
     const checkUserExists = async () => {
+      // Skip all user checks if user is already logged in
+      const userData = localStorage.getItem("currentUser");
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          if (user && user.id) {
+            setIsUserRegistered(true);
+            return; // User is logged in, no need for registration modal
+          }
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
+      }
+
       // Only apply privacy protection for find-results flow (when searching for existing tests)
       const isFromFindResults = sessionStorage.getItem('fromFindResults') === 'true';
       
@@ -119,8 +147,22 @@ export default function Results() {
         // For new first-time tests, allow viewing results and auto-open registration
         setUserExists(false);
         setIsUserRegistered(true); // Allow viewing results
-        if (testResult && !testResult.userId) {
-          // Auto-open registration modal for guest tests after 3 seconds
+        
+        // Only show registration modal for guest tests if user is not already logged in
+        const userData = localStorage.getItem("currentUser");
+        let isLoggedIn = false;
+        
+        if (userData) {
+          try {
+            const user = JSON.parse(userData);
+            isLoggedIn = !!(user && user.id);
+          } catch (error) {
+            console.error("Error parsing user data:", error);
+          }
+        }
+        
+        if (testResult && !testResult.userId && !isLoggedIn) {
+          // Auto-open registration modal for guest tests after 3 seconds (only if not logged in)
           setTimeout(() => {
             setShowRegistrationModal(true);
           }, 3000);
