@@ -1666,7 +1666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { templateId, sampleData } = req.body;
       
-      const template = await db.select().from(emailTemplates).where(eq(emailTemplates.id, templateId)).limit(1);
+      const template = await db.select().from(emailTemplates).where(eq(emailTemplates.name, templateId)).limit(1);
       
       if (!template.length) {
         return res.status(404).json({ message: "Template não encontrado" });
