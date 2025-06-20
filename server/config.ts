@@ -28,8 +28,9 @@ export const config = {
   }
 };
 
+import crypto from 'crypto';
+
 function generateSecureKey(): string {
-  const crypto = require('crypto');
   return crypto.randomBytes(32).toString('hex');
 }
 

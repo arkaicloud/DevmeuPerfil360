@@ -32,6 +32,7 @@ import {
   DataEncryption
 } from "./security-middleware";
 import { requireAuth, optionalAuth, type AuthenticatedRequest } from "./clerk-middleware";
+import { config } from "./config";
 // import puppeteer from "puppeteer"; // Disabled due to system dependencies
 
 if (!process.env.STRIPE_SECRET_KEY) {
