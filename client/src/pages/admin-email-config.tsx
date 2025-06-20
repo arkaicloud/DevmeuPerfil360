@@ -174,16 +174,16 @@ export default function AdminEmailConfig() {
     <div className="min-h-screen bg-gray-50">
       <AdminNav onLogout={handleLogout} />
 
-      <div className="p-6 max-w-4xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>Configurações SMTP</CardTitle>
-            <p className="text-muted-foreground">
+      <div className="p-4 sm:p-6 max-w-full lg:max-w-6xl mx-auto">
+        <Card className="w-full">
+          <CardHeader className="px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl">Configurações SMTP</CardTitle>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Configure as credenciais do servidor SMTP para envio automático de emails
             </p>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-6 px-4 sm:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="smtpHost">Servidor SMTP</Label>
                 <Input
@@ -205,7 +205,7 @@ export default function AdminEmailConfig() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="smtpUser">Usuário SMTP</Label>
                 <Input
@@ -214,6 +214,7 @@ export default function AdminEmailConfig() {
                   placeholder="contato@meuperfil360.com.br"
                   value={config.smtpUser}
                   onChange={(e) => setConfig({ ...config, smtpUser: e.target.value })}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -228,7 +229,7 @@ export default function AdminEmailConfig() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="fromEmail">Email Remetente</Label>
                 <Input
@@ -237,6 +238,7 @@ export default function AdminEmailConfig() {
                   placeholder="noreply@meuperfil360.com.br"
                   value={config.fromEmail}
                   onChange={(e) => setConfig({ ...config, fromEmail: e.target.value })}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -246,6 +248,7 @@ export default function AdminEmailConfig() {
                   placeholder="MeuPerfil360"
                   value={config.fromName}
                   onChange={(e) => setConfig({ ...config, fromName: e.target.value })}
+                  className="w-full"
                 />
               </div>
             </div>
@@ -287,7 +290,7 @@ export default function AdminEmailConfig() {
                 Teste de Emails Automatizados
               </h3>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="emailTestRecipient">Email Destinatário</Label>
                     <Input
@@ -296,12 +299,13 @@ export default function AdminEmailConfig() {
                       placeholder="leosouzaa10@gmail.com"
                       value={testEmail}
                       onChange={(e) => setTestEmail(e.target.value)}
+                      className="w-full"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="emailType">Tipo de Email</Label>
                     <Select value={emailType} onValueChange={setEmailType}>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Selecione o tipo de email" />
                       </SelectTrigger>
                       <SelectContent>
@@ -313,7 +317,7 @@ export default function AdminEmailConfig() {
                     </Select>
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
                     onClick={handleSendTestEmail}
                     disabled={sendTestEmailMutation.isPending || !testEmail || !emailType}
@@ -344,11 +348,11 @@ export default function AdminEmailConfig() {
               </div>
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button 
                 onClick={handleSave}
                 disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {saveMutation.isPending ? "Salvando..." : "Salvar Configurações"}
@@ -357,7 +361,7 @@ export default function AdminEmailConfig() {
                 variant="outline"
                 onClick={handleTest}
                 disabled={testMutation.isPending || !testEmail}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
               >
                 <TestTube className="w-4 h-4 mr-2" />
                 {testMutation.isPending ? "Enviando..." : "Testar Email"}
