@@ -1564,9 +1564,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Usuário já existe com este email" });
       }
 
-      // Create user with Clerk data (no password needed)
+      // Create user without Clerk dependency
       const user = await storage.createUser({
-        clerkId: userData.clerkId,
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
