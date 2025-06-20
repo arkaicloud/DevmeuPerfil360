@@ -1,0 +1,35 @@
+Você é um especialista em segurança de aplicações SaaS. Analise todo o repositório do meu microSaaS e faça um escaneamento completo de vulnerabilidades com foco no front-end, para evitar vazamento ou exposição de dados importantes.**
+>
+> **1. Escopo de Análise:**
+>
+> * Verifique se há **chaves secretas**, tokens ou variáveis de ambiente expostos no bundle do cliente (ex.: `process.env.*` vazando no código compilado).
+> * Identifique **endpoints** de API públicos sem proteção (rotas abertos, ausência de autenticação/autorização).
+> * Busque **configurações de CORS** excessivamente permissivas (`Access-Control-Allow-Origin: *`).
+> * Inspecione código em busca de **XSS**, **injection**, **Open Redirect** e outras falhas de front-end (uso de `innerHTML`, `eval()`, etc.).
+> * Cheque a inclusão de **scripts ou fontes externas** não confiáveis (CDNs sem SRI, `http://` em vez de `https://`).
+> * Analise dependências e pacotes instalados no front-end para **vulnerabilidades conhecidas** (use npm audit ou similar).
+> * Valide cabeçalhos de segurança no HTML servidos (CSP, HSTS, X-Frame-Options, X-Content-Type-Options).
+> * Identifique **logs de console** que possam conter dados sensíveis (usuários, tokens, configurações).
+> * Verifique armazenamento local (localStorage/sessionStorage) para uso indevido de dados confidenciais.
+
+> **2. Metodologia:**
+>
+> * Faça varredura estática de todo o diretório `public/`, `src/` e configuração do build.
+> * Aplique recomendações OWASP Top 10 para aplicações web.
+> * Liste cada vulnerabilidade encontrada, classificando por severidade (Alta, Média, Baixa).
+
+> **3. Entrega do Relatório:**
+>
+> * Para cada item, informe:
+>
+>   1. **Descrição da vulnerabilidade**
+>   2. **Como reproduzir** (trecho de código ou passo a passo)
+>   3. **Recomendação de correção**
+>   4. **Links de referência** (OWASP, documentação oficial, CVEs)
+
+> **4. Objetivo Final:**
+>
+> * Garantir que nenhuma informação sensível (chaves, tokens, dados pessoais) esteja acessível ao usuário final ou exposta em bundles públicos.
+> * Aplicar correções sugeridas para deixar o front-end seguro antes de colocar em produção.
+
+Use este prompt para acionar a IA dev do Replit e obter um relatório detalhado de vulnerabilidades e orientações de correção.
