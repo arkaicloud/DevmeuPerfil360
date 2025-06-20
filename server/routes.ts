@@ -3934,7 +3934,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   return `
                     <tr>
                       <td class="disc-${type.toLowerCase()}">${type}</td>
-                      <td><strong>${names[type as keyof typeof names]}</strong></td>
+                      <td><strong>${type} = ${names[type as keyof typeof names]}</strong></td>
                       <td><strong style="font-size: 16px;">${score}%</strong></td>
                       <td><strong>${nivel}</strong></td>
                     </tr>

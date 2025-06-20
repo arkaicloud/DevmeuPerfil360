@@ -527,7 +527,9 @@ export default function Results() {
                           <IconComponent className="w-5 h-5 md:w-6 md:h-6 text-white" />
                         </div>
                         <div className={`inline-block px-2 py-1 rounded text-xs md:text-sm font-bold mb-2 ${getDiscColor(type)}`}>
-                          {type}
+                          {type === 'D' ? 'D = Dominância' : 
+                           type === 'I' ? 'I = Influência' : 
+                           type === 'S' ? 'S = Estabilidade' : 'C = Conformidade'}
                         </div>
                         <div className="text-lg md:text-xl font-bold">{score}%</div>
                         <Progress value={score} className="mt-2 h-2" />
