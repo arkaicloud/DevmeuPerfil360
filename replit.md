@@ -140,6 +140,10 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **PDF PREMIUM CONTENT UPDATED** - Removed "🎧 Podcasts Brasileiros" section from all premium PDF reports
+  - **Content Optimization**: Simplified premium PDF by removing podcasts section as requested
+  - **Cleaner Layout**: More focused premium content with books and courses only
+  - **All Profiles Updated**: Change applied to D, I, S, and C profile PDFs
 - June 20, 2025: **DISC TERMINOLOGY CORRECTED** - Updated "Conscencioso" to "Conformidade" across entire system
   - **Frontend Updates**: Results page, dashboard, and all user-facing components now show "Conformidade"
   - **Backend Updates**: Email service, PDF generation, and API responses use correct terminology
