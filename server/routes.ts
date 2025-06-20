@@ -183,7 +183,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           guestData.email, 
           guestData.name, 
           discResults.profileType, 
-          testResult.id.toString()
+          testResult.id.toString(),
+          false // Guest user - use fallback URLs
         ).catch(error => {
           console.error('Erro ao enviar email de conclusão de teste para convidado:', error);
         });
@@ -267,7 +268,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           user.email, 
           user.firstName || user.email, 
           discResults.profileType, 
-          testResult.id.toString()
+          testResult.id.toString(),
+          true // Registered user - use direct URLs
         ).catch(error => {
           console.error('Erro ao enviar email de conclusão de teste:', error);
         });
@@ -505,7 +507,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               user.email,
               user.firstName || user.email,
               testResult.profileType,
-              testResult.id.toString()
+              testResult.id.toString(),
+              user.email // Registered user email for PDF access
             ).catch(error => {
               console.error('Erro ao enviar email de upgrade premium:', error);
             });
@@ -519,7 +522,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               testResult.guestEmail as string,
               testResult.guestName as string,
               testResult.profileType,
-              testResult.id.toString()
+              testResult.id.toString(),
+              testResult.guestEmail as string
             ).catch(error => {
               console.error('Erro ao enviar email de upgrade premium para convidado:', error);
             });
@@ -595,7 +599,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   user.email,
                   user.firstName || user.email,
                   testResult.profileType,
-                  testResult.id.toString()
+                  testResult.id.toString(),
+                  user.email // Registered user email for PDF access
                 ).catch(error => {
                   console.error('Erro ao enviar email de upgrade premium via webhook:', error);
                 });
@@ -609,7 +614,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   testResult.guestEmail as string,
                   testResult.guestName as string,
                   testResult.profileType,
-                  testResult.id.toString()
+                  testResult.id.toString(),
+                  testResult.guestEmail as string
                 ).catch(error => {
                   console.error('Erro ao enviar email de upgrade premium para convidado via webhook:', error);
                 });
@@ -812,7 +818,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           emailTarget,
           userName || 'Usuário',
           testResult.profileType,
-          testId.toString()
+          testId.toString(),
+          emailTarget
         ).catch(error => {
           console.error('Erro ao enviar email de upgrade premium:', error);
         });
@@ -1401,11 +1408,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
         case 'test_completion':
         case 'teste_concluido':
-          emailSent = await emailService.sendTestCompletionEmail(email, userName, profileType, resultId);
+          emailSent = await emailService.sendTestCompletionEmail(email, userName, profileType, resultId, user ? true : false);
           break;
         case 'premium_upgrade':
         case 'upgrade_premium':
-          emailSent = await emailService.sendPremiumUpgradeEmail(email, userName, profileType, resultId);
+          emailSent = await emailService.sendPremiumUpgradeEmail(email, userName, profileType, resultId, email);
           break;
         case 'retest_reminder':
         case 'lembrete_reteste':

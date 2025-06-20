@@ -221,8 +221,9 @@ class EmailService {
   async sendWelcomeEmail(to: string, userName: string): Promise<boolean> {
     const variables = {
       userName: userName,
-      loginUrl: 'https://www.meuperfil.com.br/login',
-      dashboardUrl: 'https://www.meuperfil.com.br/login',
+      loginUrl: 'https://www.meuperfil360.com.br/login',
+      dashboardUrl: 'https://www.meuperfil360.com.br/login',
+      testUrl: 'https://www.meuperfil360.com.br',
       supportEmail: 'suporte@meuperfil360.com.br'
     };
     
@@ -230,7 +231,7 @@ class EmailService {
     return await this.sendTemplateEmail(to, 'boas_vindas_cadastro', variables);
   }
 
-  async sendTestCompletionEmail(to: string, userName: string, profileType: string, resultId: string): Promise<boolean> {
+  async sendTestCompletionEmail(to: string, userName: string, profileType: string, resultId: string, isRegisteredUser: boolean = false): Promise<boolean> {
     const profileNames = {
       'D': 'Dominante',
       'I': 'Influente', 
@@ -238,19 +239,31 @@ class EmailService {
       'C': 'Conscencioso'
     };
 
+    // Smart URL routing: direct links for registered users, fallback for guests
+    const resultUrl = isRegisteredUser 
+      ? `https://www.meuperfil360.com.br/results/${resultId}`
+      : 'https://www.meuperfil360.com.br/find-results';
+    
+    const upgradeUrl = isRegisteredUser 
+      ? `https://www.meuperfil360.com.br/checkout/${resultId}`
+      : 'https://www.meuperfil360.com.br/find-results';
+
     const variables = {
       userName: userName,
       profileType: profileType,
       profileName: profileNames[profileType as keyof typeof profileNames] || profileType,
-      resultUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/results/${resultId}`,
-      upgradeUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/checkout/${resultId}`
+      resultUrl: resultUrl,
+      upgradeUrl: upgradeUrl,
+      testUrl: 'https://www.meuperfil360.com.br',
+      loginUrl: 'https://www.meuperfil360.com.br/login',
+      dashboardUrl: 'https://www.meuperfil360.com.br/login'
     };
     
     console.log(`Enviando email de conclusão de teste para: ${to}`);
     return await this.sendTemplateEmail(to, 'teste_concluido', variables);
   }
 
-  async sendPremiumUpgradeEmail(to: string, userName: string, profileType: string, resultId: string): Promise<boolean> {
+  async sendPremiumUpgradeEmail(to: string, userName: string, profileType: string, resultId: string, userEmail?: string): Promise<boolean> {
     const profileNames = {
       'D': 'Dominante',
       'I': 'Influente',
@@ -258,12 +271,20 @@ class EmailService {
       'C': 'Conscencioso'
     };
 
+    // PDF URL with email parameter for guest access
+    const pdfUrl = userEmail 
+      ? `https://www.meuperfil360.com.br/api/test/result/${resultId}/pdf?email=${encodeURIComponent(userEmail)}`
+      : `https://www.meuperfil360.com.br/api/test/result/${resultId}/pdf`;
+
     const variables = {
       userName: userName,
       profileType: profileType,
       profileName: profileNames[profileType as keyof typeof profileNames] || profileType,
-      pdfUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/api/test/result/${resultId}/pdf`,
-      dashboardUrl: `${process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'}/dashboard`
+      pdfUrl: pdfUrl,
+      dashboardUrl: 'https://www.meuperfil360.com.br/login',
+      loginUrl: 'https://www.meuperfil360.com.br/login',
+      resultUrl: `https://www.meuperfil360.com.br/results/${resultId}`,
+      testUrl: 'https://www.meuperfil360.com.br'
     };
     
     console.log(`Enviando email de upgrade premium para: ${to}`);
@@ -274,7 +295,9 @@ class EmailService {
     const variables = {
       userName: userName,
       daysSinceLastTest: daysSinceLastTest.toString(),
-      testUrl: process.env.VITE_APP_URL || 'https://meuperfil360.replit.app'
+      testUrl: 'https://www.meuperfil360.com.br',
+      loginUrl: 'https://www.meuperfil360.com.br/login',
+      dashboardUrl: 'https://www.meuperfil360.com.br/login'
     };
     
     console.log(`Enviando lembrete de reteste para: ${to}`);

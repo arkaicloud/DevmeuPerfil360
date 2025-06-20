@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **EMAIL TEMPLATES PRODUCTION READY** - Updated all email variables for www.meuperfil360.com.br domain
+  - **Production URLs**: All templates now use correct production domain (www.meuperfil360.com.br)
+  - **Smart Routing**: Registered users get direct links, guests use find-results fallback
+  - **PDF Access**: Premium emails include direct PDF download links with email parameters
+  - **Template Variables**: {{loginUrl}}, {{resultUrl}}, {{upgradeUrl}}, {{pdfUrl}}, {{dashboardUrl}}, {{testUrl}} all corrected
+  - **User Context**: userName now properly uses guest_name field from test data
 - June 20, 2025: **DISC CALCULATION CORRECTED** - Fixed percentages to sum exactly 100% in results and PDFs
   - **Largest Remainder Method**: Implemented precise algorithm ensuring exact 100% distribution
   - **Positive Score Normalization**: All scores converted to positive values before percentage calculation
