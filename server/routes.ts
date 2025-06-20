@@ -894,7 +894,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verificar credenciais admin com hash seguro
       const adminEmail = process.env.ADMIN_EMAIL || "adm@meuperfil360.com.br";
-      const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+      // Hash para a senha "admin123456"
+      const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || "$2b$10$REH0EAdP6h30BXv9HpihOeyqGjrFNOtPU02enImtDwLJcm2J9MN2i";
       
       if (!adminPasswordHash) {
         console.error("ADMIN_PASSWORD_HASH não definido");
