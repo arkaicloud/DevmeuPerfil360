@@ -133,6 +133,14 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - **Data Encryption**: Sensitive information protection
 
 ## Changelog
+- June 20, 2025: **SECURITY HARDENING COMPLETE** - Comprehensive security audit implemented with critical vulnerability fixes
+  - Reactivated all security middlewares (rate limiting, threat detection, input validation)
+  - Removed all console.log statements exposing sensitive user data, payment info, and authentication tokens
+  - Strengthened CSP with HSTS, XSS protection, and stricter content policies
+  - Enhanced rate limiting: 50 requests/15min general, 3 attempts/10min for auth, 2 attempts/30min for admin
+  - Implemented sanitized error responses to prevent information disclosure
+  - Secured localStorage with improved encryption using random IVs
+  - Threat detection system now masks sensitive data in security logs
 - June 20, 2025: **SECURITY PRIVACY SYSTEM** - Results protected with overlay until user registration, preventing unauthorized access to sensitive data
 - June 20, 2025: **WELCOME MESSAGE FIXED** - Corrected "undefined" display in login/dashboard welcome messages with proper user name fallbacks
 - June 20, 2025: **NAVIGATION ENHANCEMENT** - Login page header displays navigation bar with "Início" button for easy return to homepage

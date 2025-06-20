@@ -45,7 +45,7 @@ export default function Test() {
         };
         setGuestData(mockGuestData);
         
-        console.log(`Usuário logado detectado: ${user.email}`);
+        // Usuário logado detectado - log removido por segurança
         return;
       } catch (error) {
         console.error("Error parsing user data:", error);
@@ -55,12 +55,12 @@ export default function Test() {
 
     // For guest users, check if they have guest data from the form
     const storedData = localStorage.getItem("guestTestData");
-    console.log("Dados recuperados do localStorage:", storedData);
+    // Dados recuperados do localStorage - log removido por segurança
     
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
-        console.log("Dados parseados:", parsedData);
+        // Dados parseados - log removido por segurança
         setGuestData(parsedData);
         setIsLoggedUser(false);
       } catch (error) {
@@ -70,7 +70,7 @@ export default function Test() {
     } else {
       // If no guest data, allow them to take the test anyway
       // They'll be prompted to register at the end to save results
-      console.log("Iniciando teste como convidado sem dados salvos");
+      // Iniciando teste como convidado - log removido por segurança
       setIsLoggedUser(false);
     }
   }, [navigate, toast]);
@@ -82,7 +82,7 @@ export default function Test() {
 
       // Use logged user data if available
       if (isLoggedUser && currentUser) {
-        console.log(`Enviando teste para usuário logado: ${currentUser.email} (ID: ${currentUser.id})`);
+        // Enviando teste para usuário logado - dados sensíveis removidos do log
         endpoint = "/api/test/submit-user";
         payload = {
           userId: currentUser.id,
@@ -111,7 +111,7 @@ export default function Test() {
           whatsapp: "11999999999",
         };
         
-        console.log("Enviando teste como convidado com dados:", finalGuestData);
+        // Enviando teste como convidado - dados removidos do log por segurança
         payload = {
           guestData: finalGuestData,
           answers: answers,

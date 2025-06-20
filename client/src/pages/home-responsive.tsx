@@ -68,9 +68,9 @@ export default function Home() {
   });
 
   const onSubmit = (data: GuestTestData) => {
-    console.log("Dados do formulário recebidos:", data);
+    // Dados do formulário processados - log removido por segurança
     localStorage.setItem("guestTestData", JSON.stringify(data));
-    console.log("Dados salvos no localStorage:", data);
+    // Dados salvos - log removido por segurança
     navigate("/test");
   };
 

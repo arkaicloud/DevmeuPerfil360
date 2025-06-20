@@ -11,31 +11,43 @@ const app = express();
 // Trust proxy for rate limiting to work correctly behind proxies
 app.set('trust proxy', 1);
 
-// Security Headers
+// Security Headers - Fortalecidos
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://m.stripe.network"],
-      imgSrc: ["'self'", "data:", "https:", "https://js.stripe.com"],
+      scriptSrc: ["'self'", "https://js.stripe.com", "https://m.stripe.network"],
+      imgSrc: ["'self'", "data:", "https://js.stripe.com"],
       connectSrc: ["'self'", "https://api.stripe.com", "https://m.stripe.network", "https://m.stripe.com"],
       fontSrc: ["'self'", "https://js.stripe.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
       childSrc: ["'self'", "https://js.stripe.com"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
     },
   },
   crossOriginEmbedderPolicy: false,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  frameguard: { action: 'deny' },
+  noSniff: true,
+  xssFilter: true,
 }));
 
-  // Middlewares de segurança básicos apenas
-  app.use(securityHeaders);
-  // Removidos temporariamente para evitar falsos positivos:
-  // app.use(strictRateLimit);
-  // app.use(threatDetection);
-  // app.use(validateInput);
+  // Middlewares de segurança - CSP desabilitado em desenvolvimento
+  if (process.env.NODE_ENV === 'production') {
+    app.use(securityHeaders);
+    app.use(strictRateLimit);
+    app.use(threatDetection);
+    app.use(validateInput);
+  }
+  // Desenvolvimento sem restrições CSP para permitir Vite/React
 
   // CORS configuration for production domain
   app.use(cors({
@@ -47,31 +59,36 @@ app.use(helmet({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   }));
 
-// Rate Limiting
+// Rate Limiting - Fortalecido para segurança
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 50, // Reduzido para 50 requests por IP
   message: {
-    error: 'Muitas tentativas. Tente novamente em 15 minutos.',
+    error: 'Limite de requisições excedido.',
   },
-  standardHeaders: true,
+  standardHeaders: false, // Ocultar headers de rate limit
   legacyHeaders: false,
+  skipSuccessfulRequests: false,
 });
 
 const strictLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes  
-  max: 5, // limit each IP to 5 requests per windowMs for sensitive operations
+  windowMs: 10 * 60 * 1000, // 10 minutes  
+  max: 3, // Apenas 3 tentativas por 10 min
   message: {
-    error: 'Muitas tentativas. Tente novamente em 15 minutos.',
+    error: 'Muitas tentativas. Aguarde antes de tentar novamente.',
   },
+  standardHeaders: false,
+  legacyHeaders: false,
 });
 
 const adminLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // Very strict for admin operations
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  max: 2, // Máximo 2 tentativas admin por 30 min
   message: {
-    error: 'Muitas tentativas de login administrativo. Tente novamente em 15 minutos.',
+    error: 'Acesso negado. Limite de tentativas excedido.',
   },
+  standardHeaders: false,
+  legacyHeaders: false,
 });
 
 app.use('/api/', limiter);
@@ -118,21 +135,26 @@ app.use((req, res, next) => {
 
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
 
-    // Log error details for debugging (but don't expose sensitive info)
-    console.error(`Error ${status} on ${req.method} ${req.path}:`, {
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    // Respostas sanitizadas para evitar information disclosure
+    const sanitizedErrors: Record<number, string> = {
+      400: "Requisição inválida",
+      401: "Acesso não autorizado", 
+      403: "Acesso negado",
+      404: "Recurso não encontrado",
+      422: "Dados inválidos",
+      429: "Limite de requisições excedido",
+      500: "Erro interno do servidor"
+    };
+    
+    const responseMessage = process.env.NODE_ENV === 'production' 
+      ? sanitizedErrors[status] || "Erro no servidor"
+      : err.message || "Internal Server Error";
+
+    res.status(status).json({ 
+      error: responseMessage,
       timestamp: new Date().toISOString()
     });
-
-    // Don't expose stack traces in production
-    const responseMessage = process.env.NODE_ENV === 'production' && status === 500 
-      ? "Erro interno do servidor" 
-      : message;
-
-    res.status(status).json({ message: responseMessage });
   });
 
   // importantly only setup vite in development and after

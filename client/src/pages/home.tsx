@@ -79,7 +79,7 @@ export default function Home() {
     // Store data securely in localStorage
     localStorage.setItem("guestTestData", JSON.stringify(sanitizedData));
     
-    console.log("Dados salvos no localStorage:", sanitizedData);
+    // Dados salvos no localStorage - log removido por segurança
     
     navigate("/test");
   };

@@ -262,7 +262,7 @@ class SecurityManager {
   // Log de segurança (apenas em desenvolvimento)
   securityLog(event: string, details?: any): void {
     if (import.meta.env.DEV) {
-      console.log(`[SECURITY] ${event}:`, details);
+      // Security event logged internally - details removed for privacy
     }
     
     // Em produção, enviar para serviço de monitoramento

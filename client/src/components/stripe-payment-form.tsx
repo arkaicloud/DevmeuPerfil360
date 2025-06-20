@@ -102,7 +102,7 @@ export default function StripePaymentForm({ testId }: StripePaymentFormProps) {
                 }
               }}
               onReady={() => {
-                console.log('PaymentElement is ready');
+                // PaymentElement ready - log removed for security
                 setIsReady(true);
               }}
               onLoadError={(error) => {
