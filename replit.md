@@ -140,6 +140,10 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **DASHBOARD ROUTING FIXED** - Corrected dashboard route configuration to accept user ID parameter
+  - Updated AppFixed.tsx route from `/dashboard` to `/dashboard/:userId` to match component expectations
+  - Dashboard now loads correctly after user registration with proper user data
+  - API endpoints responding successfully: dashboard data, test limits, and user information
 - June 20, 2025: **ERROR 404 RESOLVED** - Fixed frontend routing configuration causing test result access failures
   - Corrected missing route parameter `:id` in AppFixed.tsx for `/results/:id` path
   - Enhanced React Query configuration with proper retry mechanism and stale time
