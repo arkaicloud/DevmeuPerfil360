@@ -144,6 +144,7 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
   - **Largest Remainder Method**: Implemented precise algorithm ensuring exact 100% distribution
   - **Positive Score Normalization**: All scores converted to positive values before percentage calculation
   - **Perfect Distribution**: D + I + S + C percentages now always equal exactly 100%
+  - **Database Migration Complete**: Updated all 19 existing tests with corrected scores (ID 1-20)
   - **Consistent Results**: Both frontend display and PDF reports use corrected calculations
   - **Mobile Layout Fixed**: Increased bottom spacing (mb-32) prevents last test option cutoff by next button
 - June 20, 2025: **DATABASE STABILITY SYSTEM IMPLEMENTED** - Comprehensive solution for Neon connection issues
