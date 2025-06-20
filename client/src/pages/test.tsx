@@ -11,6 +11,9 @@ import { discQuestions } from "@/lib/disc-questions";
 import { type DiscAnswer, type GuestTestData, type UserTestSubmission, type DiscTestSubmission } from "@shared/schema";
 import DiscQuestion from "@/components/disc-question";
 import TestProgress from "@/components/test-progress";
+import ProgressMilestone from "@/components/progress-milestone";
+import MobileProgressRing from "@/components/mobile-progress-ring";
+import MotivationBanner from "@/components/motivation-banner";
 import { secureStorage, validateSession, sanitizeInput, clientRateLimit } from "@/lib/security";
 
 export default function Test() {
@@ -272,17 +275,50 @@ export default function Test() {
         
         {/* Mobile Progress Bar - Always Visible */}
         <div className="px-4 pb-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-white/90">
-              Pergunta {currentQuestionIndex + 1} de {discQuestions.length}
-            </span>
-            <span className="text-xs text-white/75">
-              {Math.round(progress)}%
-            </span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              <MobileProgressRing progress={progress} size={36} strokeWidth={3} />
+              <div>
+                <div className="text-xs font-medium text-white/90">
+                  Pergunta {currentQuestionIndex + 1} de {discQuestions.length}
+                </div>
+                <div className="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white/90 mt-1">
+                  {(() => {
+                    const progressPercent = ((currentQuestionIndex + 1) / discQuestions.length) * 100;
+                    if (progressPercent <= 25) return "Início";
+                    if (progressPercent <= 50) return "Desenvolvimento";  
+                    if (progressPercent <= 75) return "Aprofundamento";
+                    return "Conclusão";
+                  })()}
+                </div>
+              </div>
+            </div>
+            
+            {/* Stage Indicators */}
+            <div className="flex space-x-1">
+              {[1, 2, 3, 4].map((stage) => {
+                const progressPercent = ((currentQuestionIndex + 1) / discQuestions.length) * 100;
+                const currentStage = progressPercent <= 25 ? 1 : progressPercent <= 50 ? 2 : progressPercent <= 75 ? 3 : 4;
+                return (
+                  <div
+                    key={stage}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      stage < currentStage 
+                        ? "bg-green-400" 
+                        : stage === currentStage 
+                          ? "bg-white animate-pulse" 
+                          : "bg-white/30"
+                    }`}
+                  />
+                );
+              })}
+            </div>
           </div>
-          <div className="w-full bg-white/20 rounded-full h-2">
+          
+          {/* Progress Bar */}
+          <div className="w-full bg-white/20 rounded-full h-1.5">
             <div 
-              className="bg-white h-2 rounded-full transition-all duration-300 ease-out" 
+              className="bg-gradient-to-r from-white to-white/80 h-1.5 rounded-full transition-all duration-500 ease-out" 
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -290,6 +326,12 @@ export default function Test() {
       </header>
 
       <div className="p-4 md:p-6">
+        {/* Motivation Banner */}
+        <MotivationBanner 
+          currentQuestion={currentQuestionIndex + 1}
+          totalQuestions={discQuestions.length}
+        />
+
         {/* Desktop Progress - Hidden on Mobile */}
         <div className="hidden md:block mb-6">
           <TestProgress 
@@ -392,7 +434,11 @@ export default function Test() {
         </Card>
       </div>
 
-
+      {/* Progress Milestone Overlay */}
+      <ProgressMilestone 
+        currentQuestion={currentQuestionIndex + 1}
+        totalQuestions={discQuestions.length}
+      />
     </div>
   );
 }

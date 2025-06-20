@@ -140,6 +140,14 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **COMPREHENSIVE MOBILE PROGRESS SYSTEM** - Complete mobile-friendly progress visualization with stage indicators
+  - **Enhanced Header Progress**: Circular progress ring with percentage display in mobile header
+  - **Stage Visualization**: 4-stage system (Início, Desenvolvimento, Aprofundamento, Conclusão) with visual indicators
+  - **Milestone Celebrations**: Popup celebrations at 25%, 50%, 75%, and 100% completion with motivational messages
+  - **Motivation Banners**: Contextual encouraging messages that appear during different test stages
+  - **Multi-layered Feedback**: Desktop timeline view, mobile dots, progress bars, and stage badges
+  - **Real-time Updates**: All progress elements update smoothly with question transitions
+  - **User Engagement**: Clear visual feedback keeps users informed of their position and progress
 - June 20, 2025: **MOBILE TEST INTERFACE OPTIMIZED** - Enhanced DISC test experience for mobile devices
   - Added persistent progress bar in header showing current question number and percentage
   - Implemented responsive question layout with compact mobile and full desktop versions
