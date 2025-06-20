@@ -49,15 +49,17 @@ export default function DiscQuestion({
 
   return (
     <div className="space-y-3 md:space-y-4">
-      <div className="grid grid-cols-1 gap-2 md:gap-3">
-        {question.options.map((option) => (
+      <div className="grid grid-cols-1 gap-3 md:gap-3">
+        {question.options.map((option, index) => (
           <div 
             key={option.id}
             className={cn(
               "p-3 md:p-4 border-2 rounded-xl transition-all duration-200",
               "hover:border-primary/50",
               isOptionDisabled(option.id) && "opacity-50",
-              (selectedMost === option.id || selectedLeast === option.id) && "border-primary bg-primary/5"
+              (selectedMost === option.id || selectedLeast === option.id) && "border-primary bg-primary/5",
+              // Extra padding for last option on mobile to prevent cutoff
+              index === question.options.length - 1 && "mb-2 md:mb-0"
             )}
           >
             {/* Mobile: Stacked layout */}

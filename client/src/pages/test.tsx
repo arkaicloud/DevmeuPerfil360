@@ -343,7 +343,7 @@ export default function Test() {
 
         {/* Question Card */}
         <Card className="shadow-lg border-0 mb-4 md:mb-8">
-          <CardContent className="p-4 md:p-6">
+          <CardContent className="p-4 md:p-6 pb-6 md:pb-6">
             <div className="text-center mb-4 md:mb-6">
               {/* Mobile: Compact question header with progress guidance */}
               <div className="md:hidden mb-3">
@@ -386,12 +386,15 @@ export default function Test() {
               </div>
             </div>
 
-            <DiscQuestion
-              question={currentQuestion}
-              selectedMost={currentAnswer.most}
-              selectedLeast={currentAnswer.least}
-              onAnswerChange={handleAnswerChange}
-            />
+            {/* Question Component with Mobile Spacing */}
+            <div className="mb-32 md:mb-0">
+              <DiscQuestion
+                question={currentQuestion}
+                selectedMost={currentAnswer.most}
+                selectedLeast={currentAnswer.least}
+                onAnswerChange={handleAnswerChange}
+              />
+            </div>
           </CardContent>
         </Card>
 
