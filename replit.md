@@ -140,6 +140,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **VPS DEPLOY READY** - Complete deployment guide and scripts created for production VPS
+  - **Comprehensive Guide**: Detailed DEPLOY_VPS_GUIDE.md with step-by-step instructions
+  - **Production Scripts**: ecosystem.config.js, deploy.sh, backup.sh, install-vps.sh
+  - **Nginx Configuration**: Optimized nginx.conf with SSL, security headers, and caching
+  - **Environment Template**: .env.vps with all necessary production variables
+  - **Code Optimizations**: Updated server/index.ts and server/config.ts for VPS deployment
+  - **Health Endpoints**: Added /health and /api/health for monitoring
 - June 20, 2025: **EMAIL TEMPLATES PRODUCTION READY** - Updated all email variables for www.meuperfil360.com.br domain
   - **Production URLs**: All templates now use correct production domain (www.meuperfil360.com.br)
   - **Smart Routing**: Registered users get direct links, guests use find-results fallback

@@ -1208,6 +1208,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(content);
   });
 
+  // Health check endpoints for monitoring
+  app.get("/health", (req: Request, res: Response) => {
+    res.json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
+  app.get("/api/health", (req: Request, res: Response) => {
+    res.json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
   // Public endpoint to get current pricing - optimized for reliability
   app.get("/api/pricing", async (req: any, res: any) => {
     // Essential pricing configuration for immediate response
