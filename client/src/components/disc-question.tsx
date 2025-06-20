@@ -48,19 +48,55 @@ export default function DiscQuestion({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3">
+    <div className="space-y-3 md:space-y-4">
+      <div className="grid grid-cols-1 gap-2 md:gap-3">
         {question.options.map((option) => (
           <div 
             key={option.id}
             className={cn(
-              "p-4 border-2 rounded-xl transition-all duration-200",
+              "p-3 md:p-4 border-2 rounded-xl transition-all duration-200",
               "hover:border-primary/50",
               isOptionDisabled(option.id) && "opacity-50",
               (selectedMost === option.id || selectedLeast === option.id) && "border-primary bg-primary/5"
             )}
           >
-            <div className="flex items-center justify-between">
+            {/* Mobile: Stacked layout */}
+            <div className="md:hidden space-y-2">
+              <span className="text-sm font-medium text-foreground block">
+                {option.text}
+              </span>
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={selectedMost === option.id ? "default" : "outline"}
+                  className={cn(
+                    "flex-1 h-9 text-xs font-bold rounded-full transition-all duration-200",
+                    selectedMost === option.id ? "bg-green-600 text-white" : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                  )}
+                  onClick={() => handleMostClick(option.id)}
+                  disabled={selectedLeast === option.id}
+                >
+                  MAIS
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={selectedLeast === option.id ? "destructive" : "outline"}
+                  className={cn(
+                    "flex-1 h-9 text-xs font-bold rounded-full transition-all duration-200",
+                    selectedLeast === option.id ? "bg-red-600 text-white" : "border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                  )}
+                  onClick={() => handleLeastClick(option.id)}
+                  disabled={selectedMost === option.id}
+                >
+                  MENOS
+                </Button>
+              </div>
+            </div>
+
+            {/* Desktop: Side-by-side layout */}
+            <div className="hidden md:flex items-center justify-between">
               <span className="text-sm font-medium text-foreground flex-1 pr-4">
                 {option.text}
               </span>

@@ -249,51 +249,84 @@ export default function Test() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {/* Header */}
-      <header className="psychology-gradient text-white p-4 safe-area-top">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
+      <header className="psychology-gradient text-white safe-area-top">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center space-x-2 md:space-x-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <Brain className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold">MeuPerfil360</h1>
+              <h1 className="text-base md:text-lg font-bold">MeuPerfil360</h1>
               <p className="text-xs opacity-90">
                 {isLoggedUser ? `Teste DISC - ${currentUser?.username}` : 'Teste DISC'}
               </p>
             </div>
           </div>
           {isLoggedUser && (
-            <div className="text-right">
+            <div className="text-right hidden sm:block">
               <p className="text-xs opacity-90">Usuário Logado</p>
               <p className="text-xs opacity-75">{currentUser?.email}</p>
             </div>
           )}
         </div>
+        
+        {/* Mobile Progress Bar - Always Visible */}
+        <div className="px-4 pb-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-white/90">
+              Pergunta {currentQuestionIndex + 1} de {discQuestions.length}
+            </span>
+            <span className="text-xs text-white/75">
+              {Math.round(progress)}%
+            </span>
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-2">
+            <div 
+              className="bg-white h-2 rounded-full transition-all duration-300 ease-out" 
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       </header>
 
-      <div className="p-6">
-        {/* Progress */}
-        <TestProgress 
-          currentQuestion={currentQuestionIndex + 1}
-          totalQuestions={discQuestions.length}
-          progress={progress}
-        />
+      <div className="p-4 md:p-6">
+        {/* Desktop Progress - Hidden on Mobile */}
+        <div className="hidden md:block mb-6">
+          <TestProgress 
+            currentQuestion={currentQuestionIndex + 1}
+            totalQuestions={discQuestions.length}
+            progress={progress}
+          />
+        </div>
 
         {/* Question Card */}
-        <Card className="shadow-lg border-0 mb-8">
-          <CardContent className="p-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold psychology-blue">
-                  {currentQuestionIndex + 1}
-                </span>
+        <Card className="shadow-lg border-0 mb-4 md:mb-8">
+          <CardContent className="p-4 md:p-6">
+            <div className="text-center mb-4 md:mb-6">
+              {/* Mobile: Compact question header */}
+              <div className="md:hidden mb-3">
+                <h3 className="text-base font-semibold text-foreground mb-2">
+                  {currentQuestion.text}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Escolha MAIS e MENOS se identifica
+                </p>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                {currentQuestion.text}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Escolha a opção que MAIS se identifica com você e a que MENOS se identifica
-              </p>
+              
+              {/* Desktop: Full question header */}
+              <div className="hidden md:block">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold psychology-blue">
+                    {currentQuestionIndex + 1}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {currentQuestion.text}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Escolha a opção que MAIS se identifica com você e a que MENOS se identifica
+                </p>
+              </div>
             </div>
 
             <DiscQuestion
@@ -306,37 +339,42 @@ export default function Test() {
         </Card>
 
         {/* Navigation Buttons */}
-        <div className="space-y-3">
-          <Button 
-            onClick={handleNext}
-            disabled={!canProceed || submitTestMutation.isPending}
-            className="w-full psychology-gradient btn-hover-lift"
-            size="lg"
-          >
-            {submitTestMutation.isPending ? (
-              <div className="spinner" />
-            ) : isLastQuestion ? (
-              "Finalizar Teste"
-            ) : (
-              <>
-                Próxima Pergunta
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </>
-            )}
-          </Button>
-
-          {currentQuestionIndex > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-4 md:relative md:bg-transparent md:backdrop-blur-none md:border-t-0 md:p-0">
+          <div className="space-y-3 max-w-md mx-auto md:max-w-none">
             <Button 
-              onClick={handlePrevious}
-              variant="outline"
-              className="w-full"
-              disabled={submitTestMutation.isPending}
+              onClick={handleNext}
+              disabled={!canProceed || submitTestMutation.isPending}
+              className="w-full psychology-gradient btn-hover-lift text-base md:text-sm"
+              size="lg"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Pergunta Anterior
+              {submitTestMutation.isPending ? (
+                <div className="spinner" />
+              ) : isLastQuestion ? (
+                "Finalizar Teste"
+              ) : (
+                <>
+                  Próxima Pergunta
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
             </Button>
-          )}
+
+            {currentQuestionIndex > 0 && (
+              <Button 
+                onClick={handlePrevious}
+                variant="outline"
+                className="w-full"
+                disabled={submitTestMutation.isPending}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Pergunta Anterior
+              </Button>
+            )}
+          </div>
         </div>
+        
+        {/* Spacer for fixed bottom buttons on mobile */}
+        <div className="h-32 md:h-0" />
 
         {/* Help Notice */}
         <Card className="mt-6 bg-amber-50 border-amber-200">

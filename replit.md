@@ -140,6 +140,18 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **MOBILE TEST INTERFACE OPTIMIZED** - Enhanced DISC test experience for mobile devices
+  - Added persistent progress bar in header showing current question number and percentage
+  - Implemented responsive question layout with compact mobile and full desktop versions
+  - Created fixed bottom navigation with accessible buttons for mobile users
+  - Optimized DiscQuestion component with stacked layout for mobile (buttons below text)
+  - Enhanced visual feedback with larger touch targets and improved color contrast
+  - Mobile users now always see progress context during test completion
+- June 20, 2025: **USER FLOW CORRECTION** - Fixed result viewing for new users without blocking privacy overlay
+  - New users can immediately view DISC results after test completion
+  - Registration modal auto-opens after 3 seconds with real user data pre-filled
+  - Privacy protection only applies when searching for existing tests via find-results
+  - Guest data properly populated in registration modal (name, email, WhatsApp)
 - June 20, 2025: **PDF RESPONSIVENESS OPTIMIZED** - Resolved content cutting issues in premium PDF reports
   - Fixed "Plano de Ação Personalizado de 4 Semanas" table cutting with optimized cell sizing
   - Action table headers reduced to 10px font with 80px max-width and proper word-wrap
