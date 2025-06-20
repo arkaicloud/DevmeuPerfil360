@@ -88,6 +88,8 @@ export default function FindResults() {
         return; // Don't navigate, already handled above
       }
       if (data.testResultId) {
+        // Mark that user came from find-results for privacy protection
+        sessionStorage.setItem('fromFindResults', 'true');
         navigate(`/results/${data.testResultId}`);
       } else {
         toast({

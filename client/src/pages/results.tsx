@@ -19,6 +19,7 @@ interface DiscProfile {
 
 interface TestResult {
   id: number;
+  userId?: number;
   profileType: string;
   scores: DiscProfile;
   isPremium: boolean;
@@ -65,10 +66,13 @@ export default function Results() {
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  // Check if user exists when test result is loaded
+  // Check if user exists when test result is loaded (for find-results flow only)
   useEffect(() => {
     const checkUserExists = async () => {
-      if (testResult?.guestEmail) {
+      // Only apply privacy protection for find-results flow (when searching for existing tests)
+      const isFromFindResults = sessionStorage.getItem('fromFindResults') === 'true';
+      
+      if (testResult?.guestEmail && isFromFindResults) {
         try {
           const response = await fetch('/api/auth/login', {
             method: 'POST',
@@ -81,27 +85,24 @@ export default function Results() {
           
           if (response.ok) {
             const responseData = await response.json();
-            // If login succeeds or redirects to Clerk, user exists
             setUserExists(true);
+            setIsUserRegistered(true);
           } else if (response.status === 401) {
             const errorText = await response.text();
-            // If error mentions password, user exists but password is wrong
             const userExistsButWrongPassword = errorText.includes('Senha incorreta') || errorText.includes('password');
             setUserExists(userExistsButWrongPassword);
             
-            // If user doesn't exist, automatically open registration modal
             if (!userExistsButWrongPassword && errorText.includes('Usuário não encontrado')) {
               setIsUserRegistered(false);
               setTimeout(() => {
                 setShowRegistrationModal(true);
-              }, 1000); // Small delay to let the page load
+              }, 1000);
             } else {
               setIsUserRegistered(true);
             }
           } else {
             setUserExists(false);
             setIsUserRegistered(false);
-            // If unable to determine, auto-open registration as fallback
             setTimeout(() => {
               setShowRegistrationModal(true);
             }, 1000);
@@ -110,10 +111,19 @@ export default function Results() {
           console.error("Erro ao verificar usuário:", error);
           setUserExists(false);
           setIsUserRegistered(false);
-          // On error, auto-open registration as fallback
           setTimeout(() => {
             setShowRegistrationModal(true);
           }, 1000);
+        }
+      } else {
+        // For new first-time tests, allow viewing results and auto-open registration
+        setUserExists(false);
+        setIsUserRegistered(true); // Allow viewing results
+        if (testResult && !testResult.userId) {
+          // Auto-open registration modal for guest tests after 3 seconds
+          setTimeout(() => {
+            setShowRegistrationModal(true);
+          }, 3000);
         }
       }
     };
