@@ -11,38 +11,40 @@ const app = express();
 // Trust proxy for rate limiting to work correctly behind proxies
 app.set('trust proxy', 1);
 
-// Security Headers - Fortalecidos
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "https://js.stripe.com", "https://m.stripe.network"],
-      imgSrc: ["'self'", "data:", "https://js.stripe.com"],
-      connectSrc: ["'self'", "https://api.stripe.com", "https://m.stripe.network", "https://m.stripe.com"],
-      fontSrc: ["'self'", "https://js.stripe.com"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
-      childSrc: ["'self'", "https://js.stripe.com"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
+// Security Headers removidos em desenvolvimento para permitir React
+if (process.env.NODE_ENV === 'production') {
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.stripe.com"],
+        imgSrc: ["'self'", "data:", "https:", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+        connectSrc: ["'self'", "https://api.stripe.com", "meuperfil360.com.br", "www.meuperfil360.com.br"],
+        fontSrc: ["'self'", "https://fonts.googleapis.com"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
+        childSrc: ["'self'", "https://js.stripe.com"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false,
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  },
-  frameguard: { action: 'deny' },
-  noSniff: true,
-  xssFilter: true,
-}));
+    crossOriginEmbedderPolicy: false,
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    },
+    frameguard: { action: 'deny' },
+    noSniff: true,
+    xssFilter: true,
+  }));
+}
 
-  // Middlewares de segurança com configurações específicas para desenvolvimento
-  app.use(securityHeaders); // Agora com CSP flexível para Replit
+  // Middlewares de segurança apenas em produção para evitar bloqueios
   if (process.env.NODE_ENV === 'production') {
+    app.use(securityHeaders);
     app.use(strictRateLimit);
     app.use(threatDetection);
     app.use(validateInput);

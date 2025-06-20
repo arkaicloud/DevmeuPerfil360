@@ -27,7 +27,7 @@ export const authRateLimit = rateLimit({
   }
 });
 
-// Middleware de segurança de headers - CSP flexível para desenvolvimento
+// Middleware de segurança de headers - CSP removido completamente em desenvolvimento
 export const securityHeaders = helmet({
   contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
     directives: {
@@ -41,17 +41,7 @@ export const securityHeaders = helmet({
       mediaSrc: ["'self'"],
       frameSrc: ["'self'", "https://js.stripe.com"],
     },
-  } : {
-    directives: {
-      defaultSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "*.replit.dev", "*.replit.app", "*.repl.co"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "*.replit.dev", "*.replit.app", "*.repl.co", "https://replit.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "*.replit.dev", "*.replit.app", "*.repl.co"],
-      imgSrc: ["'self'", "data:", "https:", "*.replit.dev", "*.replit.app", "*.repl.co"],
-      connectSrc: ["'self'", "*.replit.dev", "*.replit.app", "*.repl.co", "ws:", "wss:"],
-      fontSrc: ["'self'", "*.replit.dev", "*.replit.app", "*.repl.co"],
-      frameSrc: ["'self'", "*.replit.dev", "*.replit.app", "*.repl.co"],
-    },
-  }, // CSP flexível para desenvolvimento
+  } : false, // CSP completamente desabilitado em desenvolvimento
   crossOriginEmbedderPolicy: false,
   hsts: process.env.NODE_ENV === 'production' ? {
     maxAge: 31536000,
