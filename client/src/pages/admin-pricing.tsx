@@ -81,7 +81,7 @@ export default function AdminPricing() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav onLogout={handleLogout} />
-      <div className="p-4 sm:p-6 max-w-full lg:max-w-6xl mx-auto">
+      <div className="lg:ml-64 p-4 sm:p-6 max-w-full lg:max-w-6xl mx-auto lg:mx-0">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
           <DollarSign className="w-8 h-8 text-green-600" />
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Configuração de Preços</h1>

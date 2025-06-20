@@ -216,7 +216,7 @@ Equipe MeuPerfil360
     <div className="min-h-screen bg-gray-50">
       <AdminNav onLogout={handleLogout} />
 
-      <div className="p-4 sm:p-6 max-w-full mx-auto">
+      <div className="lg:ml-64 p-4 sm:p-6 max-w-full mx-auto lg:mx-0">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Template List */}
           <Card className="xl:col-span-1 w-full">

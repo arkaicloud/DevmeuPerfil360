@@ -174,7 +174,7 @@ export default function AdminEmailConfig() {
     <div className="min-h-screen bg-gray-50">
       <AdminNav onLogout={handleLogout} />
 
-      <div className="p-4 sm:p-6 max-w-full lg:max-w-6xl mx-auto">
+      <div className="lg:ml-64 p-4 sm:p-6 max-w-full lg:max-w-6xl mx-auto lg:mx-0">
         <Card className="w-full">
           <CardHeader className="px-4 sm:px-6">
             <CardTitle className="text-lg sm:text-xl">Configurações SMTP</CardTitle>
