@@ -994,8 +994,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allConfigs = await db.select().from(adminConfigs);
       const configs = allConfigs.filter(c => c.key.startsWith('smtp_') || c.key.startsWith('from_'));
       
-      console.log('Todas as configurações encontradas:', configs);
-      
       const emailConfig = {
         smtpHost: configs.find(c => c.key === 'smtp_host')?.value || '',
         smtpPort: parseInt(configs.find(c => c.key === 'smtp_port')?.value || '587'),
@@ -1005,8 +1003,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fromEmail: configs.find(c => c.key === 'from_email')?.value || '',
         fromName: configs.find(c => c.key === 'from_name')?.value || 'MeuPerfil360',
       };
-      
-      console.log('Configurações processadas:', emailConfig);
 
       res.json(emailConfig);
     } catch (error: any) {
@@ -1036,10 +1032,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             target: adminConfigs.key,
             set: { value: config.value, updatedAt: new Date() }
           });
-        console.log(`Configuração ${config.key} salva no banco: ${config.value}`);
       }
-
-      console.log('Todas as configurações SMTP foram salvas no banco de dados');
       res.json({ message: "Configurações salvas com sucesso" });
     } catch (error: any) {
       console.error('Email config save error:', error);
