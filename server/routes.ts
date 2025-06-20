@@ -15,7 +15,7 @@ import {
   emailTemplates
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { calculateDiscProfile } from "../client/src/lib/disc-calculator";
 import { body, param, query, validationResult } from "express-validator";
 import { emailService } from "./email-service";
@@ -495,7 +495,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Grant premium access if user is registered
       if (testResult.userId) {
         await storage.grantPremiumAccess(testResult.userId, 2);
-        console.log(`Usuário ${testResult.userId} recebeu acesso premium com 2 testes adicionais`);
+        
+        // Get user details for premium email
+        const user = await storage.getUser(testResult.userId);
+        if (user) {
+          // Send premium upgrade email asynchronously
+          setImmediate(() => {
+            emailService.sendPremiumUpgradeEmail(
+              user.email,
+              user.firstName || user.email,
+              testResult.profileType,
+              testResult.id.toString()
+            ).catch(error => {
+              console.error('Erro ao enviar email de upgrade premium:', error);
+            });
+          });
+        }
+      } else {
+        // For guest users, send premium email using guest data
+        if (testResult.guestEmail && testResult.guestName) {
+          setImmediate(() => {
+            emailService.sendPremiumUpgradeEmail(
+              testResult.guestEmail as string,
+              testResult.guestName as string,
+              testResult.profileType,
+              testResult.id.toString()
+            ).catch(error => {
+              console.error('Erro ao enviar email de upgrade premium para convidado:', error);
+            });
+          });
+        }
       }
       
       console.log(`Pagamento simulado processado com sucesso para teste ${testId}`);
@@ -549,6 +578,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Upgrade test to premium
         await storage.updateTestResultPremium(testId, payment.stripePaymentIntentId);
+        
+        // Get test result for email trigger
+        const testResult = await storage.getTestResult(testId);
+        if (testResult) {
+          // Grant premium access if user is registered
+          if (testResult.userId) {
+            await storage.grantPremiumAccess(testResult.userId, 2);
+            
+            // Get user details for premium email
+            const user = await storage.getUser(testResult.userId);
+            if (user) {
+              // Send premium upgrade email asynchronously
+              setImmediate(() => {
+                emailService.sendPremiumUpgradeEmail(
+                  user.email,
+                  user.firstName || user.email,
+                  testResult.profileType,
+                  testResult.id.toString()
+                ).catch(error => {
+                  console.error('Erro ao enviar email de upgrade premium via webhook:', error);
+                });
+              });
+            }
+          } else {
+            // For guest users, send premium email using guest data
+            if (testResult.guestEmail && testResult.guestName) {
+              setImmediate(() => {
+                emailService.sendPremiumUpgradeEmail(
+                  testResult.guestEmail as string,
+                  testResult.guestName as string,
+                  testResult.profileType,
+                  testResult.id.toString()
+                ).catch(error => {
+                  console.error('Erro ao enviar email de upgrade premium para convidado via webhook:', error);
+                });
+              });
+            }
+          }
+        }
         
         console.log(`Teste ${testId} atualizado para premium via webhook`);
       }
@@ -1149,6 +1217,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error fetching public pricing:", error);
       res.status(500).json({ error: "Failed to fetch pricing" });
+    }
+  });
+
+  // Endpoint para verificar e enviar lembretes de reteste (6 meses)
+  app.post("/api/send-retest-reminders", async (req: any, res: any) => {
+    try {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      
+      // Get all test results from 6 months ago (with some tolerance)
+      const startDate = new Date(sixMonthsAgo);
+      startDate.setDate(startDate.getDate() - 1);
+      const endDate = new Date(sixMonthsAgo);
+      endDate.setDate(endDate.getDate() + 1);
+      
+      const oldTests = await db
+        .select()
+        .from(testResults)
+        .where(
+          sql`${testResults.createdAt} >= ${startDate} AND ${testResults.createdAt} <= ${endDate}`
+        );
+
+      let emailsSent = 0;
+      
+      for (const testResult of oldTests) {
+        try {
+          if (testResult.userId) {
+            // For registered users
+            const user = await storage.getUser(testResult.userId);
+            if (user) {
+              await emailService.sendRetestReminderEmail(
+                user.email,
+                user.firstName || user.email,
+                183 // 6 months = ~183 days
+              );
+              emailsSent++;
+            }
+          } else if (testResult.guestEmail && testResult.guestName) {
+            // For guest users
+            await emailService.sendRetestReminderEmail(
+              testResult.guestEmail,
+              testResult.guestName,
+              183 // 6 months = ~183 days
+            );
+            emailsSent++;
+          }
+        } catch (emailError) {
+          console.error(`Erro ao enviar lembrete para teste ${testResult.id}:`, emailError);
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: `Lembretes de reteste enviados com sucesso`,
+        emailsSent,
+        testsChecked: oldTests.length
+      });
+      
+    } catch (error: any) {
+      console.error("Retest reminder error:", error);
+      res.status(500).json({ 
+        error: "Erro ao enviar lembretes de reteste",
+        details: error.message 
+      });
     }
   });
 

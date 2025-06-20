@@ -140,6 +140,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **AUTOMATED EMAIL TRIGGERS SYSTEM** - Complete email automation with 4 automated triggers
+  - **Boas-vindas (Cadastro)**: Welcome email sent immediately when user registers
+  - **Teste Concluído**: Test completion email sent after DISC test submission for both guests and users
+  - **Upgrade Premium**: Premium upgrade confirmation email sent after successful payment
+  - **Lembrete de Reteste**: 6-month retest reminder system with endpoint `/api/send-retest-reminders`
+  - **Background Processing**: All emails sent asynchronously using setImmediate() for optimal performance
+  - **Guest & User Support**: All triggers work for both registered users and guest users
 - June 20, 2025: **LOGGED USER AUTHENTICATION FIX** - Corrected registration modal behavior for authenticated users
   - **Smart Authentication Check**: System now properly detects logged-in users from localStorage
   - **No Duplicate Registration**: Logged users no longer see unnecessary registration prompts
