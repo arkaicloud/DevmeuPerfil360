@@ -77,31 +77,21 @@ if (process.env.NODE_ENV === 'production') {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   }));
 
-// Rate Limiting - Fortalecido para segurança
+// Rate Limiting desabilitado em desenvolvimento
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // Reduzido para 50 requests por IP
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'development' ? 10000 : 50, // Alto limite em dev
   message: {
-    error: 'Limite de requisições excedido.',
+    error: 'Acesso negado. Limite de tentativas excedido.',
   },
-  standardHeaders: false, // Ocultar headers de rate limit
+  standardHeaders: false,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
 });
 
 const strictLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes  
-  max: 3, // Apenas 3 tentativas por 10 min
-  message: {
-    error: 'Muitas tentativas. Aguarde antes de tentar novamente.',
-  },
-  standardHeaders: false,
-  legacyHeaders: false,
-});
-
-const adminLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 2, // Máximo 2 tentativas admin por 30 min
+  windowMs: 10 * 60 * 1000,
+  max: process.env.NODE_ENV === 'development' ? 1000 : 3, // Alto limite em dev
   message: {
     error: 'Acesso negado. Limite de tentativas excedido.',
   },
@@ -109,10 +99,23 @@ const adminLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use('/api/', limiter);
-app.use('/api/auth/', strictLimiter);
-app.use('/api/payment/', strictLimiter);
-app.use('/api/admin/', adminLimiter);
+const adminLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000,
+  max: process.env.NODE_ENV === 'development' ? 10000 : 2, // Alto limite em dev
+  message: {
+    error: 'Acesso negado. Limite de tentativas excedido.',
+  },
+  standardHeaders: false,
+  legacyHeaders: false,
+});
+
+// Rate limiters desabilitados em desenvolvimento
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api/', limiter);
+  app.use('/api/auth/', strictLimiter);
+  app.use('/api/payment/', strictLimiter);
+  app.use('/api/admin/', adminLimiter);
+}
 
 // Body parsing with size limits
 app.use(express.json({ limit: '10mb' }));
