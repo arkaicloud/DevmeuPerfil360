@@ -31,8 +31,8 @@ class DatabaseCircuitBreaker {
   private failures = 0;
   private lastFailureTime = 0;
   private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
-  private readonly failureThreshold = 5;
-  private readonly timeout = 30000; // 30 seconds
+  private readonly failureThreshold = 3;
+  private readonly timeout = 60000; // 1 minute
 
   isOpen(): boolean {
     if (this.state === 'OPEN') {
@@ -63,11 +63,11 @@ const circuitBreaker = new DatabaseCircuitBreaker();
 
 export async function withRetry<T>(
   operation: () => Promise<T>,
-  maxRetries: number = 5,
-  baseDelay: number = 1000
+  maxRetries: number = 3,
+  baseDelay: number = 500
 ): Promise<T> {
   if (circuitBreaker.isOpen()) {
-    throw new Error('Database circuit breaker is open - too many failures');
+    throw new Error('Database temporarily unavailable');
   }
 
   let lastError: any;
@@ -80,22 +80,22 @@ export async function withRetry<T>(
     } catch (error: any) {
       lastError = error;
       
-      // Check if it's a recoverable error
+      // Check if it's a recoverable Neon error
       const isRecoverable = 
         error?.code === 'XX000' || 
         error?.message?.includes('Control plane request failed') ||
-        error?.message?.includes('connection') ||
+        error?.message?.includes('Connection terminated') ||
         error?.message?.includes('timeout');
       
       if (isRecoverable && attempt < maxRetries) {
-        // Exponential backoff with jitter
-        const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
-        console.log(`Database retry attempt ${attempt}/${maxRetries} after ${Math.round(delay)}ms`);
+        // Shorter retry delays for faster recovery
+        const delay = baseDelay * attempt + Math.random() * 500;
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
       
-      // Non-recoverable error or max retries reached
+      // Log and fail after retries
+      console.log(`Database operation failed after ${attempt} attempts:`, error.message);
       circuitBreaker.onFailure();
       throw error;
     }

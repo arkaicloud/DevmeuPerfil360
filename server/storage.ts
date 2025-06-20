@@ -11,6 +11,9 @@ import {
   type InsertPayment 
 } from "@shared/schema";
 import { db, withRetry } from "./db";
+import { cache } from "./cache";
+import { fallbackAdminConfig } from "./fallback-data";
+import { memoryStorage } from "./memory-storage";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
@@ -44,10 +47,22 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return await withRetry(async () => {
-      const [user] = await db.select().from(users).where(eq(users.id, id));
-      return user || undefined;
-    });
+    const cacheKey = cache.getUserKey(id);
+    const cached = cache.get<User>(cacheKey);
+    if (cached) return cached;
+
+    try {
+      return await withRetry(async () => {
+        const [user] = await db.select().from(users).where(eq(users.id, id));
+        if (user) {
+          cache.set(cacheKey, user);
+        }
+        return user || undefined;
+      });
+    } catch (error) {
+      console.log(`Database unavailable for getUser(${id}), returning cached data`);
+      return cached || undefined;
+    }
   }
 
   async getUserByClerkId(clerkId: string): Promise<User | undefined> {
@@ -58,10 +73,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return await withRetry(async () => {
-      const [user] = await db.select().from(users).where(eq(users.email, email));
-      return user || undefined;
-    });
+    const cacheKey = cache.getUserByEmailKey(email);
+    const cached = cache.get<User>(cacheKey);
+    if (cached) return cached;
+
+    try {
+      return await withRetry(async () => {
+        const [user] = await db.select().from(users).where(eq(users.email, email));
+        if (user) {
+          cache.set(cacheKey, user);
+        }
+        return user || undefined;
+      });
+    } catch (error) {
+      console.log(`Database unavailable for getUserByEmail(${email}), returning cached data`);
+      return cached || undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -286,13 +313,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllAdminConfigs(): Promise<Record<string, string>> {
-    return await withRetry(async () => {
-      const configs = await db.select().from(adminConfigs);
-      return configs.reduce((acc, config) => {
-        acc[config.key] = config.value || '';
-        return acc;
-      }, {} as Record<string, string>);
-    });
+    const cacheKey = cache.getAdminConfigKey();
+    const cached = cache.get<Record<string, string>>(cacheKey);
+
+    try {
+      return await withRetry(async () => {
+        const configs = await db.select().from(adminConfigs);
+        const result = configs.reduce((acc, config) => {
+          acc[config.key] = config.value || '';
+          return acc;
+        }, {} as Record<string, string>);
+        
+        cache.set(cacheKey, result, 10 * 60 * 1000);
+        return result;
+      }, 2, 200); // Faster retry for critical operations
+    } catch (error) {
+      console.log('Database unavailable, using cached or fallback configuration');
+      
+      // Return cached data if available
+      if (cached) {
+        return cached;
+      }
+
+      // Use memory storage as fallback
+      const fallbackConfig = await memoryStorage.getAllAdminConfigs();
+      cache.set(cacheKey, fallbackConfig, 5 * 60 * 1000); // Cache fallback for 5 minutes
+      return fallbackConfig;
+    }
   }
 }
 

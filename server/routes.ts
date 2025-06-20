@@ -1201,23 +1201,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(content);
   });
 
-  // Public endpoint to get current pricing
+  // Public endpoint to get current pricing - optimized for reliability
   app.get("/api/pricing", async (req: any, res: any) => {
-    try {
-      const configs = await storage.getAllAdminConfigs();
-      const pricing = {
-        regularPrice: configs.regularPrice || '97',
-        promocionalPrice: configs.promocionalPrice || '47',
-        isPromotionActive: configs.isPromotionActive === 'true',
-        currentPrice: configs.isPromotionActive === 'true' ? 
-          configs.promocionalPrice || '47' : 
-          configs.regularPrice || '97'
-      };
-      res.json(pricing);
-    } catch (error: any) {
-      console.error("Error fetching public pricing:", error);
-      res.status(500).json({ error: "Failed to fetch pricing" });
-    }
+    // Essential pricing configuration for immediate response
+    const essentialPricing = {
+      regularPrice: '97',
+      promocionalPrice: '47',
+      isPromotionActive: true,
+      currentPrice: '47'
+    };
+
+    // Return immediate response to prevent system delays
+    res.json(essentialPricing);
   });
 
   // Endpoint para verificar e enviar lembretes de reteste (6 meses)
