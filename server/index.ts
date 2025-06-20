@@ -42,7 +42,8 @@ if (process.env.NODE_ENV === 'production') {
   }));
 }
 
-  // Middlewares de segurança apenas em produção para evitar bloqueios
+  // Middlewares de segurança desabilitados em desenvolvimento para evitar bloqueios
+  // Rate limiting e threat detection causam erro 429 no admin
   if (process.env.NODE_ENV === 'production') {
     app.use(securityHeaders);
     app.use(strictRateLimit);

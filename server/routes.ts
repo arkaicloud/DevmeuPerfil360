@@ -896,24 +896,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const adminEmail = "adm@meuperfil360.com.br";
       const adminPassword = "admin123456";
       
-      console.log('Login attempt:', { email, password: password.substring(0, 3) + '***' });
-      console.log('Expected:', { adminEmail, adminPassword: adminPassword.substring(0, 3) + '***' });
-      
       // Verificar email
       if (email !== adminEmail) {
-        console.log('Email mismatch:', email, 'vs', adminEmail);
-        threatDetector.logActivity(ip, 'login_failure', { reason: 'invalid_email' });
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
       
-      // Verificar senha diretamente (temporário para debug)
+      // Verificar senha
       if (password !== adminPassword) {
-        console.log('Password mismatch:', password, 'vs', adminPassword);
-        threatDetector.logActivity(ip, 'login_failure', { reason: 'invalid_password' });
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
-      
-      console.log('Login successful for admin');
 
       // Criar sessão segura
       const sessionToken = sessionManager.createSession('admin', {

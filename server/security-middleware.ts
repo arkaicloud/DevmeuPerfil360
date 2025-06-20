@@ -4,12 +4,12 @@ import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
-// Rate limiting mais rigoroso
+// Rate limiting mais flexível para desenvolvimento
 export const strictRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por IP
+  max: process.env.NODE_ENV === 'development' ? 1000 : 50, // mais permissivo em dev
   message: {
-    error: 'Muitas requisições. Tente novamente em 15 minutos.',
+    error: 'Acesso negado. Limite de tentativas excedido.',
     code: 'RATE_LIMIT_EXCEEDED'
   },
   standardHeaders: true,
@@ -18,11 +18,11 @@ export const strictRateLimit = rateLimit({
 
 // Rate limiting para APIs sensíveis
 export const authRateLimit = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5, // apenas 5 tentativas de login por IP
+  windowMs: 10 * 60 * 1000, // 10 minutos
+  max: process.env.NODE_ENV === 'development' ? 50 : 3, // mais permissivo em dev
   skipSuccessfulRequests: true,
   message: {
-    error: 'Muitas tentativas de login. Aguarde 15 minutos.',
+    error: 'Muitas tentativas de login. Aguarde alguns minutos.',
     code: 'AUTH_RATE_LIMIT'
   }
 });
