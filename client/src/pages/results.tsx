@@ -61,6 +61,8 @@ export default function Results() {
   const { data: testResult, isLoading, error, refetch } = useQuery<TestResult>({
     queryKey: [`/api/test/result/${testId}`],
     enabled: !!testId,
+    retry: 3,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Check if user exists when test result is loaded
@@ -267,29 +269,64 @@ export default function Results() {
 
   if (error || !testResult) {
     console.error("Erro ao carregar teste:", error);
+    
+    // If it's a 404 error, try to redirect back to find results with a helpful message
+    if (error && error.message && error.message.includes('404')) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card className="max-w-md mx-auto">
+            <CardContent className="p-6 text-center">
+              <Brain className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">Teste não encontrado</h3>
+              <p className="text-muted-foreground mb-4">
+                O teste pode ter sido removido ou o link pode estar incorreto. Use o formulário de busca para encontrar seus resultados.
+              </p>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => navigate("/find-results")} 
+                  className="w-full"
+                  variant="default"
+                >
+                  Buscar Meus Resultados
+                </Button>
+                <Button 
+                  onClick={() => navigate("/")} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Fazer Novo Teste
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+    
+    // For other errors, show generic error message with retry option
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md mx-auto">
           <CardContent className="p-6 text-center">
             <Brain className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Resultado não encontrado</h3>
+            <h3 className="text-lg font-semibold mb-2">Erro ao carregar resultados</h3>
             <p className="text-muted-foreground mb-4">
-              Não foi possível carregar os resultados do teste. O teste pode ter sido removido ou o link pode estar incorreto.
+              Ocorreu um erro temporário. Tente recarregar a página ou busque seus resultados novamente.
             </p>
             <div className="space-y-2">
               <Button 
-                onClick={() => navigate("/find-results")} 
+                onClick={() => refetch()} 
                 className="w-full"
                 variant="default"
               >
-                Buscar Meus Resultados
+                Tentar Novamente
               </Button>
               <Button 
-                onClick={() => navigate("/")} 
-                variant="outline"
+                onClick={() => navigate("/find-results")} 
                 className="w-full"
+                variant="outline"
               >
-                Fazer Novo Teste
+                Buscar Meus Resultados
               </Button>
             </div>
           </CardContent>
