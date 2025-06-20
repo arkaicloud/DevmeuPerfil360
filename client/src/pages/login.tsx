@@ -47,7 +47,7 @@ export default function Login() {
 
       toast({
         title: "Login realizado com sucesso!",
-        description: `Bem-vindo, ${data.username}!`,
+        description: `Bem-vindo, ${data.firstName || data.username || data.email || 'usuário'}!`,
       });
       navigate(`/dashboard/${data.id}`);
     },

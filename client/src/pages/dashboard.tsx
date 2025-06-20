@@ -21,9 +21,11 @@ interface TestResult {
 interface DashboardData {
   user: {
     id: number;
-    username: string;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
     email: string;
-    whatsapp?: string; // Optional whatsapp
+    whatsapp?: string;
   };
   testResults: TestResult[];
 }
@@ -53,7 +55,14 @@ export default function Dashboard() {
     staleTime: 30000,
   });
 
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<{
+    id: number;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    email: string;
+    whatsapp?: string;
+  }>({
     queryKey: [`/api/user/${userId}`],
     enabled: !!userId,
     staleTime: 30000,
@@ -262,7 +271,7 @@ export default function Dashboard() {
                       onClick={() => {
                         // Create session data from user info for compatibility
                         const mockGuestData = {
-                          name: user?.username || "",
+                          name: user?.username || user?.firstName || "",
                           email: user?.email || "",
                           whatsapp: user?.whatsapp || "",
                         };
@@ -318,7 +327,7 @@ export default function Dashboard() {
                     onClick={() => {
                       // Create session data from user info for compatibility
                       const mockGuestData = {
-                        name: user?.username || "",
+                        name: user?.username || user?.firstName || "",
                         email: user?.email || "",
                         whatsapp: user?.whatsapp || "",
                       };
@@ -356,7 +365,7 @@ export default function Dashboard() {
                 <User className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <div>
-                <div className="text-gray-800 text-sm md:text-base">Bem-vindo, {dashboardData?.user?.username || "Usuário"}</div>
+                <div className="text-gray-800 text-sm md:text-base">Bem-vindo, {dashboardData?.user?.firstName || dashboardData?.user?.username || dashboardData?.user?.email?.split('@')[0] || "Usuário"}</div>
                 <div className="text-xs md:text-sm text-blue-600 font-normal">Seu Painel Pessoal DISC</div>
               </div>
             </CardTitle>
@@ -403,7 +412,7 @@ export default function Dashboard() {
                   <Button onClick={() => {
                   // Create session data from user info for compatibility
                   const mockGuestData = {
-                    name: user?.username || "",
+                    name: user?.username || user?.firstName || "",
                     email: user?.email || "",
                     whatsapp: user?.whatsapp || "",
                   };
@@ -563,7 +572,7 @@ export default function Dashboard() {
                 if (testLimits?.canTakeTest) {
                   // Create session data from user info for compatibility
                   const mockGuestData = {
-                    name: user?.username || "",
+                    name: user?.username || user?.firstName || "",
                     email: user?.email || "",
                     whatsapp: user?.whatsapp || "",
                   };
