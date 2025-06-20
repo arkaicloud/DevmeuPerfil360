@@ -1546,9 +1546,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="{{pdfUrl}}" style="background: #DC2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-                  📄 Download PDF
+                <a href="{{pdfUrl}}" style="background: #DC2626; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-size: 16px; font-weight: bold;">
+                  📄 Baixar Relatório Premium (PDF)
                 </a>
+              </div>
+              
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #4F46E5; margin-top: 0;">Seu relatório premium inclui:</h3>
+                <ul style="color: #555;">
+                  <li>Análise comportamental completa</li>
+                  <li>Plano de ação personalizado de 4 semanas</li>
+                  <li>Recomendações de carreira específicas</li>
+                  <li>Estratégias de comunicação e liderança</li>
+                </ul>
               </div>
               
               <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">

@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **PREMIUM EMAIL PDF LINK ENHANCED** - Direct PDF download link in premium upgrade emails
+  - **Direct PDF Access**: Premium upgrade email now includes direct link to `/api/test/result/{id}/pdf`
+  - **Enhanced Button**: Improved "Baixar Relatório Premium (PDF)" button styling and visibility
+  - **Premium Benefits**: Added detailed list of premium report features in email template
+  - **User Experience**: Users can immediately download PDF from email without navigation
 - June 20, 2025: **EMAIL SYSTEM VALIDATION FIX** - Corrected admin panel email testing functionality
   - **Fixed Validation**: Email type validation now accepts both frontend and backend format values
   - **Test Email Support**: Admin can test all 4 email types through the interface
