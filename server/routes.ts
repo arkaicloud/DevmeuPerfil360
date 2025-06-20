@@ -313,6 +313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: testResult.createdAt,
         guestName: testResult.guestName || 'Usuário',
         guestEmail: testResult.guestEmail || null,
+        guestWhatsapp: testResult.guestWhatsapp || null,
       });
     } catch (error: any) {
       res.status(500).json({ message: "Erro ao buscar resultado" });

@@ -25,6 +25,7 @@ interface TestResult {
   createdAt: string;
   guestName: string;
   guestEmail?: string;
+  guestWhatsapp?: string;
 }
 
 export default function Results() {
@@ -75,17 +76,36 @@ export default function Results() {
             })
           });
           
-          // If we get a 401 with specific message about password, user exists
-          // If we get a 401 with user not found, user doesn't exist
-          if (response.status === 401) {
+          if (response.ok) {
+            const responseData = await response.json();
+            // If login succeeds or redirects to Clerk, user exists
+            setUserExists(true);
+          } else if (response.status === 401) {
             const errorText = await response.text();
-            setUserExists(errorText.includes('Senha incorreta') || errorText.includes('password'));
+            // If error mentions password, user exists but password is wrong
+            const userExistsButWrongPassword = errorText.includes('Senha incorreta') || errorText.includes('password');
+            setUserExists(userExistsButWrongPassword);
+            
+            // If user doesn't exist, automatically open registration modal
+            if (!userExistsButWrongPassword && errorText.includes('Usuário não encontrado')) {
+              setTimeout(() => {
+                setShowRegistrationModal(true);
+              }, 1000); // Small delay to let the page load
+            }
           } else {
             setUserExists(false);
+            // If unable to determine, auto-open registration as fallback
+            setTimeout(() => {
+              setShowRegistrationModal(true);
+            }, 1000);
           }
         } catch (error) {
           console.error("Erro ao verificar usuário:", error);
           setUserExists(false);
+          // On error, auto-open registration as fallback
+          setTimeout(() => {
+            setShowRegistrationModal(true);
+          }, 1000);
         }
       }
     };
@@ -615,9 +635,9 @@ export default function Results() {
         isOpen={showRegistrationModal}
         onClose={() => setShowRegistrationModal(false)}
         guestData={{
-          name: guestName || testResult.guestName || "",
-          email: "",
-          whatsapp: "",
+          name: testResult?.guestName || "",
+          email: testResult?.guestEmail || "",
+          whatsapp: (testResult as any)?.guestWhatsapp || "",
         }}
       />
     </div>
