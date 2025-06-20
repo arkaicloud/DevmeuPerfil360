@@ -133,6 +133,8 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - **Data Encryption**: Sensitive information protection
 
 ## Changelog
+- June 20, 2025: **NAVIGATION ENHANCEMENT** - Login page header displays navigation bar with "Início" button for easy return to homepage
+- June 20, 2025: **AUTO-REGISTRATION SYSTEM** - Users without accounts get registration modal with pre-filled test data (name, email, WhatsApp)
 - June 20, 2025: **AUTO-REDIRECT AFTER REGISTRATION** - Users automatically redirected to personal dashboard after account creation
 - June 20, 2025: **USER REGISTRATION FIXED** - Resolved clerk_id constraint error, registration system fully functional
 - June 19, 2025: **PRODUCTION READY** - System prepared for www.meuperfil360.com.br with all production configurations
