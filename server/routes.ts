@@ -1151,8 +1151,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const templates = await db.select().from(emailTemplates);
       
+      // Map template names to display names
+      const displayNames: Record<string, string> = {
+        'boas_vindas_cadastro': 'Boas-vindas (Cadastro)',
+        'teste_concluido': 'Teste Concluído',
+        'upgrade_premium': 'Upgrade Premium',
+        'lembrete_reteste': 'Lembrete de Reteste'
+      };
+      
       const templateMap = templates.reduce((acc, template) => {
-        acc[template.id] = template;
+        acc[template.name] = {
+          id: template.name,
+          name: displayNames[template.name] || template.name,
+          subject: template.subject,
+          content: template.content,
+          variables: template.variables || []
+        };
         return acc;
       }, {} as any);
 
@@ -1207,7 +1221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/send-test-email", [
     sanitizeInput,
     body('email').isEmail().withMessage('Email deve ser válido'),
-    body('emailType').isIn(['welcome', 'test_completion', 'premium_upgrade', 'retest_reminder']).withMessage('Tipo de email inválido'),
+    body('emailType').isIn(['boas_vindas_cadastro', 'teste_concluido', 'upgrade_premium', 'lembrete_reteste']).withMessage('Tipo de email inválido'),
     validateRequest
   ], async (req: any, res: any) => {
     try {
@@ -1295,7 +1309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const defaultTemplates = [
         {
-          name: 'welcome',
+          name: 'boas_vindas_cadastro',
           subject: 'Bem-vindo ao MeuPerfil360! 🎉',
           content: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -1339,7 +1353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           variables: ['userName', 'loginUrl', 'supportEmail']
         },
         {
-          name: 'test_completion',
+          name: 'teste_concluido',
           subject: 'Seu Teste DISC foi concluído! Perfil {{profileType}} identificado',
           content: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -1377,7 +1391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           variables: ['userName', 'profileType', 'profileName', 'resultUrl', 'upgradeUrl']
         },
         {
-          name: 'premium_upgrade',
+          name: 'upgrade_premium',
           subject: 'Seu Relatório Premium está pronto! 📊',
           content: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -1410,7 +1424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           variables: ['userName', 'profileType', 'profileName', 'pdfUrl', 'dashboardUrl']
         },
         {
-          name: 'retest_reminder',
+          name: 'lembrete_reteste',
           subject: 'Hora de refazer seu teste DISC! ⏰',
           content: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

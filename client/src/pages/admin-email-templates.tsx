@@ -22,11 +22,34 @@ interface EmailTemplate {
 export default function AdminEmailTemplates() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("test-completion");
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("boas_vindas_cadastro");
   const [templates, setTemplates] = useState<Record<string, EmailTemplate>>({
-    "test-completion": {
-      id: "test-completion",
-      name: "Conclusão do Teste",
+    "boas_vindas_cadastro": {
+      id: "boas_vindas_cadastro",
+      name: "Boas-vindas (Cadastro)",
+      subject: "Bem-vindo ao MeuPerfil360! 🎉",
+      content: `Olá {{userName}},
+
+Seja muito bem-vindo(a) ao MeuPerfil360! 🚀
+
+Sua conta foi criada com sucesso e agora você tem acesso completo à nossa plataforma de análise DISC.
+
+O que você pode fazer agora:
+• Realizar testes DISC ilimitados
+• Acessar seus resultados históricos
+• Fazer upgrade para relatórios premium
+• Acompanhar sua evolução comportamental
+
+Dúvidas? Estamos aqui para ajudar! Entre em contato: {{supportEmail}}
+
+Atenciosamente,
+Equipe MeuPerfil360
+Sua jornada de autoconhecimento começa aqui`,
+      variables: ["userName", "loginUrl", "supportEmail"]
+    },
+    "teste_concluido": {
+      id: "teste_concluido",
+      name: "Teste Concluído",
       subject: "🎯 Seu Teste DISC foi concluído - {{userName}}",
       content: `Olá {{userName}},
 
@@ -49,8 +72,8 @@ Equipe MeuPerfil360
 🌟 Transformando potencial em performance`,
       variables: ["userName", "profileType", "profileName", "resultUrl", "premiumUrl"]
     },
-    "retest-reminder": {
-      id: "retest-reminder",
+    "lembrete_reteste": {
+      id: "lembrete_reteste",
       name: "Lembrete de Reteste",
       subject: "⏰ Hora de atualizar seu perfil DISC - {{userName}}",
       content: `Olá {{userName}},
@@ -75,9 +98,9 @@ Continue sua jornada de autoconhecimento conosco!
 Atenciosamente,
 Equipe MeuPerfil360
 🚀 Evoluindo sempre`,
-      variables: ["userName", "monthsSinceTest", "testUrl"]
+      variables: ["userName", "daysSinceLastTest", "testUrl"]
     },
-    "premium-welcome": {
+    "upgrade_premium": {
       id: "premium-welcome",
       name: "Boas-vindas Premium",
       subject: "🎉 Bem-vindo ao MeuPerfil360 Premium!",
