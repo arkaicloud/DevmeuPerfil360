@@ -1358,7 +1358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Send test emails to specific users
   app.post("/api/admin/send-test-email", [
     body('email').isEmail().withMessage('Email deve ser válido'),
-    body('emailType').isIn(['boas_vindas_cadastro', 'teste_concluido', 'upgrade_premium', 'lembrete_reteste']).withMessage('Tipo de email inválido'),
+    body('emailType').isIn(['welcome', 'test_completion', 'premium_upgrade', 'retest_reminder', 'boas_vindas_cadastro', 'teste_concluido', 'upgrade_premium', 'lembrete_reteste']).withMessage('Tipo de email inválido'),
     (req: any, res: any, next: any) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -1400,15 +1400,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let emailSent = false;
       
       switch (emailType) {
+        case 'welcome':
         case 'boas_vindas_cadastro':
           emailSent = await emailService.sendWelcomeEmail(email, userName);
           break;
+        case 'test_completion':
         case 'teste_concluido':
           emailSent = await emailService.sendTestCompletionEmail(email, userName, profileType, resultId);
           break;
+        case 'premium_upgrade':
         case 'upgrade_premium':
           emailSent = await emailService.sendPremiumUpgradeEmail(email, userName, profileType, resultId);
           break;
+        case 'retest_reminder':
         case 'lembrete_reteste':
           emailSent = await emailService.sendRetestReminderEmail(email, userName, 180);
           break;

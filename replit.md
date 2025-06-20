@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **EMAIL SYSTEM VALIDATION FIX** - Corrected admin panel email testing functionality
+  - **Fixed Validation**: Email type validation now accepts both frontend and backend format values
+  - **Test Email Support**: Admin can test all 4 email types through the interface
+  - **Type Mapping**: welcome→boas_vindas_cadastro, test_completion→teste_concluido, etc.
+  - **Error Resolution**: Resolved "Dados inválidos fornecidos" validation errors
 - June 20, 2025: **AUTOMATED EMAIL TRIGGERS SYSTEM** - Complete email automation with 4 automated triggers
   - **Boas-vindas (Cadastro)**: Welcome email sent immediately when user registers
   - **Teste Concluído**: Test completion email sent after DISC test submission for both guests and users
