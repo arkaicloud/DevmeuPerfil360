@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **CHECKOUT ROUTING FIXED** - Corrected 404 error in checkout page navigation
+  - **Route Parameter**: Updated `/checkout` to `/checkout/:testId` in router configuration
+  - **Parameter Extraction**: Modified CheckoutModern component to use useParams() instead of query strings
+  - **Direct Navigation**: Dashboard popup now correctly navigates to checkout with test ID
+  - **Error Resolution**: Fixed "Page Not Found" error when accessing checkout from dashboard
 - June 20, 2025: **PREMIUM UPGRADE POPUP SYSTEM** - Dashboard popup encouraging non-premium users to upgrade
   - **Smart Detection**: Popup appears for users with non-premium tests only once per day
   - **Premium Benefits**: Lists complete premium features (analysis, action plan, career recommendations)

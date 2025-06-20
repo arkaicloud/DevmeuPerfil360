@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, QrCode, Loader2, Zap, Star } from "lucide-react";
@@ -21,22 +21,18 @@ interface PricingData {
 
 export default function CheckoutModern() {
   const [, navigate] = useLocation();
+  const params = useParams();
   const { toast } = useToast();
-  const [testId, setTestId] = useState<string | null>(null);
+  const testId = params.testId;
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'pix' | null>(null);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'method' | 'processing'>('method');
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const testIdParam = urlParams.get('testId');
-    
-    if (testIdParam) {
-      setTestId(testIdParam);
-    } else {
+    if (!testId) {
       navigate('/');
     }
-  }, [navigate]);
+  }, [testId, navigate]);
 
   const { data: testResult, isLoading: testLoading } = useQuery<TestResult>({
     queryKey: [`/api/test/result/${testId}`],

@@ -26,7 +26,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/test" component={Test} />
       <Route path="/results/:id" component={Results} />
-      <Route path="/checkout" component={CheckoutModern} />
+      <Route path="/checkout/:testId" component={CheckoutModern} />
       <Route path="/dashboard/:userId" component={Dashboard} />
       <Route path="/find-results" component={FindResults} />
       <Route path="/payment-success" component={PaymentSuccess} />
