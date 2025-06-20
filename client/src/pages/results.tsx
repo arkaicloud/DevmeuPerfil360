@@ -671,7 +671,7 @@ export default function Results() {
 
               <div className="flex justify-center">
                 <Button 
-                  onClick={() => navigate(`/checkout?testId=${testResult.id}`)}
+                  onClick={() => navigate(`/checkout/${testResult.id}`)}
                   className="w-full sm:w-auto bg-gradient-to-r from-secondary to-primary text-white btn-hover-lift"
                   size="default"
                 >

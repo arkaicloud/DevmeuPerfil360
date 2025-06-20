@@ -23,16 +23,25 @@ export default function CheckoutModern() {
   const [, navigate] = useLocation();
   const params = useParams();
   const { toast } = useToast();
-  const testId = params.testId;
+  
+  // Get testId from URL params or query string
+  const urlParams = new URLSearchParams(window.location.search);
+  const testId = params.testId || urlParams.get('testId');
+  
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'pix' | null>(null);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'method' | 'processing'>('method');
 
   useEffect(() => {
     if (!testId) {
+      toast({
+        title: "Erro",
+        description: "ID do teste não encontrado. Redirecionando...",
+        variant: "destructive"
+      });
       navigate('/');
     }
-  }, [testId, navigate]);
+  }, [testId, navigate, toast]);
 
   const { data: testResult, isLoading: testLoading } = useQuery<TestResult>({
     queryKey: [`/api/test/result/${testId}`],
