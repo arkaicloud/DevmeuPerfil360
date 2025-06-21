@@ -38,6 +38,7 @@ export default function Login() {
       const response = await apiRequest("POST", "/api/auth/login", data);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: "Erro ao fazer login" }));
+        // Throw just the message without status code
         throw new Error(errorData.message || "Erro ao fazer login");
       }
       return response.json();
@@ -53,9 +54,10 @@ export default function Login() {
       navigate(`/dashboard/${data.id}`);
     },
     onError: (error: Error) => {
+      console.error('Login error:', error);
       const friendlyMessage = getFriendlyError(error);
       toast({
-        title: "Erro no Login",
+        title: "Erro no Login", 
         description: friendlyMessage,
         variant: "destructive",
       });
