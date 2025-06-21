@@ -78,6 +78,17 @@ export default function Results() {
         console.error("Erro ao recuperar dados do convidado:", error);
       }
     }
+    
+    // Check if this is a suspended payment redirect
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get('payment');
+    const isSuspended = params.get('suspended');
+    
+    if (paymentStatus === 'success' && isSuspended === 'true') {
+      // Remove URL parameters for cleaner display
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
   }, [navigate]);
 
   const { data: testResult, isLoading, error, refetch } = useQuery<TestResult>({
