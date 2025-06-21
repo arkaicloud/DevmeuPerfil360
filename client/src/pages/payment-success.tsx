@@ -60,40 +60,81 @@ export default function PaymentSuccess() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardContent className="text-center p-8">
-          <div className="mb-6">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Pagamento Confirmado!
-            </h1>
-            <p className="text-gray-600">
-              Processando seu acesso premium...
-            </p>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="animate-pulse">
-              <div className="h-2 bg-gray-200 rounded-full">
-                <div className="h-2 bg-green-500 rounded-full w-3/4"></div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md text-center">
+        <CardContent className="pt-6">
+          {processing ? (
+            <>
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Loader2 className="w-8 h-8 text-white animate-spin" />
               </div>
-            </div>
-            
-            <p className="text-sm text-gray-500">
-              Você será redirecionado automaticamente para seu relatório premium.
-            </p>
-            
-            {testId && (
-              <Button
-                onClick={() => navigate(`/results/${testId}`)}
-                className="w-full mt-4"
+              
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Processando Pagamento...
+              </h1>
+              
+              <p className="text-gray-600 mb-6">
+                Aguarde enquanto verificamos seu pagamento e liberamos o acesso premium.
+              </p>
+            </>
+          ) : error ? (
+            <>
+              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
+              
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Erro no Pagamento
+              </h1>
+              
+              <p className="text-gray-600 mb-6">
+                {error}
+              </p>
+              
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/')}
+                className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Ver Relatório Premium
+                Voltar ao Início
               </Button>
-            )}
-          </div>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
+              
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Pagamento Aprovado!
+              </h1>
+              
+              <p className="text-gray-600 mb-6">
+                Seu relatório premium foi liberado. Redirecionando para seus resultados...
+              </p>
+              
+              {testId && (
+                <div className="space-y-3">
+                  <Button 
+                    onClick={() => navigate(`/results/${testId}?payment=success`)}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    Ver Meu Relatório Premium
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate('/')}
+                    className="w-full"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar ao Início
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

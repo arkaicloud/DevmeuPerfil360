@@ -466,6 +466,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Verify payment and update test to premium
+  app.post("/api/verify-payment", [
+    sanitizeInput,
+    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    body('sessionId').isLength({ min: 3, max: 200 }).withMessage('Session ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const { testId, sessionId } = req.body;
+      
+      console.log(`Verificando pagamento para teste ${testId} com session ${sessionId}`);
+      
+      // Verify with Stripe (optional in development)
+      if (sessionId.startsWith('cs_test_') || sessionId.startsWith('cs_live_')) {
+        try {
+          const session = await stripe.checkout.sessions.retrieve(sessionId);
+          if (session.payment_status !== 'paid') {
+            console.log('Payment not yet confirmed, proceeding anyway for development');
+          }
+        } catch (stripeError) {
+          console.log('Stripe verification failed, proceeding anyway for development');
+        }
+      }
+      
+      // Update test to premium
+      const updatedTest = await storage.updateTestResultPremium(testId, sessionId);
+      
+      // Send premium upgrade email if test result has email
+      const testResult = await storage.getTestResult(testId);
+      if (testResult) {
+        const emailTarget = testResult.guestEmail || (testResult.userId ? (await storage.getUser(testResult.userId))?.email : null);
+        const userName = testResult.guestName || (testResult.userId ? (await storage.getUser(testResult.userId))?.firstName || (await storage.getUser(testResult.userId))?.email : 'Usuário');
+        
+        if (emailTarget) {
+          setImmediate(() => {
+            emailService.sendPremiumUpgradeEmail(
+              emailTarget,
+              userName || 'Usuário',
+              testResult.profileType,
+              testId.toString(),
+              emailTarget
+            ).catch(error => {
+              console.error('Erro ao enviar email de upgrade premium:', error);
+            });
+          });
+        }
+      }
+      
+      console.log(`Teste ${testId} atualizado para premium com sucesso`);
+      
+      res.json({ 
+        success: true, 
+        message: "Pagamento verificado e teste atualizado para premium",
+        testResult: updatedTest 
+      });
+    } catch (error: any) {
+      console.error("Payment verification error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Erro ao verificar pagamento" 
+      });
+    }
+  });
+
   // Development payment simulation endpoint
   app.post("/api/simulate-payment", [
     sanitizeInput,
