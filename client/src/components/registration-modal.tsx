@@ -241,11 +241,11 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
                     <div className="flex items-start space-x-3">
                       <FormControl>
                         <Checkbox
-                          checked={!!field.value}
+                          checked={field.value === true}
                           onCheckedChange={(checked) => {
-                            field.onChange(checked === true);
+                            field.onChange(checked);
                           }}
-                          className="mt-1"
+                          className="mt-1 flex-shrink-0"
                           id="acceptTerms"
                         />
                       </FormControl>
