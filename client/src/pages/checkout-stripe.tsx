@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, Loader2, Star } from "lucide-react";
+import { Brain, ArrowLeft, Shield, CheckCircle, Crown, CreditCard, Loader2, Star, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 
@@ -21,111 +19,14 @@ interface PricingData {
   isPromoActive: boolean;
 }
 
-// Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
+// Declare Stripe global
+declare global {
+  interface Window {
+    Stripe: any;
+  }
+}
 
-const CheckoutForm = ({ testId, pricing }: { testId: string; pricing: PricingData }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const { toast } = useToast();
-  const [, navigate] = useLocation();
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/success?testId=${testId}`,
-        },
-        redirect: 'if_required'
-      });
-
-      if (error) {
-        toast({
-          title: "Erro no Pagamento",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Payment succeeded, verify and redirect
-        const response = await fetch('/api/verify-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            paymentIntentId: paymentIntent.id,
-            testId: parseInt(testId)
-          })
-        });
-
-        const result = await response.json();
-        
-        if (result.success) {
-          toast({
-            title: "Pagamento Aprovado!",
-            description: "Redirecionando para seus resultados premium...",
-          });
-          
-          setTimeout(() => {
-            navigate(`/results/${testId}?payment=success`);
-          }, 1500);
-        } else {
-          throw new Error('Erro na verificação do pagamento');
-        }
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao processar pagamento",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white p-6 rounded-lg border">
-        <PaymentElement 
-          options={{
-            layout: "tabs",
-            paymentMethodOrder: ['card', 'link']
-          }}
-        />
-      </div>
-      
-      <Button 
-        type="submit"
-        disabled={!stripe || !elements || isProcessing}
-        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 text-lg"
-      >
-        {isProcessing ? (
-          <div className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Processando Pagamento...
-          </div>
-        ) : (
-          <>
-            <Crown className="w-5 h-5 mr-2" />
-            Finalizar Compra - R$ {pricing.promocionalPrice}
-          </>
-        )}
-      </Button>
-    </form>
-  );
-};
-
-export default function CheckoutEmbedded() {
+export default function CheckoutStripe() {
   const [, navigate] = useLocation();
   const params = useParams();
   const { toast } = useToast();
@@ -133,8 +34,9 @@ export default function CheckoutEmbedded() {
   const urlParams = new URLSearchParams(window.location.search);
   const testId = params.testId || urlParams.get('testId');
   
-  const [clientSecret, setClientSecret] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [stripe, setStripe] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [stripeLoading, setStripeLoading] = useState(true);
 
   useEffect(() => {
     if (!testId) {
@@ -147,6 +49,38 @@ export default function CheckoutEmbedded() {
     }
   }, [testId, navigate, toast]);
 
+  // Load Stripe.js
+  useEffect(() => {
+    const loadStripe = async () => {
+      try {
+        // Load Stripe script
+        if (!window.Stripe) {
+          const script = document.createElement('script');
+          script.src = 'https://js.stripe.com/v3/';
+          script.onload = () => {
+            const stripeInstance = window.Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+            setStripe(stripeInstance);
+            setStripeLoading(false);
+          };
+          script.onerror = () => {
+            console.error('Failed to load Stripe.js');
+            setStripeLoading(false);
+          };
+          document.head.appendChild(script);
+        } else {
+          const stripeInstance = window.Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+          setStripe(stripeInstance);
+          setStripeLoading(false);
+        }
+      } catch (error) {
+        console.error('Error loading Stripe:', error);
+        setStripeLoading(false);
+      }
+    };
+
+    loadStripe();
+  }, []);
+
   const { data: testResult, isLoading: testLoading } = useQuery<TestResult>({
     queryKey: [`/api/test/result/${testId}`],
     enabled: !!testId,
@@ -156,44 +90,62 @@ export default function CheckoutEmbedded() {
     queryKey: ['/api/pricing'],
   });
 
-  // Create PaymentIntent when component loads
-  useEffect(() => {
-    if (!testId || !pricing) return;
+  const handleCheckout = async () => {
+    if (!stripe || !testId || !pricing) {
+      toast({
+        title: "Erro",
+        description: "Sistema de pagamento não está pronto",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const createPaymentIntent = async () => {
-      try {
-        const response = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            testId: parseInt(testId),
-            amount: parseInt(pricing.promocionalPrice) * 100
-          })
+    setLoading(true);
+
+    try {
+      // Create checkout session
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          testId: parseInt(testId),
+          amount: parseInt(pricing.promocionalPrice) * 100,
+          paymentMethod: 'card'
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.sessionId) {
+        // Redirect to Stripe Checkout
+        const { error } = await stripe.redirectToCheckout({
+          sessionId: data.sessionId
         });
 
-        const data = await response.json();
-        
-        if (data.clientSecret) {
-          setClientSecret(data.clientSecret);
-        } else {
-          throw new Error('Erro ao criar intenção de pagamento');
+        if (error) {
+          console.error('Stripe redirect error:', error);
+          toast({
+            title: "Erro no Redirecionamento",
+            description: "Não foi possível redirecionar para o pagamento. Tente novamente.",
+            variant: "destructive",
+          });
         }
-      } catch (error) {
-        console.error('Error creating payment intent:', error);
-        toast({
-          title: "Erro",
-          description: "Erro ao inicializar pagamento",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+      } else {
+        throw new Error('Session ID não recebido');
       }
-    };
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Erro no Checkout",
+        description: "Não foi possível iniciar o pagamento. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    createPaymentIntent();
-  }, [testId, pricing, toast]);
-
-  if (testLoading || loading) {
+  if (testLoading || stripeLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
         <Card className="w-full max-w-md text-center">
@@ -212,6 +164,7 @@ export default function CheckoutEmbedded() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-6">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Teste não encontrado</h2>
             <p className="text-gray-600 mb-4">O teste solicitado não existe ou foi removido.</p>
             <Button onClick={() => navigate('/')} className="mt-4">
@@ -240,13 +193,14 @@ export default function CheckoutEmbedded() {
     );
   }
 
-  if (!clientSecret) {
+  if (!stripe) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-6">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Erro no Sistema de Pagamento</h2>
-            <p className="text-gray-600 mb-4">Não foi possível inicializar o pagamento. Tente novamente.</p>
+            <p className="text-gray-600 mb-4">Não foi possível carregar o Stripe. Verifique sua conexão e tente novamente.</p>
             <Button onClick={() => window.location.reload()} className="w-full">
               Tentar Novamente
             </Button>
@@ -335,29 +289,38 @@ export default function CheckoutEmbedded() {
           </CardContent>
         </Card>
 
-        {/* Payment Form */}
+        {/* Payment Button */}
         <Card>
           <CardHeader>
             <CardTitle>Finalizar Pagamento</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Elements 
-              stripe={stripePromise} 
-              options={{ 
-                clientSecret,
-                appearance: {
-                  theme: 'stripe',
-                  variables: {
-                    colorPrimary: '#7c3aed',
-                    colorBackground: '#ffffff',
-                    colorText: '#1f2937',
-                    borderRadius: '8px',
-                  },
-                },
-              }}
+          <CardContent className="space-y-4">
+            <Button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 text-lg h-16"
             >
-              <CheckoutForm testId={testId!} pricing={pricing!} />
-            </Elements>
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Redirecionando para o Stripe...
+                </div>
+              ) : (
+                <>
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Pagar com Cartão - R$ {pricing?.promocionalPrice || '47'}
+                </>
+              )}
+            </Button>
+
+            {/* Fallback iframe (if needed) */}
+            {loading && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700 text-center">
+                  Se o redirecionamento não funcionar, você será redirecionado automaticamente para a página de pagamento.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

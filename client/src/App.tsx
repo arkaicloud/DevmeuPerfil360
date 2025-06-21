@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home-responsive";
 import Test from "@/pages/test";
 import Results from "@/pages/results";
-import CheckoutModern from "@/pages/checkout-modern";
+import CheckoutEmbedded from "@/pages/checkout-embedded";
 import Dashboard from "@/pages/dashboard";
 import FindResults from "@/pages/find-results";
 import PaymentSuccess from "@/pages/payment-success";
@@ -20,6 +20,8 @@ import AdminEmailConfig from "@/pages/admin-email-config";
 import AdminEmailTemplates from "@/pages/admin-email-templates";
 import AdminPricing from "@/pages/admin-pricing";
 import NotFound from "@/pages/not-found";
+import Success from "@/pages/success";
+import Cancel from "@/pages/cancel";
 
 function Router() {
   return (
@@ -27,7 +29,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/test" component={Test} />
       <Route path="/results/:id" component={Results} />
-      <Route path="/checkout/:testId?" component={CheckoutModern} />
+      <Route path="/checkout/:testId?" component={CheckoutEmbedded} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/payment-test" component={PaymentTest} />
       <Route path="/stripe-direct" component={StripeDirect} />
@@ -39,6 +41,8 @@ function Router() {
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
       <Route path="/admin/pricing" component={AdminPricing} />
+      <Route path="/success" component={Success} />
+      <Route path="/cancel" component={Cancel} />
       <Route component={NotFound} />
     </Switch>
   );

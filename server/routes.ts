@@ -505,8 +505,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `http://localhost:5000/payment-success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
-        cancel_url: `http://localhost:5000/checkout/${testId}?payment=cancelled`,
+        success_url: `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
+        cancel_url: `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/cancel?testId=${testId}`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
