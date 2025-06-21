@@ -40,8 +40,7 @@ class MemoryStorage implements IStorage {
       freeTestsUsed: insertUser.freeTestsUsed || 0,
       premiumTestsRemaining: insertUser.premiumTestsRemaining || 0,
       isPremiumActive: insertUser.isPremiumActive || false,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
 
     this.users.set(user.id, user);
@@ -55,7 +54,6 @@ class MemoryStorage implements IStorage {
 
     user.stripeCustomerId = customerId;
     user.stripeSubscriptionId = subscriptionId || null;
-    user.updatedAt = new Date();
 
     this.users.set(userId, user);
     this.usersByEmail.set(user.email, user);

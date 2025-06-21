@@ -145,6 +145,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
   - **Real-time Updates**: Price changes in admin panel immediately reflect on homepage and checkout
   - **Cache Management**: Added cache clearing when pricing is updated to ensure instant updates
   - **Fallback Support**: Maintains system stability with fallback values if database fails
+- June 21, 2025: **DATABASE SCHEMA ERROR FIXED** - Resolved "updated_at column does not exist" error causing database failures
+  - **Schema Consistency**: Removed updated_at column references from all database operations
+  - **Memory Storage**: Updated memory storage to match simplified schema without updatedAt field
+  - **Database Sync**: Applied schema changes using npm run db:push to sync database structure
+  - **Error Resolution**: Fixed all database operations that were failing due to column mismatch
 - June 21, 2025: **USER REGISTRATION RUNTIME ERROR FIXED** - Resolved runtime error when creating accounts for new users
   - **Field Mapping**: Fixed mismatch between frontend 'username' field and backend 'firstName' field
   - **Schema Compatibility**: Updated insertUserSchema to include all required fields for user creation

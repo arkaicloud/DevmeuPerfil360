@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  clerkId: text("clerk_id").unique(), // Clerk user ID (optional)
+  clerkId: text("clerk_id"), // Clerk user ID (optional)
   email: text("email").notNull().unique(),
   firstName: text("first_name"),
   lastName: text("last_name"),
@@ -16,7 +16,6 @@ export const users = pgTable("users", {
   premiumTestsRemaining: integer("premium_tests_remaining").default(0),
   isPremiumActive: boolean("is_premium_active").default(false),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const testResults = pgTable("test_results", {
