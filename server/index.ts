@@ -187,6 +187,16 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
+  // SPA fallback for client-side routing - MUST be after all API routes
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api/')) {
+      // Send the main index.html for any non-API route
+      res.sendFile(path.join(__dirname, '../dist/index.html'));
+    } else {
+      res.status(404).json({ error: 'API endpoint not found' });
+    }
+  });
+
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.

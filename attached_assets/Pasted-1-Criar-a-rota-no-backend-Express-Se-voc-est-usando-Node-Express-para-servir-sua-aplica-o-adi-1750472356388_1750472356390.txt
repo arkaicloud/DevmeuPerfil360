@@ -1,0 +1,77 @@
+1) Criar a rota no backend (Express)
+Se você está usando Node/Express para servir sua aplicação, adicione algo assim ao seu servidor:
+
+js
+Copiar
+Editar
+// logo após todas as outras rotas e do `app.use(express.static(...))`
+app.get('/success', (req, res) => {
+  // lê o session_id, busca dados se quiser e envia o front pronto
+  // ex: page HTML estática em public/success.html
+  res.sendFile(path.join(__dirname, 'public', 'success.html'))
+})
+E crie um arquivo public/success.html com o HTML/JS que mostra o resultado do pagamento (você pode ler o ?session_id=... e chamar a API do Stripe ali via JS).
+
+2) Registrar a rota no front-end (React/Vue/SPA)
+Se seu app é uma SPA com React Router, Next.js, Vue Router etc., você precisa declarar a rota /success:
+
+jsx
+Copiar
+Editar
+// exemplo React Router v6
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './Home'
+import Success from './Success'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+E no componente Success você faz o
+
+js
+Copiar
+Editar
+const params = new URLSearchParams(window.location.search)
+const sessionId = params.get('session_id')
+// carrega detalhes via API do Stripe e exibe pro usuário
+3) Fallback para SPA em deploy estático
+Se você faz app.use(express.static(...)) e serve só um index.html, o Vite (ou Rollup) precisa de um history fallback para que qualquer rota volte pro index.html e seu router cuide do resto. Em Vite.config.js:
+
+js
+Copiar
+Editar
+export default {
+  // ...
+  server: {
+    fs: { strict: false },
+    historyApiFallback: true
+  }
+}
+Ou, em Express, após o static:
+
+js
+Copiar
+Editar
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
+Checklist
+Confirme o success_url na criação da sessão:
+
+js
+Copiar
+Editar
+success_url: `https://${process.env.REPLIT_URL}/success?session_id={CHECKOUT_SESSION_ID}`
+Teste acessando diretamente https://<seu-app>.replit.dev/success no navegador — deve aparecer algo, não 404.
+
+Implemente um dos métodos acima (rota Express ou front-end) para servir essa URL.
+
+Refaça o fluxo do Stripe e o redirect já cairá na sua página de resultados em vez de 404.
