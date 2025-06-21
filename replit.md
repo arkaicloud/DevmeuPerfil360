@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 21, 2025: **DISC CALCULATION REVERTED** - Restored original DISC methodology with individual factor scoring
+  - **Independent Scoring**: Each DISC factor (D, I, S, C) now scores 0-100 independently
+  - **No Forced Total**: Removed constraint requiring percentages to sum to 100%
+  - **Authentic DISC**: Restored proper DISC assessment methodology where factors represent intensity levels
+  - **Better Analysis**: Each factor shows individual strength without artificial balancing
 - June 21, 2025: **ADMIN PAYMENT CONTROL HIDDEN** - Payment methods admin page removed from navigation menu
   - **Menu Simplified**: Removed "Métodos de Pagamento" option from admin navigation
   - **Direct Access Only**: Page still exists at /admin/payment-methods but not visible in menu

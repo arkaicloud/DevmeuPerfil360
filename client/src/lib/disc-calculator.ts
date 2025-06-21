@@ -36,58 +36,21 @@ export function calculateDiscProfile(answers: DiscAnswer[]): DiscProfile {
     }
   });
 
-  // Normalize scores to percentages that sum to exactly 100%
+  // Convert raw scores to individual percentages (0-100 scale for each factor)
+  // Each factor gets its own independent percentage without forcing a 100% total
+  const maxPossibleScore = answers.length * 2; // Maximum points per factor
+  
   // Handle negative scores by shifting to positive range
   const minScore = Math.min(scores.D, scores.I, scores.S, scores.C);
   const shift = minScore < 0 ? Math.abs(minScore) : 0;
   
-  // Create positive scores with minimum value of 1
-  const positiveScores = {
-    D: Math.max(1, scores.D + shift + 1),
-    I: Math.max(1, scores.I + shift + 1),
-    S: Math.max(1, scores.S + shift + 1),
-    C: Math.max(1, scores.C + shift + 1),
+  // Calculate individual percentages for each DISC factor
+  const normalizedScores = {
+    D: Math.min(100, Math.max(0, Math.round(((scores.D + shift) / (maxPossibleScore + shift)) * 100))),
+    I: Math.min(100, Math.max(0, Math.round(((scores.I + shift) / (maxPossibleScore + shift)) * 100))),
+    S: Math.min(100, Math.max(0, Math.round(((scores.S + shift) / (maxPossibleScore + shift)) * 100))),
+    C: Math.min(100, Math.max(0, Math.round(((scores.C + shift) / (maxPossibleScore + shift)) * 100))),
   };
-  
-  // Calculate total for percentage conversion
-  const total = positiveScores.D + positiveScores.I + positiveScores.S + positiveScores.C;
-  
-  // Calculate exact percentages
-  const exactPercentages = {
-    D: (positiveScores.D / total) * 100,
-    I: (positiveScores.I / total) * 100,
-    S: (positiveScores.S / total) * 100,
-    C: (positiveScores.C / total) * 100,
-  };
-  
-  // Apply largest remainder method for exact 100% distribution
-  const baseScores = {
-    D: Math.floor(exactPercentages.D),
-    I: Math.floor(exactPercentages.I),
-    S: Math.floor(exactPercentages.S),
-    C: Math.floor(exactPercentages.C),
-  };
-  
-  // Calculate remainders for each score
-  const remainderData = [
-    { type: 'D', remainder: exactPercentages.D - baseScores.D },
-    { type: 'I', remainder: exactPercentages.I - baseScores.I },
-    { type: 'S', remainder: exactPercentages.S - baseScores.S },
-    { type: 'C', remainder: exactPercentages.C - baseScores.C },
-  ].sort((a, b) => b.remainder - a.remainder);
-  
-  // Start with base scores
-  const normalizedScores = { ...baseScores };
-  
-  // Calculate remaining percentage points to distribute
-  const baseSum = baseScores.D + baseScores.I + baseScores.S + baseScores.C;
-  const remaining = 100 - baseSum;
-  
-  // Distribute remaining points to highest remainders
-  for (let i = 0; i < remaining; i++) {
-    const targetType = remainderData[i % 4].type as keyof typeof normalizedScores;
-    normalizedScores[targetType] += 1;
-  }
 
   // Determine primary profile type
   const primaryType = Object.entries(normalizedScores).reduce((a, b) => 
