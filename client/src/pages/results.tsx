@@ -87,6 +87,10 @@ export default function Results() {
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
+  const { data: pricing } = useQuery<PricingConfig>({
+    queryKey: ["/api/pricing"],
+  });
+
   // Check if user exists when test result is loaded (for find-results flow only)
   useEffect(() => {
     const checkUserExists = async () => {
