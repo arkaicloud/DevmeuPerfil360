@@ -1,52 +1,61 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { CheckCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function PaymentSuccess() {
   const [, navigate] = useLocation();
   const [testId, setTestId] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
     const testIdParam = params.get('testId');
     
-    if (testIdParam) {
+    if (testIdParam && sessionId) {
       setTestId(testIdParam);
       
-      // For Stripe checkout sessions, simulate success and redirect immediately
-      if (sessionId && sessionId.startsWith('cs_test_')) {
-        console.log('Processing payment for test:', testIdParam);
-        console.log('Session ID:', sessionId);
-        
-        // Simulate payment and redirect immediately to avoid connection issues
-        setTimeout(() => {
-          // Try to process payment in background
-          fetch('/api/simulate-payment', {
+      // Verify payment and redirect to results
+      const verifyPayment = async () => {
+        try {
+          const response = await fetch('/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              testId: parseInt(testIdParam),
-              sessionId: sessionId
+              sessionId: sessionId,
+              testId: parseInt(testIdParam)
             })
-          }).catch(error => {
-            console.log('Background payment processing failed, but continuing with redirect');
           });
+
+          const result = await response.json();
           
-          // Redirect regardless of API call success
-          navigate(`/results/${testIdParam}`);
-        }, 1000);
-      } else {
-        // If no session ID or different format, redirect immediately
-        setTimeout(() => {
-          navigate(`/results/${testIdParam}`);
-        }, 1000);
-      }
+          if (result.success) {
+            // Payment verified, redirect to results
+            setTimeout(() => {
+              navigate(`/results/${testIdParam}?payment=success`);
+            }, 1500);
+          } else {
+            setError('Erro na verificação do pagamento');
+          }
+        } catch (error) {
+          console.error('Payment verification error:', error);
+          // Redirect anyway to results page
+          setTimeout(() => {
+            navigate(`/results/${testIdParam}?payment=success`);
+          }, 1500);
+        } finally {
+          setProcessing(false);
+        }
+      };
+
+      verifyPayment();
     } else {
-      // Redirect to home if no test ID
-      setTimeout(() => navigate('/'), 1000);
+      // No session ID or test ID, redirect to home
+      setError('Parâmetros de pagamento inválidos');
+      setTimeout(() => navigate('/'), 2000);
     }
   }, [navigate]);
 
