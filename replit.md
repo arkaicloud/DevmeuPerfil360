@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 20, 2025: **ADMIN PRICING SYSTEM FIXED** - Homepage now reflects pricing changes made in admin panel
+  - **Dynamic Pricing**: `/api/pricing` endpoint now reads from admin configurations instead of hardcoded values
+  - **Real-time Updates**: Price changes in admin panel immediately reflect on homepage and checkout
+  - **Cache Management**: Added cache clearing when pricing is updated to ensure instant updates
+  - **Fallback Support**: Maintains system stability with fallback values if database fails
 - June 20, 2025: **PDF PREMIUM CONTENT UPDATED** - Removed "🎧 Podcasts Brasileiros" section from all premium PDF reports
   - **Content Optimization**: Simplified premium PDF by removing podcasts section as requested
   - **Cleaner Layout**: More focused premium content with books and courses only

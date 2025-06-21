@@ -1146,6 +1146,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.setAdminConfig('promocionalPrice', promocionalPrice.toString());
       await storage.setAdminConfig('isPromotionActive', isPromotionActive.toString());
       
+      // Clear cache to ensure immediate updates
+      cache.delete(cache.getPricingKey());
+      
       res.json({ success: true });
     } catch (error: any) {
       console.error("Error updating pricing config:", error);
@@ -1230,18 +1233,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Public endpoint to get current pricing - optimized for reliability
+  // Public endpoint to get current pricing - reads from admin configurations
   app.get("/api/pricing", async (req: any, res: any) => {
-    // Essential pricing configuration for immediate response
-    const essentialPricing = {
-      regularPrice: '97',
-      promocionalPrice: '47',
-      isPromotionActive: true,
-      currentPrice: '47'
-    };
-
-    // Return immediate response to prevent system delays
-    res.json(essentialPricing);
+    try {
+      // Try to get pricing from admin configurations
+      const configs = await storage.getAllAdminConfigs();
+      const pricing = {
+        regularPrice: configs.regularPrice || '97',
+        promocionalPrice: configs.promocionalPrice || '47',
+        isPromotionActive: configs.isPromotionActive === 'true',
+        currentPrice: configs.isPromotionActive === 'true' ? (configs.promocionalPrice || '47') : (configs.regularPrice || '97')
+      };
+      
+      res.json(pricing);
+    } catch (error) {
+      // Fallback to default values if database fails
+      console.error('Error fetching pricing from database, using fallbacks:', error);
+      const fallbackPricing = {
+        regularPrice: '97',
+        promocionalPrice: '47',
+        isPromotionActive: true,
+        currentPrice: '47'
+      };
+      res.json(fallbackPricing);
+    }
   });
 
   // Endpoint para verificar e enviar lembretes de reteste (6 meses)
