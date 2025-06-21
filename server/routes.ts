@@ -33,6 +33,7 @@ import {
 } from "./security-middleware";
 import { requireAuth, optionalAuth, type AuthenticatedRequest } from "./clerk-middleware";
 import { config } from "./config";
+import { cache } from "./cache";
 // import puppeteer from "puppeteer"; // Disabled due to system dependencies
 
 if (!process.env.STRIPE_SECRET_KEY) {
