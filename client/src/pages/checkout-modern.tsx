@@ -280,9 +280,13 @@ export default function CheckoutModern() {
                     <QrCode className="w-6 h-6 mr-4 text-green-600" />
                     <div className="text-left">
                       <div className="font-medium text-gray-900">PIX</div>
-                      <div className="text-sm text-gray-600">Processamento imediato</div>
+                      <div className="text-sm text-gray-600">Processamento imediato *</div>
                     </div>
                   </Button>
+
+                  <div className="text-xs text-gray-500 mt-2 px-1">
+                    * Se PIX não estiver disponível, você será direcionado para pagamento com cartão
+                  </div>
                 </div>
 
                 {/* Development Test Button - Only for internal testing */}

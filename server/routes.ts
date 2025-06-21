@@ -490,11 +490,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
-      // Create optimized checkout session with correct payment methods
-      const paymentMethodTypes = paymentMethod === 'pix' ? ['pix'] : ['card'];
-      
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: paymentMethodTypes,
+      // Create optimized checkout session with fallback for PIX
+      let sessionConfig: any = {
         mode: 'payment',
         line_items: [{
           price_data: {
@@ -513,7 +510,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
         },
-      });
+      };
+
+      let session;
+      if (paymentMethod === 'pix') {
+        // Try PIX first, fallback to card if not available
+        try {
+          sessionConfig.payment_method_types = ['pix'];
+          session = await stripe.checkout.sessions.create(sessionConfig);
+          console.log(`Sessão Stripe PIX criada: ${session.id}`);
+        } catch (pixError: any) {
+          console.log('PIX não disponível na conta Stripe, usando cartão como fallback');
+          sessionConfig.payment_method_types = ['card'];
+          session = await stripe.checkout.sessions.create(sessionConfig);
+          console.log(`Sessão Stripe cartão (fallback PIX) criada: ${session.id}`);
+        }
+      } else {
+        sessionConfig.payment_method_types = ['card'];
+        session = await stripe.checkout.sessions.create(sessionConfig);
+        console.log(`Sessão Stripe cartão criada: ${session.id}`);
+      }
       
       console.log(`Sessão Stripe criada: ${session.id}`);
       
