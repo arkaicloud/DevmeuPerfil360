@@ -1341,6 +1341,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin - Payment Methods Configuration
+  app.get("/api/admin/payment-methods", async (req: Request, res: Response) => {
+    try {
+      const methods = await storage.getAdminConfig('payment_methods');
+      const parsedMethods = methods ? JSON.parse(methods) : {
+        card: true,
+        pix: false,
+        apple_pay: false,
+        google_pay: false
+      };
+      
+      res.json({ methods: parsedMethods });
+    } catch (error) {
+      console.error("Erro ao buscar métodos de pagamento:", error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        methods: {
+          card: true,
+          pix: false,
+          apple_pay: false,
+          google_pay: false
+        }
+      });
+    }
+  });
+
+  app.post("/api/admin/payment-methods", async (req: Request, res: Response) => {
+    try {
+      const { methods } = req.body;
+      
+      if (!methods || typeof methods !== 'object') {
+        return res.status(400).json({ error: "Configuração de métodos inválida" });
+      }
+
+      await storage.setAdminConfig('payment_methods', JSON.stringify(methods));
+      
+      res.json({ 
+        success: true, 
+        message: "Métodos de pagamento atualizados com sucesso" 
+      });
+    } catch (error) {
+      console.error("Erro ao salvar métodos de pagamento:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Endpoint para servir páginas da aplicação
   app.get("/api/page/:page", async (req: Request, res: Response) => {
     const { page } = req.params;
