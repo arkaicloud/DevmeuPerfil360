@@ -45,7 +45,7 @@ export const ErrorMessages = {
 
   // Email
   EMAIL: {
-    SEND_ERROR: "Não foi possível enviar o email. Verifique seu endereço de email.",
+    SEND_ERROR: "Erro no envio de email. Tente novamente mais tarde.",
     INVALID_EMAIL: "Email inválido. Verifique o endereço digitado.",
     TEMPLATE_ERROR: "Erro no sistema de emails. Tente novamente mais tarde.",
     CONFIG_ERROR: "Configuração de email temporariamente indisponível."

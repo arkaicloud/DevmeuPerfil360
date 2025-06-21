@@ -91,7 +91,7 @@ export const FriendlyErrorMessages = {
 export function getFriendlyError(error: any): string {
   // Se o erro já contém uma mensagem amigável, usar ela
   if (error?.response?.data?.message) {
-    return error.response.data.message;
+    return getFriendlyErrorFromString(error.response.data.message);
   }
 
   // Se é uma mensagem de erro simples
@@ -125,8 +125,9 @@ function getFriendlyErrorFromString(errorString: string): string {
   const lowerError = errorString.toLowerCase();
 
   // Mapeamento de erros comuns
-  if (lowerError.includes('user not found') || lowerError.includes('usuário não encontrado')) {
-    return FriendlyErrorMessages.AUTH.USER_NOT_FOUND;
+  if (lowerError.includes('user not found') || lowerError.includes('usuário não encontrado') || 
+      lowerError.includes('não foi possível enviar o email') || lowerError.includes('invalid credentials')) {
+    return FriendlyErrorMessages.AUTH.INVALID_CREDENTIALS;
   }
 
   if (lowerError.includes('invalid password') || lowerError.includes('senha inválida')) {

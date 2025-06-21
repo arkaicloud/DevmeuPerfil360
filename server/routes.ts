@@ -2109,7 +2109,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUserByEmail(username);
       
       if (!user) {
-        return sendErrorResponse(res, 401, ErrorMessages.AUTH.INVALID_CREDENTIALS);
+        return res.status(401).json({ 
+          success: false, 
+          message: "Email ou senha incorretos. Verifique seus dados e tente novamente."
+        });
       }
 
       // Authentication is handled by Clerk, this endpoint is deprecated
@@ -2125,7 +2128,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Erro no login:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
+      res.status(500).json({ 
+        success: false, 
+        message: "Erro interno do servidor. Tente novamente." 
+      });
     }
   });
 

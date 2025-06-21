@@ -37,8 +37,8 @@ export default function Login() {
     mutationFn: async (data: LoginData) => {
       const response = await apiRequest("POST", "/api/auth/login", data);
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Erro ao fazer login");
+        const errorData = await response.json().catch(() => ({ message: "Erro ao fazer login" }));
+        throw new Error(errorData.message || "Erro ao fazer login");
       }
       return response.json();
     },
