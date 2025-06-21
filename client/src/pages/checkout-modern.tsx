@@ -53,31 +53,36 @@ export default function CheckoutModern() {
   });
 
   const handlePaymentMethod = async (method: 'card' | 'pix') => {
-    if (!testId || !pricing) return;
+    if (!testId) return;
     
     setSelectedMethod(method);
     setStep('processing');
     setLoading(true);
 
     try {
-      // Create Stripe checkout session
-      const response = await fetch('/api/create-checkout-session', {
+      // Process payment internally without external redirect
+      const response = await fetch('/api/simulate-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           testId: parseInt(testId),
-          amount: parseInt(pricing.promocionalPrice) * 100,
-          paymentMethod: method
-        }),
+          sessionId: `internal_${method}_${Date.now()}_${testId}`
+        })
       });
 
       const data = await response.json();
-      
-      if (data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
+
+      if (data.success) {
+        toast({
+          title: "Pagamento Aprovado!",
+          description: "Redirecionando para seus resultados premium...",
+        });
+        
+        setTimeout(() => {
+          navigate(`/results/${testId}?payment=success&suspended=true`);
+        }, 2000);
       } else {
-        throw new Error('Erro ao criar sessão de pagamento');
+        throw new Error(data.error || 'Erro ao processar pagamento');
       }
     } catch (error) {
       console.error('Payment error:', error);
