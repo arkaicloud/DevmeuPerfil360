@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { CreditCard, QrCode, Smartphone, Settings, Save } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import AdminNav from "@/components/admin-nav";
 
 interface PaymentMethod {
   id: string;
@@ -18,6 +20,7 @@ interface PaymentMethod {
 }
 
 export default function PaymentMethods() {
+  const [, navigate] = useLocation();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
       id: 'card',
@@ -58,8 +61,13 @@ export default function PaymentMethods() {
   const { toast } = useToast();
 
   useEffect(() => {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
+      navigate("/admin/login");
+      return;
+    }
     loadPaymentMethods();
-  }, []);
+  }, [navigate]);
 
   const loadPaymentMethods = async () => {
     try {
@@ -122,6 +130,11 @@ export default function PaymentMethods() {
     return paymentMethods.filter(method => method.type === type);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    navigate("/admin/login");
+  };
+
   const renderMethodCard = (method: PaymentMethod) => {
     const IconComponent = method.icon;
     
@@ -159,16 +172,21 @@ export default function PaymentMethods() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 lg:ml-64">
-        <div className="p-6">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+      <>
+        <AdminNav onLogout={handleLogout} />
+        <div className="min-h-screen bg-gray-50 lg:ml-64">
+          <div className="p-6">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 lg:ml-64">
+    <>
+      <AdminNav onLogout={handleLogout} />
+      <div className="min-h-screen bg-gray-50 lg:ml-64">
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
@@ -277,5 +295,6 @@ export default function PaymentMethods() {
         </Card>
       </div>
     </div>
+    </>
   );
 }
