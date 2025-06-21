@@ -29,6 +29,13 @@ interface TestResult {
   guestWhatsapp?: string;
 }
 
+interface PricingConfig {
+  regularPrice: string;
+  promocionalPrice: string;
+  isPromotionActive: boolean;
+  currentPrice: string;
+}
+
 export default function Results() {
   const [, navigate] = useLocation();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -662,8 +669,8 @@ export default function Results() {
 
               <div className="text-center mb-4">
                 <div className="inline-flex items-center space-x-2">
-                  <span className="text-2xl font-bold psychology-purple">R$ 47,00</span>
-                  <span className="text-sm text-muted-foreground line-through">R$ 97,00</span>
+                  <span className="text-2xl font-bold psychology-purple">R$ {pricing?.promocionalPrice || '47'},00</span>
+                  <span className="text-sm text-muted-foreground line-through">R$ {pricing?.regularPrice || '97'},00</span>
                   <span className="bg-accent text-white text-xs px-2 py-1 rounded-full">52% OFF</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Oferta por tempo limitado</p>
