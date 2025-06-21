@@ -46,9 +46,6 @@ const CheckoutForm = ({ testId, pricing }: { testId: string; pricing: PricingDat
     try {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/success?testId=${testId}`,
-        },
         redirect: 'if_required'
       });
 

@@ -505,8 +505,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           quantity: 1,
         }],
-        success_url: `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
-        cancel_url: `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/cancel?testId=${testId}`,
+        success_url: `https://47b86e58-c5cd-4e8c-a0bc-0b8ccaa1d94c-00-2ehx3agf7uozt.picard.replit.dev/success?session_id={CHECKOUT_SESSION_ID}&testId=${testId}`,
+        cancel_url: `https://47b86e58-c5cd-4e8c-a0bc-0b8ccaa1d94c-00-2ehx3agf7uozt.picard.replit.dev/cancel?testId=${testId}`,
         metadata: {
           testId: testId.toString(),
           paymentMethod: paymentMethod,
