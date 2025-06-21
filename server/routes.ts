@@ -381,7 +381,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create Stripe Checkout Session - working configuration  
+  // Create Payment Intent for embedded checkout
+  app.post("/api/create-payment-intent", [
+    sanitizeInput,
+    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    body('amount').isInt({ min: 1 }).withMessage('Valor inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const { testId, amount } = req.body;
+      
+      // Verify test exists
+      const testResult = await storage.getTestResult(testId);
+      if (!testResult) {
+        return res.status(404).json({ error: "Teste não encontrado" });
+      }
+      
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      
+      // Create payment intent for embedded checkout
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'brl',
+        metadata: {
+          testId: testId.toString(),
+        },
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      console.error('Create payment intent error:', error);
+      res.status(500).json({ error: "Erro ao criar intenção de pagamento" });
+    }
+  });
+
+  // Verify Payment Intent
+  app.post("/api/verify-payment-intent", [
+    sanitizeInput,
+    body('paymentIntentId').isString().withMessage('Payment Intent ID inválido'),
+    body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
+    validateRequest
+  ], async (req: any, res: any) => {
+    try {
+      const { paymentIntentId, testId } = req.body;
+      
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      
+      // Retrieve payment intent from Stripe
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === 'succeeded') {
+        // Update test to premium
+        const updatedTest = await storage.updateTestResultPremium(testId, paymentIntentId);
+        
+        // Send premium upgrade email
+        setImmediate(async () => {
+          try {
+            if (updatedTest.guestEmail) {
+              await emailService.sendPremiumUpgradeEmail(
+                updatedTest.guestEmail, 
+                updatedTest.guestName || updatedTest.guestEmail,
+                updatedTest.profileType,
+                updatedTest.id.toString()
+              );
+            }
+          } catch (emailError) {
+            console.error('Error sending premium upgrade email:', emailError);
+          }
+        });
+        
+        res.json({ 
+          success: true, 
+          message: "Pagamento verificado e teste atualizado para premium"
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          error: "Pagamento não foi confirmado"
+        });
+      }
+    } catch (error: any) {
+      console.error('Verify payment intent error:', error);
+      res.status(500).json({ error: "Erro ao verificar pagamento" });
+    }
+  });
+
+  // Legacy Stripe Checkout Session (for compatibility)
   app.post("/api/create-checkout-session", [
     sanitizeInput,
     body('testId').isInt({ min: 1 }).withMessage('Test ID inválido'),
