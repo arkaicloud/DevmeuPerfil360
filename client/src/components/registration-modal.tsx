@@ -36,6 +36,7 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
       confirmPassword: "",
       acceptTerms: false,
     },
+    mode: "onChange",
   });
 
   // Update form fields when guestData changes
@@ -74,6 +75,16 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
   });
 
   const onSubmit = (data: Registration) => {
+    // Validate terms acceptance first
+    if (!data.acceptTerms) {
+      toast({
+        title: "Termos de uso",
+        description: "Você deve aceitar os termos de uso para criar uma conta",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Security validation before submission
     if (!clientRateLimit.isAllowed('registration', 3, 300000)) { // 3 attempts per 5 minutes
       toast({
@@ -229,13 +240,19 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
                       <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                        checked={field.value || false}
+                        onCheckedChange={(checked) => {
+                          field.onChange(!!checked);
+                        }}
                         className="mt-1"
+                        id="acceptTerms"
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                      <FormLabel 
+                        htmlFor="acceptTerms"
+                        className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
+                      >
                         Ao criar a conta, você concorda com nossos{" "}
                         <span className="text-primary underline">Termos de Uso</span> e{" "}
                         <span className="text-primary underline">Política de Privacidade</span>
