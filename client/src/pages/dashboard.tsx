@@ -375,7 +375,14 @@ export default function Dashboard() {
               ) : (
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
-                    onClick={() => navigate("/")} 
+                    onClick={() => {
+                      const latestTest = dashboardData?.testResults?.[0];
+                      if (latestTest) {
+                        navigate(`/checkout/${latestTest.id}`);
+                      } else {
+                        navigate("/");
+                      }
+                    }} 
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                   >
                     <Crown className="w-4 h-4 mr-2" />
@@ -612,7 +619,12 @@ export default function Dashboard() {
                   sessionStorage.setItem("guestTestData", JSON.stringify(mockGuestData));
                   navigate("/test");
                 } else {
-                  navigate("/");
+                  const latestTest = dashboardData?.testResults?.[0];
+                  if (latestTest) {
+                    navigate(`/checkout/${latestTest.id}`);
+                  } else {
+                    navigate("/");
+                  }
                 }
               }}
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
