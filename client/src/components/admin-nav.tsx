@@ -148,9 +148,9 @@ export default function AdminNav({ onLogout }: AdminNavProps) {
                 
                 return (
                   <Link key={item.href} href={item.href}>
-                    <a
+                    <div
                       className={cn(
-                        "group flex items-center px-2 py-2 text-base font-medium rounded-md",
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
                         isActive
                           ? "bg-blue-50 text-blue-700"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -164,7 +164,7 @@ export default function AdminNav({ onLogout }: AdminNavProps) {
                         )}
                       />
                       {item.title}
-                    </a>
+                    </div>
                   </Link>
                 );
               })}
