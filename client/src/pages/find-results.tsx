@@ -11,6 +11,7 @@ import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyError } from "@/lib/error-handler";
 import { Brain, Search, Key } from "lucide-react";
 import { sanitizeInput, validateEmail, clientRateLimit } from "@/lib/security";
 
@@ -108,9 +109,10 @@ export default function FindResults() {
           variant: "destructive",
         });
       } else {
+        const friendlyMessage = getFriendlyError(error);
         toast({
           title: "Erro ao buscar resultados",
-          description: error.message || "Ocorreu um erro. Tente novamente.",
+          description: friendlyMessage,
           variant: "destructive",
         });
       }

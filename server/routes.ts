@@ -31,6 +31,7 @@ import {
   threatDetector,
   DataEncryption
 } from "./security-middleware";
+import { ErrorMessages, getFriendlyErrorMessage, sendErrorResponse } from "./error-messages";
 import { requireAuth, optionalAuth, type AuthenticatedRequest } from "./clerk-middleware";
 import { config } from "./config";
 import { cache } from "./cache";
@@ -123,10 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('Check email error:', error);
-      res.status(500).json({ 
-        error: "Erro ao verificar email",
-        exists: false
-      });
+      sendErrorResponse(res, 500, ErrorMessages.SYSTEM.DATABASE_ERROR);
     }
   });
 
@@ -220,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verify user exists
       const user = await storage.getUser(parseInt(userId));
       if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado" });
+        return sendErrorResponse(res, 404, ErrorMessages.AUTH.USER_NOT_FOUND);
       }
 
       // Check test limits before proceeding
@@ -1079,7 +1077,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get user data
       const user = await storage.getUser(userId);
       if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado" });
+        return sendErrorResponse(res, 404, ErrorMessages.AUTH.USER_NOT_FOUND);
       }
 
       // Associate any guest tests with this user's email to their account
@@ -2111,7 +2109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUserByEmail(username);
       
       if (!user) {
-        return res.status(401).json({ message: "Usuário não encontrado" });
+        return sendErrorResponse(res, 401, ErrorMessages.AUTH.INVALID_CREDENTIALS);
       }
 
       // Authentication is handled by Clerk, this endpoint is deprecated
@@ -2144,7 +2142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado" });
+        return sendErrorResponse(res, 404, ErrorMessages.AUTH.USER_NOT_FOUND);
       }
 
       // Password updates are handled by Clerk, not by our system

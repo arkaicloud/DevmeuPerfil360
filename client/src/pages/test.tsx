@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Brain, ArrowRight, ArrowLeft, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyError } from "@/lib/error-handler";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { discQuestions } from "@/lib/disc-questions";

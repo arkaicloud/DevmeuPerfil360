@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Brain, LogIn, Eye, EyeOff } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyError } from "@/lib/error-handler";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username deve ter pelo menos 3 caracteres"),
@@ -52,9 +53,10 @@ export default function Login() {
       navigate(`/dashboard/${data.id}`);
     },
     onError: (error: Error) => {
+      const friendlyMessage = getFriendlyError(error);
       toast({
         title: "Erro no Login",
-        description: error.message,
+        description: friendlyMessage,
         variant: "destructive",
       });
     },
