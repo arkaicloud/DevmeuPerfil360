@@ -10,13 +10,10 @@ export default function PaymentSuccessHandler() {
   const [processing, setProcessing] = useState(true);
   
   useEffect(() => {
-    // Parse URL to get testId and sessionId
-    const url = window.location.href;
-    const testIdMatch = url.match(/testId=(\d+)/);
-    const sessionIdMatch = url.match(/session_id=([^&]+)/);
-    
-    const testId = testIdMatch ? testIdMatch[1] : null;
-    const sessionId = sessionIdMatch ? sessionIdMatch[1] : null;
+    // Get data from server-injected variables
+    const stripeData = (window as any).__STRIPE_SUCCESS__;
+    const testId = stripeData?.testId;
+    const sessionId = stripeData?.sessionId;
     
     if (!testId) {
       navigate('/');
