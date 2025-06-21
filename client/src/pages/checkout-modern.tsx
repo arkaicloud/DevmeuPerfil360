@@ -285,7 +285,7 @@ export default function CheckoutModern() {
                   </Button>
 
                   <div className="text-xs text-gray-500 mt-2 px-1">
-                    * Se PIX não estiver disponível, você será direcionado para pagamento com cartão
+                    * PIX requer habilitação específica na conta Stripe. Se não disponível, será usado cartão automaticamente
                   </div>
                 </div>
 

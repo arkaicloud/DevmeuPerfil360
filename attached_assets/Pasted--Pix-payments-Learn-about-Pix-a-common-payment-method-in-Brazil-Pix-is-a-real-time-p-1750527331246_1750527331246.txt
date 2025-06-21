@@ -1,0 +1,111 @@
+# Pix payments
+
+Learn about Pix, a common payment method in Brazil.
+
+---
+
+Pix is a real-time payment system developed by the Central Bank of Brazil. The service works by transferring funds between two bank accounts. To pay with Pix, customers authenticate and approve by scanning a QR code or copying a Pix string in their preferred banking apps.
+
+* **Customer locations**
+
+  Brazil
+
+* **Presentment currency**
+
+  BRL
+
+* **Payment confirmation**
+
+  Customer-initiated
+
+* **Payment method family**
+
+  Real-time payment
+
+* **Payout timing**
+
+  Standard payout timing applies
+
+* **Recurring Payments**
+
+  No
+
+* **Connect support**
+
+  [Yes](https://docs.stripe.com/payments/pix.md#connect)
+
+* **Dispute support**
+
+  No
+
+* **Manual capture support**
+
+  No
+
+* **Refunds / Partial refunds**
+
+  [Yes / yes](https://docs.stripe.com/payments/pix.md#refunds)
+
+Stripe accounts in the US can accept Pix payments with USD settlement 
+
+Stripe accounts in Brazil can accept Pix payments with BRL settlement 
+
+- 
+- 
+- 1
+- 
+
+1 Not supported when using Checkout in subscription mode or setup mode.
+
+## Payment flow 
+
+![](images/payments/pix/checkout.svg)
+Selects Pix at checkout
+
+
+![](images/payments/pix/qr_code.svg)
+Receives Pix string and/or QR code
+
+
+![](images/payments/pix/bank_portal.svg)
+Makes a payment through bank apps or internet banking
+
+
+![](images/payments/pix/success.svg)
+Receives notification that payment is complete
+
+
+## Getting started 
+
+You don’t have to integrate {{lpm_name}} and other payment methods individually. If you use our front-end products, Stripe automatically determines the most relevant payment methods to display. Go to the [Stripe Dashboard](https://dashboard.stripe.com/settings/payment_methods) and enable {{lpm_name}}. To get started with one of our hosted UIs, follow a quickstart:
+
+- [Checkout](https://docs.stripe.com/checkout/quickstart.md): Our prebuilt, hosted checkout page.
+- [Elements](https://docs.stripe.com/payments/quickstart.md): Our drop-in UI components.
+
+To manually list payment methods, learn how to [manually integrate payment method](https://docs.stripe.com/payments/pix/accept-a-payment.md).
+
+## Disputes 
+
+Disputes are permitted in a limited set of circumstances. Buyers can raise disputes with their banks and must provide evidence of their issue, for example, fraud or account takeover. You can’t challenge such disputes. If Stripe is notified that our partner has accepted a request to return customer funds, Stripe removes the funds from your account.
+
+## Refunds 
+
+You can refund Pix payments up to 90 days after the original payment date and view the refund reflected in your account within a few minutes.
+
+## Connect 
+
+Use [Stripe Connect](https://docs.stripe.com/connect/how-connect-works.md) with Pix to process payments on behalf of connected accounts.
+*Connect* users use Pix with the following charge types:
+
+- [Direct](https://docs.stripe.com/connect/direct-charges.md)
+- [Destination](https://docs.stripe.com/connect/destination-charges.md)
+- [Separate charges and transfers](https://docs.stripe.com/connect/separate-charges-and-transfers.md)
+
+Pix is only supported on Connect where connected accounts are in the same country as the platform.
+
+### Accept Pix payments as the connected account
+
+[Direct charges](https://docs.stripe.com/connect/direct-charges.md) and charge types using the [on_behalf_of](https://docs.stripe.com/connect/separate-charges-and-transfers.md#settlement-merchant) parameter require the connected account itself (not the platform) to have activated the Pix payment method. Connect platforms can use the [`pix_payments` capability](https://docs.stripe.com/connect/account-capabilities.md#payment-methods) to determine whether that’s the case for a connected account:
+
+- In the case of connected accounts that use the Stripe Dashboard, the owner of the account needs to activate the payment method in their [Payment methods settings](https://dashboard.stripe.com/settings/payment_methods) in the Dashboard.
+- In the case of connected accounts that use the Express Dashboard or a dashboard that isn’t hosted by Stripe, the platform needs to request the `pix_payments` capability.

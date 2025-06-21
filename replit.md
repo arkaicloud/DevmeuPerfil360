@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 21, 2025: **PIX PAYMENT SYSTEM ENHANCED** - Implemented robust PIX payment flow with intelligent fallback
+  - **Stripe PIX Integration**: Added proper PIX payment method configuration following Stripe documentation
+  - **Intelligent Fallback**: PIX attempts first, automatically falls back to card if PIX not enabled in Stripe account
+  - **BRL Currency Enforcement**: Ensures all payments use Brazilian Real as required for PIX
+  - **User Communication**: Clear messaging about PIX availability and automatic fallback behavior
+  - **Error Handling**: Detailed logging for PIX availability debugging and troubleshooting
 - June 20, 2025: **ADMIN PRICING SYSTEM FIXED** - Homepage now reflects pricing changes made in admin panel
   - **Dynamic Pricing**: `/api/pricing` endpoint now reads from admin configurations instead of hardcoded values
   - **Real-time Updates**: Price changes in admin panel immediately reflect on homepage and checkout
