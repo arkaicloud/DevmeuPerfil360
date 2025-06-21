@@ -4297,6 +4297,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stripe redirect routes - Add before createServer
+  app.get('/success', async (req: Request, res: Response) => {
+    const sessionId = req.query.session_id as string;
+    const testId = req.query.testId as string;
+    
+    console.log(`Processing Stripe success: sessionId=${sessionId}, testId=${testId}`);
+    
+    if (!sessionId || !testId) {
+      return res.redirect('/');
+    }
+
+    try {
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      
+      console.log(`Stripe session status: ${session.payment_status}`);
+      
+      if (session.payment_status === 'paid') {
+        // Update test to premium
+        const updatedTest = await storage.updateTestResultPremium(parseInt(testId), sessionId);
+        console.log(`Test ${testId} upgraded to premium`);
+        
+        // Send premium upgrade email in background
+        setImmediate(async () => {
+          try {
+            if (updatedTest.guestEmail) {
+              await emailService.sendPremiumUpgradeEmail(
+                updatedTest.guestEmail,
+                updatedTest.guestName || updatedTest.guestEmail,
+                updatedTest.profileType,
+                updatedTest.id.toString()
+              );
+              console.log(`Premium upgrade email sent to ${updatedTest.guestEmail}`);
+            }
+          } catch (emailError) {
+            console.error('Error sending premium upgrade email:', emailError);
+          }
+        });
+        
+        // Redirect to results page with success parameter
+        return res.redirect(`/results/${testId}?payment=success`);
+      } else {
+        return res.redirect(`/results/${testId}?payment=pending`);
+      }
+    } catch (error) {
+      console.error('Error verifying Stripe payment:', error);
+      return res.redirect(`/results/${testId}?payment=error`);
+    }
+  });
+
+  app.get('/cancel', (req: Request, res: Response) => {
+    const testId = req.query.testId as string;
+    console.log(`Processing Stripe cancel for test: ${testId}`);
+    
+    if (testId) {
+      res.redirect(`/checkout/${testId}?payment=cancelled`);
+    } else {
+      res.redirect('/');
+    }
+  });
+
   const server = createServer(app);
   return server;
 }
