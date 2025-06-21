@@ -490,9 +490,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       
-      // Create optimized checkout session
+      // Create optimized checkout session with correct payment methods
+      const paymentMethodTypes = paymentMethod === 'pix' ? ['pix'] : ['card'];
+      
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
+        payment_method_types: paymentMethodTypes,
         mode: 'payment',
         line_items: [{
           price_data: {
