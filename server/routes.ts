@@ -3297,7 +3297,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     <tr>
                       <td class="disc-${type.toLowerCase()}">${type}</td>
                       <td><strong>${names[type as keyof typeof names]}</strong></td>
-                      <td><strong style="font-size: 18px;">${score}%</strong></td>
+                      <td style="position: relative; padding: 8px; min-width: 120px;">
+                        <div style="background: #f0f0f0; height: 24px; border-radius: 4px; position: relative; overflow: visible;">
+                          <div style="background: ${type === 'D' ? '#e53e3e' : type === 'I' ? '#dd6b20' : type === 'S' ? '#38a169' : '#3b82f6'}; height: 100%; width: ${score}%; border-radius: 4px; position: relative;"></div>
+                          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: #333; font-size: 13px; z-index: 10; text-shadow: 1px 1px 1px rgba(255,255,255,0.8);">${score}%</span>
+                        </div>
+                      </td>
                       <td><strong>${nivel}</strong></td>
                     </tr>
                   `;
@@ -4188,7 +4193,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     <tr>
                       <td class="disc-${type.toLowerCase()}">${type}</td>
                       <td><strong>${type} = ${names[type as keyof typeof names]}</strong></td>
-                      <td><strong style="font-size: 16px;">${score}%</strong></td>
+                      <td style="position: relative; padding: 8px; min-width: 120px;">
+                        <div style="background: #f0f0f0; height: 24px; border-radius: 4px; position: relative; overflow: visible;">
+                          <div style="background: ${type === 'D' ? '#e53e3e' : type === 'I' ? '#dd6b20' : type === 'S' ? '#38a169' : '#3b82f6'}; height: 100%; width: ${score}%; border-radius: 4px; position: relative;"></div>
+                          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: #333; font-size: 13px; z-index: 10; text-shadow: 1px 1px 1px rgba(255,255,255,0.8);">${score}%</span>
+                        </div>
+                      </td>
                       <td><strong>${nivel}</strong></td>
                     </tr>
                   `;

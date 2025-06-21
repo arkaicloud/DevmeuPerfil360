@@ -145,6 +145,8 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
   - **No Forced Total**: Removed constraint requiring percentages to sum to 100%
   - **Authentic DISC**: Restored proper DISC assessment methodology where factors represent intensity levels
   - **Better Analysis**: Each factor shows individual strength without artificial balancing
+  - **Database Updated**: Corrected all existing test scores to use new methodology
+  - **PDF Fixed**: Progress bars now display percentages correctly without text cutoff
 - June 21, 2025: **ADMIN PAYMENT CONTROL HIDDEN** - Payment methods admin page removed from navigation menu
   - **Menu Simplified**: Removed "Métodos de Pagamento" option from admin navigation
   - **Direct Access Only**: Page still exists at /admin/payment-methods but not visible in menu
