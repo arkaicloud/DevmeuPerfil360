@@ -78,13 +78,30 @@ export default function Results() {
         console.error("Erro ao recuperar dados do convidado:", error);
       }
     }
+
+    // Check for payment success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    
+    if (paymentStatus === 'success') {
+      toast({
+        title: "Pagamento Confirmado!",
+        description: "Seu acesso premium foi liberado com sucesso. Aproveite seu relatório completo!",
+        duration: 5000,
+      });
+      
+      // Clean URL after showing toast
+      setTimeout(() => {
+        window.history.replaceState({}, '', `/results/${id}`);
+      }, 1000);
+    }
     
     // Check if this is a suspended payment redirect
     const params = new URLSearchParams(window.location.search);
-    const paymentStatus = params.get('payment');
+    const suspendedPaymentStatus = params.get('payment');
     const isSuspended = params.get('suspended');
     
-    if (paymentStatus === 'success' && isSuspended === 'true') {
+    if (suspendedPaymentStatus === 'success' && isSuspended === 'true') {
       // Remove URL parameters for cleaner display
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
