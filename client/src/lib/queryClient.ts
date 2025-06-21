@@ -5,8 +5,15 @@ async function throwIfResNotOk(res: Response) {
     const text = await res.text();
     try {
       const errorData = JSON.parse(text);
-      throw new Error(errorData.message || text || res.statusText);
+      // Extract just the message, not the whole JSON structure
+      const message = errorData.message || errorData.error || text || res.statusText;
+      throw new Error(message);
     } catch {
+      // If JSON parsing fails, check if text contains JSON-like structure
+      const messageMatch = text.match(/"message":"([^"]+)"/);
+      if (messageMatch) {
+        throw new Error(messageMatch[1]);
+      }
       throw new Error(text || res.statusText);
     }
   }

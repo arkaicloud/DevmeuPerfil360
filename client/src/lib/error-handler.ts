@@ -124,6 +124,14 @@ export function getFriendlyError(error: any): string {
 function getFriendlyErrorFromString(errorString: string): string {
   const lowerError = errorString.toLowerCase();
 
+  // Clean up JSON structures that might be showing
+  if (errorString.includes('{"success":false,"message":"')) {
+    const messageMatch = errorString.match(/"message":"([^"]+)"/);
+    if (messageMatch) {
+      return messageMatch[1];
+    }
+  }
+
   // Mapeamento de erros comuns
   if (lowerError.includes('user not found') || lowerError.includes('usuário não encontrado') || 
       lowerError.includes('não foi possível enviar o email') || lowerError.includes('invalid credentials')) {
