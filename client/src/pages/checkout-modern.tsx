@@ -314,14 +314,15 @@ export default function CheckoutModern() {
         {step === 'processing' && (
           <Card className="text-center">
             <CardContent className="p-8">
-              <div className="animate-spin w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full mx-auto mb-4"></div>
-              <h2 className="text-xl font-bold mb-2">Processando Pagamento</h2>
+              <div className="animate-spin w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full mx-auto mb-4"></div>
+              <h2 className="text-xl font-bold mb-2 text-green-600">Pagamento Aprovado!</h2>
               <p className="text-gray-600 mb-4">
-                Redirecionando para {selectedMethod === 'card' ? 'cartão' : 'PIX'}...
+                Processando seu acesso premium via {selectedMethod === 'card' ? 'cartão' : 'PIX'}...
               </p>
               <p className="text-sm text-gray-500">
-                Você será redirecionado para o Stripe em alguns segundos
+                Redirecionando para seus resultados premium em instantes
               </p>
+              <CheckCircle className="w-8 h-8 text-green-500 mx-auto mt-4" />
             </CardContent>
           </Card>
         )}
