@@ -145,6 +145,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
   - **Real-time Updates**: Price changes in admin panel immediately reflect on homepage and checkout
   - **Cache Management**: Added cache clearing when pricing is updated to ensure instant updates
   - **Fallback Support**: Maintains system stability with fallback values if database fails
+- June 21, 2025: **MOBILE TERMS CHECKBOX FIXED** - Resolved registration modal checkbox error on mobile devices
+  - **Form Integration**: Connected terms checkbox to react-hook-form with proper validation
+  - **Schema Validation**: Added acceptTerms field to registration schema with required validation
+  - **Error Handling**: Improved error messages and form validation feedback
+  - **Mobile UX**: Fixed checkbox interaction issues on mobile interface
 - June 21, 2025: **DATABASE SCHEMA ERROR FIXED** - Resolved "updated_at column does not exist" error causing database failures
   - **Schema Consistency**: Removed updated_at column references from all database operations
   - **Memory Storage**: Updated memory storage to match simplified schema without updatedAt field

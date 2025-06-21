@@ -34,6 +34,7 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
       whatsapp: guestData.whatsapp || "",
       password: "",
       confirmPassword: "",
+      acceptTerms: false,
     },
   });
 
@@ -221,19 +222,29 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
               />
 
               {/* Terms Checkbox */}
-              <div className="flex items-start space-x-3">
-                <Checkbox 
-                  id="terms"
-                  className="mt-1"
-                />
-                <div className="text-xs text-muted-foreground leading-relaxed">
-                  <Label htmlFor="terms" className="cursor-pointer">
-                    Ao criar a conta, você concorda com nossos{" "}
-                    <span className="text-primary underline">Termos de Uso</span> e{" "}
-                    <span className="text-primary underline">Política de Privacidade</span>
-                  </Label>
-                </div>
-              </div>
+              <FormField
+                control={form.control}
+                name="acceptTerms"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                        Ao criar a conta, você concorda com nossos{" "}
+                        <span className="text-primary underline">Termos de Uso</span> e{" "}
+                        <span className="text-primary underline">Política de Privacidade</span>
+                      </FormLabel>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
 
               <Button 
                 type="submit" 
