@@ -19,6 +19,7 @@ import AdminDashboard from "@/pages/admin-dashboard-new";
 import AdminEmailConfig from "@/pages/admin-email-config";
 import AdminEmailTemplates from "@/pages/admin-email-templates";
 import AdminPricing from "@/pages/admin-pricing";
+import AdminPaymentMethods from "@/pages/admin/payment-methods";
 import NotFound from "@/pages/not-found";
 import Success from "@/pages/success";
 import Cancel from "@/pages/cancel";
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
       <Route path="/admin/pricing" component={AdminPricing} />
+      <Route path="/admin/payment-methods" component={AdminPaymentMethods} />
       <Route path="/success" component={PaymentSuccessRedirect} />
       <Route path="/payment-success" component={Success} />
       <Route path="/cancel" component={Cancel} />

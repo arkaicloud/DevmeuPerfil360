@@ -512,20 +512,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       };
 
+      // Check if payment method is enabled in admin settings
+      const enabledMethods = await storage.getAdminConfig('payment_methods');
+      const methodsConfig = enabledMethods ? JSON.parse(enabledMethods) : { card: true, pix: false };
+      
+      // Force card if requested method is not enabled
+      if (paymentMethod === 'pix' && !methodsConfig.pix) {
+        console.log('PIX não habilitado no admin, usando cartão');
+        paymentMethod = 'card';
+      }
+
       let session;
-      if (paymentMethod === 'pix') {
-        // Try PIX first, fallback to card if not available
+      if (paymentMethod === 'pix' && methodsConfig.pix) {
+        // Try PIX first, fallback to card if not available in Stripe
         try {
-          // PIX requires BRL currency and specific configuration
           sessionConfig.payment_method_types = ['pix'];
-          // Ensure currency is BRL for PIX
           sessionConfig.line_items[0].price_data.currency = 'brl';
           session = await stripe.checkout.sessions.create(sessionConfig);
           console.log(`Sessão Stripe PIX criada: ${session.id}`);
         } catch (pixError: any) {
-          console.log('PIX não disponível:', pixError.message);
+          console.log('PIX não disponível no Stripe:', pixError.message);
           console.log('Usando cartão como fallback para PIX');
-          // Fallback to card with BRL currency maintained
           sessionConfig.payment_method_types = ['card'];
           sessionConfig.line_items[0].price_data.currency = 'brl';
           session = await stripe.checkout.sessions.create(sessionConfig);
@@ -533,7 +540,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else {
         sessionConfig.payment_method_types = ['card'];
-        // Ensure BRL currency for Brazilian market
         sessionConfig.line_items[0].price_data.currency = 'brl';
         session = await stripe.checkout.sessions.create(sessionConfig);
         console.log(`Sessão Stripe cartão criada: ${session.id}`);

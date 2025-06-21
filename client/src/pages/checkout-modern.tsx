@@ -30,6 +30,12 @@ export default function CheckoutModern() {
   
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'pix' | null>(null);
   const [loading, setLoading] = useState(false);
+  const [availableMethods, setAvailableMethods] = useState({
+    card: true,
+    pix: false,
+    apple_pay: false,
+    google_pay: false
+  });
   const [step, setStep] = useState<'method' | 'processing'>('method');
 
   useEffect(() => {
@@ -41,7 +47,20 @@ export default function CheckoutModern() {
       });
       navigate('/');
     }
+    loadPaymentMethods();
   }, [testId, navigate, toast]);
+
+  const loadPaymentMethods = async () => {
+    try {
+      const response = await fetch('/api/admin/payment-methods');
+      const data = await response.json();
+      if (data.methods) {
+        setAvailableMethods(data.methods);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar métodos de pagamento:', error);
+    }
+  };
 
   const { data: testResult, isLoading: testLoading } = useQuery<TestResult>({
     queryKey: [`/api/test/result/${testId}`],
@@ -259,34 +278,47 @@ export default function CheckoutModern() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
-                  <Button
-                    onClick={() => handlePaymentMethod('card')}
-                    disabled={loading}
-                    className="h-16 text-left justify-start bg-blue-600 hover:bg-blue-700"
-                  >
-                    <CreditCard className="w-6 h-6 mr-4" />
-                    <div>
-                      <div className="font-medium">Cartão de Crédito</div>
-                      <div className="text-sm opacity-90">Aprovação instantânea</div>
-                    </div>
-                  </Button>
+                  {availableMethods.card && (
+                    <Button
+                      onClick={() => handlePaymentMethod('card')}
+                      disabled={loading}
+                      className="h-16 text-left justify-start bg-blue-600 hover:bg-blue-700"
+                    >
+                      <CreditCard className="w-6 h-6 mr-4" />
+                      <div>
+                        <div className="font-medium">Cartão de Crédito</div>
+                        <div className="text-sm opacity-90">Aprovação instantânea</div>
+                      </div>
+                    </Button>
+                  )}
 
-                  <Button
-                    onClick={() => handlePaymentMethod('pix')}
-                    disabled={loading}
-                    variant="outline"
-                    className="h-16 text-left justify-start border-2 hover:bg-green-50"
-                  >
-                    <QrCode className="w-6 h-6 mr-4 text-green-600" />
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">PIX</div>
-                      <div className="text-sm text-gray-600">Processamento imediato *</div>
-                    </div>
-                  </Button>
+                  {availableMethods.pix && (
+                    <>
+                      <Button
+                        onClick={() => handlePaymentMethod('pix')}
+                        disabled={loading}
+                        variant="outline"
+                        className="h-16 text-left justify-start border-2 hover:bg-green-50"
+                      >
+                        <QrCode className="w-6 h-6 mr-4 text-green-600" />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900">PIX</div>
+                          <div className="text-sm text-gray-600">Processamento imediato *</div>
+                        </div>
+                      </Button>
 
-                  <div className="text-xs text-gray-500 mt-2 px-1">
-                    * PIX requer habilitação específica na conta Stripe. Se não disponível, será usado cartão automaticamente
-                  </div>
+                      <div className="text-xs text-gray-500 mt-2 px-1">
+                        * PIX requer habilitação específica na conta Stripe. Se não disponível, será usado cartão automaticamente
+                      </div>
+                    </>
+                  )}
+
+                  {!availableMethods.card && !availableMethods.pix && (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>Nenhum método de pagamento disponível</p>
+                      <p className="text-sm">Entre em contato com o suporte</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Development Test Button - Only for internal testing */}

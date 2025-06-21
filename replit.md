@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 21, 2025: **ADMIN PAYMENT CONTROL SYSTEM** - Complete admin panel for payment method management
+  - **Payment Methods Admin Page**: New interface to toggle PIX, Card, and Digital Wallets
+  - **Real-time Checkout Control**: Checkout page respects admin payment method configurations
+  - **Database Storage**: Payment settings saved in admin_config table with JSON format
+  - **Smart Fallbacks**: System ensures at least one payment method is always available
+  - **User Experience**: Clear messaging when payment methods are disabled
 - June 21, 2025: **PIX PAYMENT SYSTEM ENHANCED** - Implemented robust PIX payment flow with intelligent fallback
   - **Stripe PIX Integration**: Added proper PIX payment method configuration following Stripe documentation
   - **Intelligent Fallback**: PIX attempts first, automatically falls back to card if PIX not enabled in Stripe account
