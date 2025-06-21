@@ -145,6 +145,10 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
   - **Real-time Updates**: Price changes in admin panel immediately reflect on homepage and checkout
   - **Cache Management**: Added cache clearing when pricing is updated to ensure instant updates
   - **Fallback Support**: Maintains system stability with fallback values if database fails
+- June 21, 2025: **PDF PREMIUM PODCASTS REMOVED** - Completely removed "🎧 Podcasts Brasileiros" section from all premium PDF reports
+  - **Content Optimization**: Simplified premium PDF by removing podcasts section as requested by user
+  - **Cleaner Layout**: More focused premium content with books and courses only
+  - **All Profiles Updated**: Change applied to D, I, S, and C profile PDFs in server/routes.ts
 - June 20, 2025: **PDF PREMIUM CONTENT UPDATED** - Removed "🎧 Podcasts Brasileiros" section from all premium PDF reports
   - **Content Optimization**: Simplified premium PDF by removing podcasts section as requested
   - **Cleaner Layout**: More focused premium content with books and courses only

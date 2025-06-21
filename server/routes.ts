@@ -3619,16 +3619,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
               </ul>
             </div>
 
-            <div class="resource-card podcasts">
-              <h4>🎧 Podcasts Brasileiros</h4>
-              <ul>
-                <li>"Mundo DISC" - Episódios sobre perfil ${testResult.profileType}</li>
-                <li>"PodPeople" - Desenvolvimento comportamental</li>
-                <li>"Café Brasil" - Carreira e liderança</li>
-                <li>"Flow Podcast" - Entrevistas inspiradoras</li>
-              </ul>
-            </div>
-
           </div>
 
           <!-- SABOTADORES -->
@@ -4192,17 +4182,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               </ul>
             </div>
-
-            <div class="resource-card podcasts">
-              <h4>🎧 Podcasts Brasileiros</h4>
-              <ul>
-                <li>"Mundo DISC" - Episódios sobre perfil ${testResult.profileType}</li>
-                <li>"PodPeople" - Desenvolvimento comportamental</li>
-                <li>"Café Brasil" - Carreira e liderança</li>
-                <li>"Flow Podcast" - Entrevistas inspiradoras</li>
-              </ul>
-            </div>
-
 
           </div>
 
