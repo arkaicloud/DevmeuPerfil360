@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home-responsive";
 import Test from "@/pages/test";
 import Results from "@/pages/results";
-import CheckoutEmbedded from "@/pages/checkout-embedded";
+import CheckoutModern from "@/pages/checkout-modern";
 import Dashboard from "@/pages/dashboard";
 import FindResults from "@/pages/find-results";
 import PaymentSuccess from "@/pages/payment-success";
@@ -31,7 +31,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/test" component={Test} />
       <Route path="/results/:id" component={Results} />
-      <Route path="/checkout/:testId?" component={CheckoutEmbedded} />
+      <Route path="/checkout/:testId?" component={CheckoutModern} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/payment-test" component={PaymentTest} />
       <Route path="/stripe-direct" component={StripeDirect} />
