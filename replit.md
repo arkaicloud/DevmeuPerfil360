@@ -140,6 +140,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 21, 2025: **FOOTER ADDED** - Added professional footer with copyright and developer attribution
+  - **Copyright Notice**: "© 2025 MeuPerfil360. Todos os direitos reservados."
+  - **Developer Credit**: "Desenvolvido por Arkai (www.arkaicloud.com.br)" with clickable link
+  - **Professional Design**: Clean footer with proper spacing and hover effects
+  - **Responsive Layout**: Optimized for all device sizes
 - June 21, 2025: **DISC CALCULATION REVERTED** - Restored original DISC methodology with individual factor scoring
   - **Independent Scoring**: Each DISC factor (D, I, S, C) now scores 0-100 independently
   - **No Forced Total**: Removed constraint requiring percentages to sum to 100%

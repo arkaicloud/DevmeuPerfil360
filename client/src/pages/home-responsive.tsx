@@ -657,6 +657,28 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t border-gray-200 py-8 mt-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              © {new Date().getFullYear()} MeuPerfil360. Todos os direitos reservados.
+            </p>
+            <p className="text-xs text-gray-500">
+              Desenvolvido por{' '}
+              <a 
+                href="https://www.arkaicloud.com.br" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                Arkai
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
