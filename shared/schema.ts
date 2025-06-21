@@ -131,6 +131,9 @@ export const registrationSchema = z.object({
   whatsapp: z.string().min(10, "WhatsApp deve ter pelo menos 10 dígitos").optional(),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
   confirmPassword: z.string(),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: "Você deve aceitar os termos de uso",
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Senhas não coincidem",
   path: ["confirmPassword"],

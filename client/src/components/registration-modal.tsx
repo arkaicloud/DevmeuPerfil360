@@ -237,27 +237,29 @@ export default function RegistrationModal({ isOpen, onClose, guestData }: Regist
                 control={form.control}
                 name="acceptTerms"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value || false}
-                        onCheckedChange={(checked) => {
-                          field.onChange(!!checked);
-                        }}
-                        className="mt-1"
-                        id="acceptTerms"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel 
-                        htmlFor="acceptTerms"
-                        className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
-                      >
-                        Ao criar a conta, você concorda com nossos{" "}
-                        <span className="text-primary underline">Termos de Uso</span> e{" "}
-                        <span className="text-primary underline">Política de Privacidade</span>
-                      </FormLabel>
-                      <FormMessage />
+                  <FormItem>
+                    <div className="flex items-start space-x-3">
+                      <FormControl>
+                        <Checkbox
+                          checked={!!field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked === true);
+                          }}
+                          className="mt-1"
+                          id="acceptTerms"
+                        />
+                      </FormControl>
+                      <div className="flex-1">
+                        <FormLabel 
+                          htmlFor="acceptTerms"
+                          className="text-xs text-muted-foreground leading-relaxed cursor-pointer block"
+                        >
+                          Ao criar a conta, você concorda com nossos{" "}
+                          <span className="text-primary underline">Termos de Uso</span> e{" "}
+                          <span className="text-primary underline">Política de Privacidade</span>
+                        </FormLabel>
+                        <FormMessage className="text-xs mt-1" />
+                      </div>
                     </div>
                   </FormItem>
                 )}
