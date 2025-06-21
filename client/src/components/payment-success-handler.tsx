@@ -1,46 +1,32 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Download, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-export default function PaymentSuccessRedirect() {
+export default function PaymentSuccessHandler() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [processing, setProcessing] = useState(true);
   
-  // Get URL parameters from search or route parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const testId = urlParams.get('testId') || urlParams.get('testId');
-  const sessionId = urlParams.get('session_id') || urlParams.get('session_id');
-  
-  // Also check if parameters come from redirect query
-  const route = urlParams.get('route');
-  if (route === '/success') {
-    const params = window.location.search.split('&');
-    params.forEach(param => {
-      if (param.includes('testId=')) {
-        const testIdFromParam = param.split('testId=')[1];
-        if (testIdFromParam && !testId) {
-          // Re-parse parameters properly
-          window.location.search = window.location.search.replace('route=/success&', '');
-        }
-      }
-    });
-  }
-
   useEffect(() => {
+    // Parse URL to get testId and sessionId
+    const url = window.location.href;
+    const testIdMatch = url.match(/testId=(\d+)/);
+    const sessionIdMatch = url.match(/session_id=([^&]+)/);
+    
+    const testId = testIdMatch ? testIdMatch[1] : null;
+    const sessionId = sessionIdMatch ? sessionIdMatch[1] : null;
+    
     if (!testId) {
       navigate('/');
       return;
     }
 
-    // Verify payment and redirect
-    const verifyAndRedirect = async () => {
+    const processPayment = async () => {
       try {
         if (sessionId) {
-          // Verify payment with Stripe
+          // Verify payment
           const response = await fetch('/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -55,29 +41,30 @@ export default function PaymentSuccessRedirect() {
           if (result.success) {
             toast({
               title: "Pagamento Confirmado!",
-              description: "Acesso premium liberado com sucesso",
+              description: "Acesso premium liberado",
             });
           }
         }
 
-        // Always redirect to results page with payment success parameter
+        // Show success message briefly then redirect
         setTimeout(() => {
-          navigate(`/results/${testId}?payment=success`);
-        }, 1500);
+          setProcessing(false);
+          setTimeout(() => {
+            navigate(`/results/${testId}?payment=success`);
+          }, 1500);
+        }, 1000);
 
       } catch (error) {
         console.error('Payment verification error:', error);
         // Even on error, redirect to results
         setTimeout(() => {
           navigate(`/results/${testId}?payment=success`);
-        }, 1500);
-      } finally {
-        setProcessing(false);
+        }, 2000);
       }
     };
 
-    verifyAndRedirect();
-  }, [testId, sessionId, navigate, toast]);
+    processPayment();
+  }, [navigate, toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
@@ -89,7 +76,7 @@ export default function PaymentSuccessRedirect() {
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 Processando Pagamento
               </h1>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600">
                 Verificando pagamento e liberando acesso premium...
               </p>
             </>
@@ -99,17 +86,9 @@ export default function PaymentSuccessRedirect() {
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 Pagamento Confirmado!
               </h1>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600">
                 Redirecionando para seu relatório premium...
               </p>
-              
-              <Button 
-                onClick={() => navigate(`/results/${testId}`)}
-                className="w-full bg-green-600 hover:bg-green-700"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Acessar Relatório Premium
-              </Button>
             </>
           )}
         </CardContent>

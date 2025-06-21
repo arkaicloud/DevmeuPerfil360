@@ -23,6 +23,7 @@ import NotFound from "@/pages/not-found";
 import Success from "@/pages/success";
 import Cancel from "@/pages/cancel";
 import PaymentSuccessRedirect from "@/pages/payment-success-redirect";
+import PaymentSuccessHandler from "@/components/payment-success-handler";
 
 function Router() {
   return (
