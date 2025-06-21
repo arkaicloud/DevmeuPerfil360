@@ -246,7 +246,14 @@ export default function Dashboard() {
                 variant="ghost"
                 size="sm"
                 className="text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm border border-white/30 px-3 md:px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-xs md:text-sm"
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  const latestTest = dashboardData?.testResults?.[0];
+                  if (latestTest) {
+                    navigate(`/checkout/${latestTest.id}`);
+                  } else {
+                    navigate("/");
+                  }
+                }}
               >
                 <Crown className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                 <span className="hidden sm:inline">Upgrade Premium</span>
@@ -305,7 +312,14 @@ export default function Dashboard() {
                     </Button>
                   ) : (
                     <Button 
-                      onClick={() => navigate("/")} 
+                      onClick={() => {
+                        const latestTest = dashboardData?.testResults?.[0];
+                        if (latestTest) {
+                          navigate(`/checkout/${latestTest.id}`);
+                        } else {
+                          navigate("/");
+                        }
+                      }} 
                       size="sm"
                       className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                     >
