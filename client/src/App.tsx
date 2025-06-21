@@ -22,6 +22,7 @@ import AdminPricing from "@/pages/admin-pricing";
 import NotFound from "@/pages/not-found";
 import Success from "@/pages/success";
 import Cancel from "@/pages/cancel";
+import PaymentSuccessRedirect from "@/pages/payment-success-redirect";
 
 function Router() {
   return (
@@ -41,7 +42,8 @@ function Router() {
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
       <Route path="/admin/pricing" component={AdminPricing} />
-      <Route path="/success" component={Success} />
+      <Route path="/success" component={PaymentSuccessRedirect} />
+      <Route path="/payment-success" component={Success} />
       <Route path="/cancel" component={Cancel} />
       <Route component={NotFound} />
     </Switch>

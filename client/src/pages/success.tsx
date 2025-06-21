@@ -10,10 +10,11 @@ export default function Success() {
   const { toast } = useToast();
   const [processing, setProcessing] = useState(true);
   
-  // Get testId and sessionId from URL parameters
+  // Get testId and sessionId from URL parameters or hash
   const urlParams = new URLSearchParams(window.location.search);
-  const testId = urlParams.get('testId');
-  const sessionId = urlParams.get('session_id');
+  const hashParams = new URLSearchParams(window.location.hash.substring(1).split('?')[1] || '');
+  const testId = urlParams.get('testId') || hashParams.get('testId');
+  const sessionId = urlParams.get('session_id') || hashParams.get('session_id');
 
   useEffect(() => {
     // If no testId, redirect to home
@@ -44,8 +45,13 @@ export default function Success() {
         if (result.success) {
           toast({
             title: "Pagamento Confirmado!",
-            description: "Seu acesso premium foi liberado com sucesso.",
+            description: "Redirecionando para seu relatório premium...",
           });
+          
+          // Redirect to results with premium access after 2 seconds
+          setTimeout(() => {
+            navigate(`/results/${testId}?payment=success`);
+          }, 2000);
         } else {
           toast({
             title: "Verificação Pendente",
@@ -56,8 +62,13 @@ export default function Success() {
         console.error('Payment verification error:', error);
         toast({
           title: "Pagamento Processado",
-          description: "Seu pagamento foi processado com sucesso.",
+          description: "Redirecionando para seu relatório...",
         });
+        
+        // Even if verification fails, redirect to results (payment was successful if we got here)
+        setTimeout(() => {
+          navigate(`/results/${testId}?payment=success`);
+        }, 2000);
       } finally {
         setProcessing(false);
       }
@@ -93,7 +104,7 @@ export default function Success() {
             Pagamento Confirmado!
           </h1>
           <p className="text-gray-600 mb-6">
-            Seu relatório premium foi liberado com sucesso.
+            Redirecionando para seu relatório premium em instantes...
           </p>
           
           <div className="space-y-3">
