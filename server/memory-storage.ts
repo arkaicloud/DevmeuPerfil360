@@ -37,9 +37,9 @@ class MemoryStorage implements IStorage {
       whatsapp: insertUser.whatsapp || null,
       stripeCustomerId: null,
       stripeSubscriptionId: null,
-      freeTestsUsed: 0,
-      premiumTestsRemaining: null,
-      isPremiumActive: false,
+      freeTestsUsed: insertUser.freeTestsUsed || 0,
+      premiumTestsRemaining: insertUser.premiumTestsRemaining || 0,
+      isPremiumActive: insertUser.isPremiumActive || false,
       createdAt: new Date(),
       updatedAt: new Date()
     };

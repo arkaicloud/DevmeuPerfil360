@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   premiumTestsRemaining: integer("premium_tests_remaining").default(0),
   isPremiumActive: boolean("is_premium_active").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const testResults = pgTable("test_results", {
@@ -87,8 +88,6 @@ export const emailTemplates = pgTable("email_templates", {
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
-  stripeCustomerId: true,
-  stripeSubscriptionId: true,
 });
 
 export const insertTestResultSchema = createInsertSchema(testResults).omit({

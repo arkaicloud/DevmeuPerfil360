@@ -1973,17 +1973,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Usuário já existe com este email" });
       }
 
-      // Create user without Clerk dependency
+      // Create user without Clerk dependency - map frontend fields to backend schema
       const user = await storage.createUser({
         email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        whatsapp: userData.whatsapp,
+        firstName: userData.username || userData.firstName, // Frontend sends 'username' 
+        lastName: userData.lastName || null,
+        whatsapp: userData.whatsapp || null,
+        clerkId: null,
+        freeTestsUsed: 0,
+        premiumTestsRemaining: 0,
+        isPremiumActive: false,
       });
 
+      // Associate any guest tests with this new user
+      if (userData.email) {
+        try {
+          await storage.associateGuestTestsWithUser(userData.email, user.id);
+        } catch (error) {
+          console.error('Erro ao associar testes de visitante:', error);
+        }
+      }
+
       // Send welcome email (non-blocking)
-      emailService.sendWelcomeEmail(user.email, user.firstName || user.email).catch(error => {
-        console.error('Erro ao enviar email de boas-vindas:', error);
+      setImmediate(() => {
+        emailService.sendWelcomeEmail(user.email, user.firstName || user.email).catch(error => {
+          console.error('Erro ao enviar email de boas-vindas:', error);
+        });
       });
 
       res.json({
@@ -1991,6 +2006,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        username: user.firstName || user.email, // Add username field for frontend compatibility
         message: "Conta criada com sucesso",
       });
     } catch (error: any) {

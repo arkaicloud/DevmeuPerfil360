@@ -145,6 +145,11 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
   - **Real-time Updates**: Price changes in admin panel immediately reflect on homepage and checkout
   - **Cache Management**: Added cache clearing when pricing is updated to ensure instant updates
   - **Fallback Support**: Maintains system stability with fallback values if database fails
+- June 21, 2025: **USER REGISTRATION RUNTIME ERROR FIXED** - Resolved runtime error when creating accounts for new users
+  - **Field Mapping**: Fixed mismatch between frontend 'username' field and backend 'firstName' field
+  - **Schema Compatibility**: Updated insertUserSchema to include all required fields for user creation
+  - **Guest Test Association**: Added automatic association of guest tests with newly registered users
+  - **Background Processing**: Moved welcome email to background processing using setImmediate()
 - June 21, 2025: **PDF PREMIUM PODCASTS REMOVED** - Completely removed "🎧 Podcasts Brasileiros" section from all premium PDF reports
   - **Content Optimization**: Simplified premium PDF by removing podcasts section as requested by user
   - **Cleaner Layout**: More focused premium content with books and courses only
