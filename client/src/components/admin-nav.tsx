@@ -9,8 +9,7 @@ import {
   DollarSign,
   Menu,
   X,
-  LogOut,
-  CreditCard
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -43,12 +42,6 @@ const navItems = [
     href: "/admin/pricing",
     icon: DollarSign,
     description: "Gerenciar preços e promoções"
-  },
-  {
-    title: "Métodos de Pagamento",
-    href: "/admin/payment-methods",
-    icon: CreditCard,
-    description: "Controlar PIX, cartões e carteiras digitais"
   }
 ];
 
