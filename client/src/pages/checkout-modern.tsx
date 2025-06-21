@@ -53,36 +53,31 @@ export default function CheckoutModern() {
   });
 
   const handlePaymentMethod = async (method: 'card' | 'pix') => {
-    if (!testId) return;
+    if (!testId || !pricing) return;
     
     setSelectedMethod(method);
     setStep('processing');
     setLoading(true);
 
     try {
-      // Process payment internally without external redirect
-      const response = await fetch('/api/simulate-payment', {
+      // Create real Stripe checkout session for validation
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           testId: parseInt(testId),
-          sessionId: `internal_${method}_${Date.now()}_${testId}`
-        })
+          amount: parseInt(pricing.promocionalPrice) * 100,
+          paymentMethod: method
+        }),
       });
 
       const data = await response.json();
-
-      if (data.success) {
-        toast({
-          title: "Pagamento Aprovado!",
-          description: "Redirecionando para seus resultados premium...",
-        });
-        
-        setTimeout(() => {
-          navigate(`/results/${testId}?payment=success&suspended=true`);
-        }, 2000);
+      
+      if (data.url) {
+        // Redirect to Stripe checkout for real payment validation
+        window.location.href = data.url;
       } else {
-        throw new Error(data.error || 'Erro ao processar pagamento');
+        throw new Error('Erro ao criar sessão de pagamento');
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -290,21 +285,23 @@ export default function CheckoutModern() {
                   </Button>
                 </div>
 
-                {/* Development Test Button */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <Button
-                    onClick={handleSimulatePayment}
-                    disabled={loading}
-                    variant="outline"
-                    className="w-full h-12 border-dashed border-2 border-purple-300 text-purple-600 hover:bg-purple-50"
-                  >
-                    <Zap className="w-4 h-4 mr-2" />
-                    Simular Pagamento (Teste)
-                  </Button>
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    Para desenvolvimento e testes
-                  </p>
-                </div>
+                {/* Development Test Button - Only for internal testing */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <Button
+                      onClick={handleSimulatePayment}
+                      disabled={loading}
+                      variant="outline"
+                      className="w-full h-12 border-dashed border-2 border-red-300 text-red-600 hover:bg-red-50"
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      ⚠️ DESENVOLVIMENTO - Simular Pagamento
+                    </Button>
+                    <p className="text-xs text-red-500 text-center mt-2 font-medium">
+                      APENAS PARA DESENVOLVIMENTO - NÃO USAR EM PRODUÇÃO
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -319,15 +316,14 @@ export default function CheckoutModern() {
         {step === 'processing' && (
           <Card className="text-center">
             <CardContent className="p-8">
-              <div className="animate-spin w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full mx-auto mb-4"></div>
-              <h2 className="text-xl font-bold mb-2 text-green-600">Pagamento Aprovado!</h2>
+              <div className="animate-spin w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4"></div>
+              <h2 className="text-xl font-bold mb-2">Redirecionando para Pagamento</h2>
               <p className="text-gray-600 mb-4">
-                Processando seu acesso premium via {selectedMethod === 'card' ? 'cartão' : 'PIX'}...
+                Você será redirecionado para o Stripe para processar seu pagamento via {selectedMethod === 'card' ? 'cartão' : 'PIX'}...
               </p>
               <p className="text-sm text-gray-500">
-                Redirecionando para seus resultados premium em instantes
+                Aguarde alguns segundos para o redirecionamento automático
               </p>
-              <CheckCircle className="w-8 h-8 text-green-500 mx-auto mt-4" />
             </CardContent>
           </Card>
         )}

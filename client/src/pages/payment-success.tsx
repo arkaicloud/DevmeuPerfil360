@@ -18,7 +18,7 @@ export default function PaymentSuccess() {
     if (testIdParam && sessionId) {
       setTestId(testIdParam);
       
-      // Verify payment and redirect to results
+      // Verify payment with Stripe and update premium status
       const verifyPayment = async () => {
         try {
           const response = await fetch('/api/verify-payment', {
@@ -33,20 +33,17 @@ export default function PaymentSuccess() {
           const result = await response.json();
           
           if (result.success) {
-            // Payment verified, redirect to results
+            // Payment verified successfully, redirect to results
             setTimeout(() => {
               navigate(`/results/${testIdParam}?payment=success`);
             }, 1500);
           } else {
-            setError('Erro na verificação do pagamento');
+            setError('Pagamento não foi confirmado pelo Stripe');
+            setProcessing(false);
           }
         } catch (error) {
           console.error('Payment verification error:', error);
-          // Redirect anyway to results page
-          setTimeout(() => {
-            navigate(`/results/${testIdParam}?payment=success`);
-          }, 1500);
-        } finally {
+          setError('Erro ao verificar pagamento com Stripe');
           setProcessing(false);
         }
       };
