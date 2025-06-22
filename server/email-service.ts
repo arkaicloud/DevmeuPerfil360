@@ -25,6 +25,7 @@ class EmailService {
   private transporter: nodemailer.Transporter | null = null;
   private config: EmailConfig | null = null;
   private sendgridConfigured: boolean = false;
+  private configCacheTime: number = 0;
 
   async loadConfiguration(): Promise<EmailConfig> {
     try {
@@ -53,9 +54,8 @@ class EmailService {
   }
 
   async createTransporter(): Promise<nodemailer.Transporter> {
-    if (!this.config) {
-      await this.loadConfiguration();
-    }
+    // Force reload configuration
+    await this.loadConfiguration(true);
 
     if (!this.config) {
       throw new Error('Configuração de email não encontrada');
@@ -86,22 +86,14 @@ class EmailService {
     
     this.transporter = nodemailer.createTransport(smtpConfig);
     
-    // Verificar conexão sem cache
+    // Verificar conexão
     try {
       await this.transporter.verify();
-      console.log(`✅ SMTP conectado: ${this.config.smtpHost}`);
+      console.log(`SMTP conectado: ${this.config.smtpHost}`);
       return this.transporter;
     } catch (verifyError: any) {
-      console.error('❌ Falha SMTP:', verifyError.message);
+      console.error('Falha SMTP:', verifyError.message);
       console.error(`Host: ${this.config.smtpHost}, Porta: ${this.config.smtpPort}, Usuario: ${this.config.smtpUser}`);
-      
-      if (verifyError.code === 'EAUTH') {
-        console.error('Erro de autenticação - credenciais inválidas');
-      } else if (verifyError.code === 'ENOTFOUND') {
-        console.error('Host SMTP não encontrado');
-      } else if (verifyError.code === 'ETIMEDOUT') {
-        console.error('Timeout na conexão SMTP');
-      }
       
       this.transporter = null;
       throw verifyError;
@@ -139,12 +131,16 @@ class EmailService {
         const msg = {
           to: to,
           from: {
-            email: this.config?.fromEmail || 'naoresponda@meuperfil360.com.br',
+            email: this.config?.fromEmail || 'contato@meuperfil360.com.br',
             name: this.config?.fromName || 'MeuPerfil360'
           },
           subject: subject,
           html: html,
-          text: text || html.replace(/<[^>]*>/g, '')
+          text: text || html.replace(/<[^>]*>/g, ''),
+          reply_to: {
+            email: 'contato@meuperfil360.com.br',
+            name: 'MeuPerfil360'
+          }
         };
 
         const result = await sgMail.send(msg);
@@ -166,12 +162,23 @@ class EmailService {
         throw new Error('Configuração de email não disponível');
       }
 
+      // Force using custom domain for Brevo
+      const fromEmail = this.config.smtpHost.includes('brevo') || this.config.smtpHost.includes('sendinblue') 
+        ? 'contato@meuperfil360.com.br' 
+        : this.config.fromEmail;
+
       const mailOptions = {
-        from: `${this.config.fromName} <${this.config.fromEmail}>`,
+        from: `MeuPerfil360 <${fromEmail}>`,
+        replyTo: 'contato@meuperfil360.com.br',
         to: to,
         subject: subject,
         html: html,
         text: text || html.replace(/<[^>]*>/g, ''),
+        headers: {
+          'X-Original-From': 'contato@meuperfil360.com.br',
+          'Return-Path': 'contato@meuperfil360.com.br',
+          'Sender': fromEmail
+        }
       };
 
       const result = await this.transporter!.sendMail(mailOptions);
@@ -290,7 +297,7 @@ class EmailService {
       loginUrl: 'https://www.meuperfil360.com.br/login',
       dashboardUrl: 'https://www.meuperfil360.com.br/login',
       testUrl: 'https://www.meuperfil360.com.br',
-      supportEmail: 'suporte@meuperfil360.com.br'
+      supportEmail: 'contato@meuperfil360.com.br'
     };
     
     console.log(`Enviando email de boas-vindas para: ${to}`);
@@ -393,7 +400,7 @@ class EmailService {
       resetUrl: finalResetUrl,
       loginUrl: `${baseUrl}/login`,
       testUrl: baseUrl,
-      supportEmail: 'suporte@meuperfil360.com.br'
+      supportEmail: 'contato@meuperfil360.com.br'
     };
     
     console.log(`Enviando email de recuperação de senha para: ${to} com URL: ${finalResetUrl}`);
