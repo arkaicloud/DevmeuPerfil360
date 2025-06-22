@@ -28,18 +28,29 @@ class MemoryStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash password if provided
+    let passwordHash = null;
+    if (insertUser.password) {
+      const bcrypt = await import('bcrypt');
+      passwordHash = await bcrypt.default.hash(insertUser.password, 12);
+    }
+
     const user: User = {
       id: this.userCounter++,
       clerkId: insertUser.clerkId || null,
       email: insertUser.email,
       firstName: insertUser.firstName || null,
       lastName: insertUser.lastName || null,
+      username: insertUser.username || null,
+      passwordHash: passwordHash,
       whatsapp: insertUser.whatsapp || null,
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       freeTestsUsed: insertUser.freeTestsUsed || 0,
       premiumTestsRemaining: insertUser.premiumTestsRemaining || 0,
       isPremiumActive: insertUser.isPremiumActive || false,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
       createdAt: new Date()
     };
 

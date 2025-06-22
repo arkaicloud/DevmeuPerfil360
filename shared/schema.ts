@@ -141,7 +141,9 @@ export const registrationSchema = z.object({
 
 // Types
 export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema> & {
+  password?: string;
+};
 export type TestResult = typeof testResults.$inferSelect;
 export type InsertTestResult = z.infer<typeof insertTestResultSchema>;
 export type Payment = typeof payments.$inferSelect;

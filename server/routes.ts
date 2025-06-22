@@ -2189,7 +2189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User login
+  // User login with proper password validation
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
@@ -2200,7 +2200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Tentativa de login para usuário: ${username}`);
 
-      // Try to find user by email (no username in Clerk system)
+      // Find user by email
       const user = await storage.getUserByEmail(username);
       
       if (!user) {
@@ -2210,16 +2210,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Authentication is handled by Clerk, this endpoint is deprecated
-      console.log(`Login attempt for user: ${username} - redirecting to Clerk authentication`);
+      // Check if user has a password hash
+      if (!user.passwordHash) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "Email ou senha incorretos. Verifique seus dados e tente novamente."
+        });
+      }
+
+      // Validate password using bcrypt
+      const bcrypt = await import('bcrypt');
+      const isPasswordValid = await bcrypt.default.compare(password, user.passwordHash);
+
+      if (!isPasswordValid) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "Email ou senha incorretos. Verifique seus dados e tente novamente."
+        });
+      }
+
+      console.log(`Login bem-sucedido para usuário: ${username}`);
 
       res.json({
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        message: "Use Clerk authentication for login",
-        redirectToClerk: true
+        username: user.firstName || user.email
       });
     } catch (error: any) {
       console.error("Erro no login:", error);
