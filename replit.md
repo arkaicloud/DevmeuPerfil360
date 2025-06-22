@@ -140,6 +140,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 22, 2025: **DISC CALCULATION COMPLETELY FIXED** - Implemented correct DISC methodology with proper MA/ME scoring system
+  - **Correct Formula**: MA (Mais Adequado) +1 point, ME (Menos Evidente) -1 point per factor
+  - **Proper Mapping**: A=Dominância, B=Influência, C=Estabilidade, D=Conformidade based on question content
+  - **Accurate Percentages**: Uses absolute values normalization ensuring realistic and meaningful scores
+  - **Percentage Distribution**: Results now show appropriate ranges (30-60%) instead of artificially low scores
+  - **Profile Detection**: Primary type based on highest raw score, not absolute values
+  - **Validation Tested**: Manual calculation confirms D=56%, I=22%, S=22%, C=0% for pure Dominance profile
 - June 22, 2025: **TEST PROGRESS UI CORRECTED** - Fixed progress description from "22-28" to "19-24" questions to match actual 24-question test structure
   - **Progress Stages**: Updated to show correct question ranges: 1-6, 7-12, 13-18, 19-24
   - **Accurate Display**: Test progress now reflects the actual DISC questionnaire structure

@@ -12,50 +12,70 @@ export interface DiscProfile {
 }
 
 export function calculateDiscProfile(answers: DiscAnswer[]): DiscProfile {
-  // Initialize scores
-  const scores = { D: 0, I: 0, S: 0, C: 0 };
+  // Initialize scores for MA (Mais Adequado) and ME (Menos Evidente)
+  const maScores = { D: 0, I: 0, S: 0, C: 0 };
+  const meScores = { D: 0, I: 0, S: 0, C: 0 };
   
-  // Map options to DISC categories (simplified mapping for demo)
-  const optionToDisc: Record<string, keyof typeof scores> = {
-    'A': 'D', // Dominance
-    'B': 'I', // Influence  
-    'C': 'S', // Steadiness
-    'D': 'C', // Conscientiousness
+  // Correct mapping based on DISC methodology
+  // Each question option is mapped to its corresponding DISC factor
+  const optionToDisc: Record<string, keyof typeof maScores> = {
+    'A': 'D', // Dominância - direto, decidido, assume liderança
+    'B': 'I', // Influência - motivar, envolver, comunicativo
+    'C': 'S', // Estabilidade - harmonia, apoio, estável
+    'D': 'C', // Conformidade - análise, qualidade, precisão
   };
 
-  // Calculate scores based on answers
+  // Calculate scores based on DISC methodology
+  // MA (Mais Adequado) = +1 ponto
+  // ME (Menos Evidente) = -1 ponto
   answers.forEach(answer => {
-    // Add points for "most" answers
+    // +1 for MA (most adequate)
     if (optionToDisc[answer.most]) {
-      scores[optionToDisc[answer.most]] += 2;
+      maScores[optionToDisc[answer.most]] += 1;
     }
     
-    // Subtract points for "least" answers  
+    // +1 for ME tracking (will be subtracted)
     if (optionToDisc[answer.least]) {
-      scores[optionToDisc[answer.least]] -= 1;
+      meScores[optionToDisc[answer.least]] += 1;
     }
   });
 
-  // Convert raw scores to individual percentages (0-100 scale for each factor)
-  // Each factor gets its own independent percentage without forcing a 100% total
-  const maxPossibleScore = answers.length * 2; // Maximum points per factor
-  
-  // Handle negative scores by shifting to positive range
-  const minScore = Math.min(scores.D, scores.I, scores.S, scores.C);
-  const shift = minScore < 0 ? Math.abs(minScore) : 0;
-  
-  // Calculate individual percentages for each DISC factor
-  const normalizedScores = {
-    D: Math.min(100, Math.max(0, Math.round(((scores.D + shift) / (maxPossibleScore + shift)) * 100))),
-    I: Math.min(100, Math.max(0, Math.round(((scores.I + shift) / (maxPossibleScore + shift)) * 100))),
-    S: Math.min(100, Math.max(0, Math.round(((scores.S + shift) / (maxPossibleScore + shift)) * 100))),
-    C: Math.min(100, Math.max(0, Math.round(((scores.C + shift) / (maxPossibleScore + shift)) * 100))),
+  // Calculate final scores: MA - ME for each factor
+  const rawScores = {
+    D: maScores.D - meScores.D,
+    I: maScores.I - meScores.I,
+    S: maScores.S - meScores.S,
+    C: maScores.C - meScores.C,
   };
 
-  // Determine primary profile type
-  const primaryType = Object.entries(normalizedScores).reduce((a, b) => 
-    normalizedScores[a[0] as keyof typeof normalizedScores] > normalizedScores[b[0] as keyof typeof normalizedScores] ? a : b
-  )[0] as keyof typeof normalizedScores;
+  // Normalize to percentages using absolute values method
+  const absoluteSum = Math.abs(rawScores.D) + Math.abs(rawScores.I) + Math.abs(rawScores.S) + Math.abs(rawScores.C);
+  
+  // Avoid division by zero
+  const normalizedScores = absoluteSum > 0 ? {
+    D: Math.round((Math.abs(rawScores.D) / absoluteSum) * 100),
+    I: Math.round((Math.abs(rawScores.I) / absoluteSum) * 100),
+    S: Math.round((Math.abs(rawScores.S) / absoluteSum) * 100),
+    C: Math.round((Math.abs(rawScores.C) / absoluteSum) * 100),
+  } : {
+    D: 25, I: 25, S: 25, C: 25 // Equal distribution if no clear preference
+  };
+
+  // Ensure percentages sum to exactly 100% (adjust for rounding)
+  const currentSum = normalizedScores.D + normalizedScores.I + normalizedScores.S + normalizedScores.C;
+  if (currentSum !== 100) {
+    const diff = 100 - currentSum;
+    // Add difference to the highest score to maintain proportions
+    const maxKey = Object.entries(normalizedScores).reduce((a, b) => 
+      normalizedScores[a[0] as keyof typeof normalizedScores] > normalizedScores[b[0] as keyof typeof normalizedScores] ? a : b
+    )[0] as keyof typeof normalizedScores;
+    normalizedScores[maxKey] = Math.max(0, normalizedScores[maxKey] + diff);
+  }
+
+  // Determine primary profile type based on raw scores (not absolute values)
+  const primaryType = Object.entries(rawScores).reduce((a, b) => 
+    rawScores[a[0] as keyof typeof rawScores] > rawScores[b[0] as keyof typeof rawScores] ? a : b
+  )[0] as keyof typeof rawScores;
 
   // Get profile description
   const descriptions = {
@@ -64,6 +84,9 @@ export function calculateDiscProfile(answers: DiscAnswer[]): DiscProfile {
     S: "Você é paciente, leal e prefere ambientes estáveis. Valoriza a harmonia e é confiável em suas relações.",
     C: "Você é analítico, preciso e orientado por qualidade. Gosta de seguir procedimentos e busca a excelência.",
   };
+
+  // Debug information for validation (remove in production)
+  // console.log('DISC Calculation Debug:', { maScores, meScores, rawScores, absoluteSum, normalizedScores, primaryType });
 
   return {
     profileType: primaryType,
