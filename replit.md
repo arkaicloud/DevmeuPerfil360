@@ -140,6 +140,12 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 21, 2025: **DEVELOPMENT MODE ENABLED** - All test/checkout/login functionality hidden for development
+  - **Homepage Banner**: Added development notice with warning message
+  - **Buttons Disabled**: All test start, login, and checkout buttons disabled/hidden
+  - **Routes Protected**: Login, test, checkout, and dashboard routes conditionally hidden
+  - **Header Updated**: Login/logout functionality removed from navigation
+  - **Global Flag**: isDevelopmentMode = true controls all functionality visibility
 - June 21, 2025: **FRIENDLY ERROR MESSAGES SYSTEM COMPLETED** - Comprehensive user-friendly error handling implemented
   - **Backend Error System**: Created centralized error message system replacing technical messages with friendly Portuguese alternatives
   - **Frontend Error Handler**: Implemented smart error translation utility converting API errors to user-friendly messages

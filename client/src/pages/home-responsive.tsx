@@ -22,6 +22,9 @@ export default function Home() {
   const [, navigate] = useLocation();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // DEVELOPMENT MODE - Hide all test/checkout/login functionality
+  const isDevelopmentMode = true;
 
   // Prevent any Stripe loading on home page
   useEffect(() => {
@@ -118,14 +121,16 @@ export default function Home() {
                   <p className="text-xs sm:text-sm opacity-90">Descubra seu perfil comportamental</p>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-white/20 touch-button"
-                onClick={() => navigate("/login")}
-              >
-                Fazer Login
-              </Button>
+              {!isDevelopmentMode && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 touch-button"
+                  onClick={() => navigate("/login")}
+                >
+                  Fazer Login
+                </Button>
+              )}
             </div>
           </div>
         </header>
@@ -285,28 +290,53 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 touch-button"
-                    onClick={() => navigate("/find-results")}
-                  >
-                    Recuperar Teste
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
-                    onClick={() => navigate("/login")}
-                  >
-                    Login
-                  </Button>
+                  {!isDevelopmentMode && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 touch-button"
+                        onClick={() => navigate("/find-results")}
+                      >
+                        Recuperar Teste
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-gray-700 border-gray-300 hover:bg-gray-50 touch-button"
+                        onClick={() => navigate("/login")}
+                      >
+                        Login
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </div>
           </div>
         </div>
       </header>
+      {/* Development Notice */}
+      {isDevelopmentMode && (
+        <div className="mobile-padding">
+          <div className="responsive-container">
+            <div className="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-dashed border-orange-300 rounded-xl p-6 text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-orange-100 p-3 rounded-full">
+                  <span className="text-2xl">⚡</span>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-orange-800 mb-2">
+                DESENVOLVIMENTO - Simular Pagamento
+              </h3>
+              <p className="text-orange-700 font-medium">
+                APENAS PARA DESENVOLVIMENTO - NÃO USAR EM PRODUÇÃO
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="mobile-padding">
         <div className="responsive-container">
@@ -327,19 +357,21 @@ export default function Home() {
           </div>
 
           {/* Early CTA Button */}
-          <div className="text-center mb-16">
-            <Button
-              onClick={() => setShowDataForm(true)}
-              size="lg"
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-4 text-xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
-            >
-              <Brain className="w-6 h-6 mr-3" />
-              Fazer Teste Grátis Agora
-            </Button>
-            <p className="text-sm text-gray-500 mt-3">
-              ⚡ Resultado em 5 minutos • 100% gratuito • Sem cadastro inicial
-            </p>
-          </div>
+          {!isDevelopmentMode && (
+            <div className="text-center mb-16">
+              <Button
+                onClick={() => setShowDataForm(true)}
+                size="lg"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-4 text-xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
+              >
+                <Brain className="w-6 h-6 mr-3" />
+                Fazer Teste Grátis Agora
+              </Button>
+              <p className="text-sm text-gray-500 mt-3">
+                ⚡ Resultado em 5 minutos • 100% gratuito • Sem cadastro inicial
+              </p>
+            </div>
+          )}
 
           {/* DISC Dimensions */}
           <div className="mb-16">
@@ -513,19 +545,28 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Button
-                  onClick={isLoggedIn ? startTestAsLoggedUser : () => setShowDataForm(true)}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold"
-                >
-                  {isLoggedIn ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <Crown className="w-5 h-5" />
-                      <span>Fazer Teste - {currentUser?.username}</span>
-                    </div>
-                  ) : (
-                    "Começar Teste Grátis"
-                  )}
-                </Button>
+                {!isDevelopmentMode ? (
+                  <Button
+                    onClick={isLoggedIn ? startTestAsLoggedUser : () => setShowDataForm(true)}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold"
+                  >
+                    {isLoggedIn ? (
+                      <div className="flex items-center justify-center space-x-2">
+                        <Crown className="w-5 h-5" />
+                        <span>Fazer Teste - {currentUser?.username}</span>
+                      </div>
+                    ) : (
+                      "Começar Teste Grátis"
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="w-full bg-gray-400 text-gray-600 py-3 text-lg font-semibold cursor-not-allowed"
+                  >
+                    Funcionalidade em Desenvolvimento
+                  </Button>
+                )}
               </div>
 
               {/* Premium Version */}
@@ -596,12 +637,21 @@ export default function Home() {
                   </p>
                 </div>
 
-                <Button
-                  onClick={() => setShowDataForm(true)}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold shadow-lg"
-                >
-                  Começar e Fazer Upgrade
-                </Button>
+                {!isDevelopmentMode ? (
+                  <Button
+                    onClick={() => setShowDataForm(true)}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold shadow-lg"
+                  >
+                    Começar e Fazer Upgrade
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="w-full bg-gray-400 text-gray-600 py-3 text-lg font-semibold cursor-not-allowed"
+                  >
+                    Funcionalidade em Desenvolvimento
+                  </Button>
+                )}
               </div>
             </div>
           </div>

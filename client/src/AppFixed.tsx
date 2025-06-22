@@ -21,24 +21,33 @@ import AdminPricing from "@/pages/admin-pricing";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  // DEVELOPMENT MODE - Hide all test/checkout/login functionality
+  const isDevelopmentMode = true;
+
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/test" component={Test} />
-      <Route path="/results/:id" component={Results} />
-      <Route path="/checkout/:testId" component={CheckoutModern} />
-      <Route path="/dashboard/:userId" component={Dashboard} />
-      <Route path="/find-results" component={FindResults} />
-      <Route path="/payment-success" component={PaymentSuccess} />
-      <Route path="/payment-test" component={PaymentTest} />
-      <Route path="/stripe-direct" component={StripeDirect} />
-      <Route path="/login" component={Login} />
+      {/* Development mode - hide user-facing routes */}
+      {!isDevelopmentMode && <Route path="/test" component={Test} />}
+      {!isDevelopmentMode && <Route path="/results/:id" component={Results} />}
+      {!isDevelopmentMode && <Route path="/checkout/:testId" component={CheckoutModern} />}
+      {!isDevelopmentMode && <Route path="/dashboard/:userId" component={Dashboard} />}
+      {!isDevelopmentMode && <Route path="/find-results" component={FindResults} />}
+      {!isDevelopmentMode && <Route path="/login" component={Login} />}
+      
+      {/* Keep admin routes always available */}
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/email-config" component={AdminEmailConfig} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
       <Route path="/admin/pricing" component={AdminPricing} />
+      
+      {/* Keep payment test routes for development */}
+      <Route path="/payment-success" component={PaymentSuccess} />
+      <Route path="/payment-test" component={PaymentTest} />
+      <Route path="/stripe-direct" component={StripeDirect} />
+      
       <Route component={NotFound} />
     </Switch>
   );
