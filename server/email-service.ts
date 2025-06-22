@@ -61,11 +61,14 @@ class EmailService {
       throw new Error('Configuração de email não encontrada');
     }
 
-    // Configuração Gmail otimizada com App Password
-    const gmailConfig: any = {
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
+    // Reset previous transporter
+    this.transporter = null;
+
+    // Configuração SMTP dinâmica baseada no provedor
+    const smtpConfig: any = {
+      host: this.config.smtpHost,
+      port: this.config.smtpPort,
+      secure: this.config.smtpSecure,
       auth: {
         user: this.config.smtpUser,
         pass: this.config.smtpPassword,
@@ -73,32 +76,34 @@ class EmailService {
       tls: {
         rejectUnauthorized: false
       },
-      connectionTimeout: 60000,
-      greetingTimeout: 30000,
-      socketTimeout: 60000,
-      pool: false // Disable pooling for better reliability
+      connectionTimeout: 30000,
+      greetingTimeout: 10000,
+      socketTimeout: 30000,
+      pool: false
     };
 
-    this.transporter = nodemailer.createTransport(gmailConfig);
+    console.log(`Configurando SMTP: ${this.config.smtpHost}:${this.config.smtpPort} (${this.config.smtpUser})`);
     
-    // Verificar conexão
+    this.transporter = nodemailer.createTransport(smtpConfig);
+    
+    // Verificar conexão sem cache
     try {
       await this.transporter.verify();
-      console.log('✅ Conexão SMTP Gmail verificada e funcionando');
+      console.log(`✅ SMTP conectado: ${this.config.smtpHost}`);
       return this.transporter;
     } catch (verifyError: any) {
-      console.error('❌ Falha na verificação SMTP:', verifyError.message);
+      console.error('❌ Falha SMTP:', verifyError.message);
+      console.error(`Host: ${this.config.smtpHost}, Porta: ${this.config.smtpPort}, Usuario: ${this.config.smtpUser}`);
       
-      // Log detalhado do erro para diagnóstico
       if (verifyError.code === 'EAUTH') {
-        console.error('🔐 Erro de autenticação - verifique as credenciais Gmail');
-        console.error('💡 Certifique-se de usar App Password, não a senha normal');
+        console.error('Erro de autenticação - credenciais inválidas');
       } else if (verifyError.code === 'ENOTFOUND') {
-        console.error('🌐 Erro de DNS - problema de conectividade');
+        console.error('Host SMTP não encontrado');
       } else if (verifyError.code === 'ETIMEDOUT') {
-        console.error('⏰ Timeout de conexão');
+        console.error('Timeout na conexão SMTP');
       }
       
+      this.transporter = null;
       throw verifyError;
     }
   }
@@ -170,7 +175,8 @@ class EmailService {
       };
 
       const result = await this.transporter!.sendMail(mailOptions);
-      console.log(`SMTP: Email enviado com sucesso para ${to}:`, result.messageId);
+      console.log(`✅ Email enviado via ${this.config?.smtpHost} para ${to}:`, result.messageId);
+      console.log(`📧 Detalhes: aceitos=${result.accepted?.length}, rejeitados=${result.rejected?.length}`);
       return true;
     } catch (smtpError: any) {
       console.error('SMTP também falhou:', smtpError.message);
@@ -260,14 +266,21 @@ class EmailService {
   }
 
   async sendEmailDevelopmentMode(to: string, subject: string, html: string): Promise<boolean> {
-    console.log('\n=== EMAIL EM MODO DE DESENVOLVIMENTO ===');
+    console.log('\n=== EMAIL NÃO ENVIADO - MODO DESENVOLVIMENTO ===');
     console.log(`Para: ${to}`);
     console.log(`Assunto: ${subject}`);
-    console.log(`Status: Email não enviado - limite diário do Gmail excedido`);
-    console.log(`Solução: Configure SENDGRID_API_KEY para envio real`);
+    console.log(`Erro: Configuração SMTP inválida ou SendGrid não configurado`);
+    console.log(`Configuração atual:`);
+    console.log(`- Host: ${this.config?.smtpHost}`);
+    console.log(`- Porta: ${this.config?.smtpPort}`);
+    console.log(`- Usuario: ${this.config?.smtpUser}`);
+    console.log(`Soluções:`);
+    console.log(`1. Configure SENDGRID_API_KEY para envio profissional`);
+    console.log(`2. Verifique as credenciais SMTP no painel do provedor`);
+    console.log(`3. Confirme se as credenciais estão ativas`);
     console.log('=== FIM DO EMAIL ===\n');
     
-    return false; // Return false to indicate email wasn't actually sent
+    return false;
   }
 
   // Automated email functions
