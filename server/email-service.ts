@@ -305,20 +305,24 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(to: string, userName: string, resetUrl: string): Promise<boolean> {
-    // Extract token from URL and create production URL
+    // For development, use the actual development URL. For production, use production domain.
+    // This ensures the reset links work in the current environment
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const baseUrl = isDevelopment ? 'http://localhost:5000' : 'https://meuperfil360.com.br';
+    
     const tokenMatch = resetUrl.match(/token=([^&]+)/);
     const token = tokenMatch ? tokenMatch[1] : '';
-    const productionResetUrl = `https://meuperfil360.com.br/reset-password?token=${token}`;
+    const finalResetUrl = `${baseUrl}/reset-password?token=${token}`;
     
     const variables = {
       userName: userName,
-      resetUrl: productionResetUrl,
-      loginUrl: 'https://meuperfil360.com.br/login',
-      testUrl: 'https://meuperfil360.com.br',
+      resetUrl: finalResetUrl,
+      loginUrl: `${baseUrl}/login`,
+      testUrl: baseUrl,
       supportEmail: 'suporte@meuperfil360.com.br'
     };
     
-    console.log(`Enviando email de recuperação de senha para: ${to} com URL: ${productionResetUrl}`);
+    console.log(`Enviando email de recuperação de senha para: ${to} com URL: ${finalResetUrl}`);
     return await this.sendTemplateEmail(to, 'recuperacao_senha', variables);
   }
 }
