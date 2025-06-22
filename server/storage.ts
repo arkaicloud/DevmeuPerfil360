@@ -58,7 +58,8 @@ export class DatabaseStorage implements IStorage {
         throw new Error('User not found');
       }
 
-      const token = require('crypto').randomBytes(32).toString('hex');
+      const crypto = await import('crypto');
+      const token = crypto.default.randomBytes(32).toString('hex');
       const expires = new Date(Date.now() + 3600000); // 1 hour
 
       await withRetry(async () => {
@@ -107,8 +108,8 @@ export class DatabaseStorage implements IStorage {
         return false;
       }
 
-      const bcrypt = require('bcrypt');
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const bcrypt = await import('bcrypt');
+      const hashedPassword = await bcrypt.default.hash(newPassword, 10);
 
       await withRetry(async () => {
         await db.update(users)

@@ -1488,6 +1488,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password reset request
+  app.post("/api/auth/forgot-password", [
+    body("email").isEmail().normalizeEmail(),
+    validateRequest
+  ], async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return sendErrorResponse(res, 400, "Email inválido");
+      }
+
+      const { email } = req.body;
+      
+      // Check if user exists
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists or not for security
+        return res.json({ 
+          success: true, 
+          message: "Se o email existir em nosso sistema, você receberá um link para redefinir sua senha." 
+        });
+      }
+
+      // Generate reset token
+      const token = await storage.generatePasswordResetToken(email);
+      
+      // Send reset email
+      const resetUrl = `${config.domain}/reset-password?token=${token}`;
+      
+      // Send email asynchronously for better performance
+      setImmediate(async () => {
+        try {
+          await emailService.sendPasswordResetEmail(email, user.firstName || user.username || 'Usuário', resetUrl);
+          console.log(`Email de recuperação de senha enviado para: ${email}`);
+        } catch (error) {
+          console.error('Erro ao enviar email de recuperação:', error);
+        }
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Se o email existir em nosso sistema, você receberá um link para redefinir sua senha." 
+      });
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      sendErrorResponse(res, 500, "Erro interno do servidor");
+    }
+  });
+
+  // Password reset validation
+  app.get("/api/auth/validate-reset-token/:token", async (req: Request, res: Response) => {
+    try {
+      const { token } = req.params;
+      const user = await storage.validatePasswordResetToken(token);
+      
+      if (!user) {
+        return sendErrorResponse(res, 400, "Token inválido ou expirado");
+      }
+
+      res.json({ success: true, email: user.email });
+    } catch (error) {
+      console.error('Validate reset token error:', error);
+      sendErrorResponse(res, 500, "Erro interno do servidor");
+    }
+  });
+
+  // Password reset confirmation
+  app.post("/api/auth/reset-password", [
+    body("token").notEmpty(),
+    body("password").isLength({ min: 6 }),
+  ], async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return sendErrorResponse(res, 400, "Dados inválidos. A senha deve ter pelo menos 6 caracteres.");
+      }
+
+      const { token, password } = req.body;
+      
+      const success = await storage.resetPassword(token, password);
+      
+      if (!success) {
+        return sendErrorResponse(res, 400, "Token inválido ou expirado");
+      }
+
+      res.json({ 
+        success: true, 
+        message: "Senha redefinida com sucesso. Faça login com sua nova senha." 
+      });
+    } catch (error) {
+      console.error('Reset password error:', error);
+      sendErrorResponse(res, 500, "Erro interno do servidor");
+    }
+  });
+
   // Endpoint para verificar e enviar lembretes de reteste (6 meses)
   app.post("/api/send-retest-reminders", async (req: any, res: any) => {
     try {

@@ -66,7 +66,8 @@ class MemoryStorage implements IStorage {
       throw new Error('User not found');
     }
 
-    const token = require('crypto').randomBytes(32).toString('hex');
+    const crypto = await import('crypto');
+    const token = crypto.default.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 3600000); // 1 hour
 
     user.resetPasswordToken = token;
@@ -92,8 +93,8 @@ class MemoryStorage implements IStorage {
       return false;
     }
 
-    const bcrypt = require('bcrypt');
-    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    const bcrypt = await import('bcrypt');
+    user.passwordHash = await bcrypt.default.hash(newPassword, 10);
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     
