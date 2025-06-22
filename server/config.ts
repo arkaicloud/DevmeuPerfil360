@@ -3,11 +3,11 @@
 export const config = {
   // Configuração para produção - usar variável de ambiente ou fallback
   domain: process.env.DOMAIN || (process.env.NODE_ENV === 'production' 
-    ? 'https://www.meuperfil360.com.br' 
+    ? 'https://meuperfil360.com.br' 
     : 'http://localhost:5000'),
   cors: {
     origin: process.env.CORS_ORIGINS?.split(',') || (process.env.NODE_ENV === 'production' 
-      ? ['https://www.meuperfil360.com.br', 'https://meuperfil360.com.br'] 
+      ? ['https://meuperfil360.com.br', 'https://www.meuperfil360.com.br'] 
       : ['http://localhost:5000', 'http://127.0.0.1:5000']),
     credentials: true,
   },

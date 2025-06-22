@@ -140,11 +140,18 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 22, 2025: **DEPLOY READY FOR MEUPERFIL360.COM.BR** - Complete deployment package prepared for official domain
+  - **Domain Configuration**: Updated all configs for meuperfil360.com.br (without www prefix)
+  - **Deploy Manual**: Created comprehensive DEPLOY_PRODUCTION.md with step-by-step instructions
+  - **Environment Template**: .env.production ready with all production variables
+  - **Deploy Script**: comandos-deploy.sh with automated server setup commands
+  - **Checklist**: CHECKLIST_DEPLOY.md with verification steps and critical configurations
+  - **Production URLs**: All email templates and redirects configured for meuperfil360.com.br
 - June 21, 2025: **PRODUCTION READY** - Restored all functionality, removed development banners from checkout
   - **Development Mode Disabled**: isDevelopmentMode = false restores all functionality
   - **Checkout Cleaned**: Removed development warning banners for production deployment
   - **All Features Active**: Test, login, checkout, and dashboard fully functional
-  - **Production Deployment**: Platform ready for www.meuperfil360.com.br
+  - **Production Deployment**: Platform ready for meuperfil360.com.br
 - June 21, 2025: **FRIENDLY ERROR MESSAGES SYSTEM COMPLETED** - Comprehensive user-friendly error handling implemented
   - **Backend Error System**: Created centralized error message system replacing technical messages with friendly Portuguese alternatives
   - **Frontend Error Handler**: Implemented smart error translation utility converting API errors to user-friendly messages
