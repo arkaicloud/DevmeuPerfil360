@@ -21,10 +21,10 @@ export default function TestProgress({ currentQuestion, totalQuestions, progress
   const currentStage = getTestStage(currentQuestion, totalQuestions);
   
   const stages = [
-    { id: 1, name: "Início", questions: "1-7" },
-    { id: 2, name: "Desenvolvimento", questions: "8-14" },
-    { id: 3, name: "Aprofundamento", questions: "15-21" },
-    { id: 4, name: "Conclusão", questions: "22-28" }
+    { id: 1, name: "Início", questions: "1-6" },
+    { id: 2, name: "Desenvolvimento", questions: "7-12" },
+    { id: 3, name: "Aprofundamento", questions: "13-18" },
+    { id: 4, name: "Conclusão", questions: "19-24" }
   ];
 
   return (

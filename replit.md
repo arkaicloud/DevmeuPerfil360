@@ -140,6 +140,10 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 22, 2025: **TEST PROGRESS UI CORRECTED** - Fixed progress description from "22-28" to "19-24" questions to match actual 24-question test structure
+  - **Progress Stages**: Updated to show correct question ranges: 1-6, 7-12, 13-18, 19-24
+  - **Accurate Display**: Test progress now reflects the actual DISC questionnaire structure
+  - **User Experience**: Clear progress indication throughout the 24-question assessment
 - June 22, 2025: **USER REGISTRATION SYSTEM COMPLETELY FIXED** - Phone and password now saved correctly during registration
   - **Password Hashing**: Both DatabaseStorage and MemoryStorage now hash passwords with bcrypt (12 rounds)
   - **WhatsApp Field**: Phone number properly saved in whatsapp column during user creation
