@@ -305,10 +305,18 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(to: string, userName: string, resetUrl: string): Promise<boolean> {
-    // For development, use the actual development URL. For production, use production domain.
-    // This ensures the reset links work in the current environment
+    // Use Replit public domain or production domain
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const baseUrl = isDevelopment ? 'http://localhost:5000' : 'https://meuperfil360.com.br';
+    const replitDomain = process.env.REPLIT_DOMAINS;
+    
+    let baseUrl;
+    if (isDevelopment && replitDomain) {
+      baseUrl = `https://${replitDomain}`;
+    } else if (!isDevelopment) {
+      baseUrl = 'https://meuperfil360.com.br';
+    } else {
+      baseUrl = 'http://localhost:5000';
+    }
     
     const tokenMatch = resetUrl.match(/token=([^&]+)/);
     const token = tokenMatch ? tokenMatch[1] : '';

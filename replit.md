@@ -143,12 +143,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - June 22, 2025: **PASSWORD RESET SYSTEM FULLY IMPLEMENTED** - Complete forgot password functionality with email recovery
   - **Backend Routes**: /api/auth/forgot-password, /api/auth/validate-reset-token, /api/auth/reset-password
   - **Frontend Pages**: /forgot-password and /reset-password with full UX flow
-  - **Email Template**: Professional password reset email with security warnings and production domain links
+  - **Email Template**: Professional password reset email with security warnings and correct domain links
   - **Database Schema**: Added reset_password_token and reset_password_expires columns
   - **Security Features**: 1-hour token expiration, secure token generation, password validation
   - **Login Integration**: "Esqueci minha senha" link added to login page
-  - **Email System**: Gmail SMTP configured, emails sent successfully with meuperfil360.com.br domain
-  - **Testing Completed**: Full flow tested - email sent, token validated, password reset successful
+  - **Email System**: Gmail SMTP configured, emails sent successfully with correct domain (Replit public domain in dev, production domain in prod)
+  - **Domain Configuration**: Smart domain detection using REPLIT_DOMAINS environment variable
+  - **Testing Completed**: Full flow tested - email sent with correct URLs, token validated, password reset functional
 - June 22, 2025: **DEPLOY READY FOR MEUPERFIL360.COM.BR** - Complete deployment package prepared for official domain
   - **Domain Configuration**: Updated all configs for meuperfil360.com.br (without www prefix)
   - **Deploy Manual**: Created comprehensive DEPLOY_PRODUCTION.md with step-by-step instructions
