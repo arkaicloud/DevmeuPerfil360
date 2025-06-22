@@ -1514,8 +1514,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate reset token
       const token = await storage.generatePasswordResetToken(email);
       
-      // Send reset email
-      const resetUrl = `${config.domain}/reset-password?token=${token}`;
+      // Send reset email with production domain
+      const resetUrl = `https://meuperfil360.com.br/reset-password?token=${token}`;
       
       // Send email asynchronously for better performance
       setImmediate(async () => {

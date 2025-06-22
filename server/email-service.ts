@@ -305,15 +305,20 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(to: string, userName: string, resetUrl: string): Promise<boolean> {
+    // Extract token from URL and create production URL
+    const tokenMatch = resetUrl.match(/token=([^&]+)/);
+    const token = tokenMatch ? tokenMatch[1] : '';
+    const productionResetUrl = `https://meuperfil360.com.br/reset-password?token=${token}`;
+    
     const variables = {
       userName: userName,
-      resetUrl: resetUrl,
+      resetUrl: productionResetUrl,
       loginUrl: 'https://meuperfil360.com.br/login',
       testUrl: 'https://meuperfil360.com.br',
       supportEmail: 'suporte@meuperfil360.com.br'
     };
     
-    console.log(`Enviando email de recuperação de senha para: ${to}`);
+    console.log(`Enviando email de recuperação de senha para: ${to} com URL: ${productionResetUrl}`);
     return await this.sendTemplateEmail(to, 'recuperacao_senha', variables);
   }
 }
