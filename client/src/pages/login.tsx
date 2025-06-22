@@ -185,7 +185,16 @@ export default function Login() {
                 </form>
               </Form>
 
-              <div className="mt-6 text-center">
+              <div className="mt-6 text-center space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto font-normal psychology-blue"
+                    onClick={() => navigate("/forgot-password")}
+                  >
+                    Esqueci minha senha
+                  </Button>
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Não tem uma conta?{" "}
                   <Button
@@ -196,7 +205,7 @@ export default function Login() {
                     Faça o teste gratuito
                   </Button>
                 </p>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-sm text-muted-foreground">
                   Esqueceu seus dados?{" "}
                   <Button
                     variant="link"
