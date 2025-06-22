@@ -295,13 +295,26 @@ class EmailService {
     const variables = {
       userName: userName,
       daysSinceLastTest: daysSinceLastTest.toString(),
-      testUrl: 'https://www.meuperfil360.com.br',
-      loginUrl: 'https://www.meuperfil360.com.br/login',
-      dashboardUrl: 'https://www.meuperfil360.com.br/login'
+      testUrl: 'https://meuperfil360.com.br',
+      loginUrl: 'https://meuperfil360.com.br/login',
+      dashboardUrl: 'https://meuperfil360.com.br/login'
     };
     
     console.log(`Enviando lembrete de reteste para: ${to}`);
     return await this.sendTemplateEmail(to, 'lembrete_reteste', variables);
+  }
+
+  async sendPasswordResetEmail(to: string, userName: string, resetUrl: string): Promise<boolean> {
+    const variables = {
+      userName: userName,
+      resetUrl: resetUrl,
+      loginUrl: 'https://meuperfil360.com.br/login',
+      testUrl: 'https://meuperfil360.com.br',
+      supportEmail: 'suporte@meuperfil360.com.br'
+    };
+    
+    console.log(`Enviando email de recuperação de senha para: ${to}`);
+    return await this.sendTemplateEmail(to, 'recuperacao_senha', variables);
   }
 }
 

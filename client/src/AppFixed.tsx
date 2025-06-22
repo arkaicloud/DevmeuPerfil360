@@ -18,6 +18,8 @@ import AdminDashboard from "@/pages/admin-dashboard-new";
 import AdminEmailConfig from "@/pages/admin-email-config";
 import AdminEmailTemplates from "@/pages/admin-email-templates";
 import AdminPricing from "@/pages/admin-pricing";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -34,6 +36,8 @@ function Router() {
       {!isDevelopmentMode && <Route path="/dashboard/:userId" component={Dashboard} />}
       {!isDevelopmentMode && <Route path="/find-results" component={FindResults} />}
       {!isDevelopmentMode && <Route path="/login" component={Login} />}
+      {!isDevelopmentMode && <Route path="/forgot-password" component={ForgotPassword} />}
+      {!isDevelopmentMode && <Route path="/reset-password" component={ResetPassword} />}
       
       {/* Keep admin routes always available */}
       <Route path="/admin" component={AdminLogin} />

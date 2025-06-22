@@ -140,6 +140,13 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
+- June 22, 2025: **PASSWORD RESET SYSTEM IMPLEMENTED** - Complete forgot password functionality with email recovery
+  - **Backend Routes**: /api/auth/forgot-password, /api/auth/validate-reset-token, /api/auth/reset-password
+  - **Frontend Pages**: /forgot-password and /reset-password with full UX flow
+  - **Email Template**: Professional password reset email with security warnings
+  - **Database Schema**: Added reset_password_token and reset_password_expires columns
+  - **Security Features**: 1-hour token expiration, secure token generation, password validation
+  - **Login Integration**: "Esqueci minha senha" link added to login page
 - June 22, 2025: **DEPLOY READY FOR MEUPERFIL360.COM.BR** - Complete deployment package prepared for official domain
   - **Domain Configuration**: Updated all configs for meuperfil360.com.br (without www prefix)
   - **Deploy Manual**: Created comprehensive DEPLOY_PRODUCTION.md with step-by-step instructions

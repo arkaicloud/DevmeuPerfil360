@@ -60,6 +60,48 @@ class MemoryStorage implements IStorage {
     return user;
   }
 
+  async generatePasswordResetToken(email: string): Promise<string> {
+    const user = Array.from(this.users.values()).find(u => u.email === email);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const token = require('crypto').randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1 hour
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = expires;
+    this.users.set(user.id, user);
+    this.usersByEmail.set(user.email, user);
+
+    return token;
+  }
+
+  async validatePasswordResetToken(token: string): Promise<User | null> {
+    const user = Array.from(this.users.values()).find(u => 
+      u.resetPasswordToken === token && 
+      u.resetPasswordExpires && 
+      u.resetPasswordExpires > new Date()
+    );
+    return user || null;
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    const user = await this.validatePasswordResetToken(token);
+    if (!user) {
+      return false;
+    }
+
+    const bcrypt = require('bcrypt');
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    
+    this.users.set(user.id, user);
+    this.usersByEmail.set(user.email, user);
+    return true;
+  }
+
   async checkUserTestLimits(userId: number): Promise<{ canTakeTest: boolean; reason?: string; testsRemaining?: number }> {
     const user = this.users.get(userId);
     if (!user) {

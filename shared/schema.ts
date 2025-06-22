@@ -5,16 +5,16 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  clerkId: text("clerk_id"), // Clerk user ID (optional)
+  firstName: text("first_name").notNull(),
   email: text("email").notNull().unique(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
-  whatsapp: text("whatsapp"),
+  username: text("username"),
+  passwordHash: text("password_hash"),
+  clerkId: text("clerk_id"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
-  freeTestsUsed: integer("free_tests_used").default(0),
   premiumTestsRemaining: integer("premium_tests_remaining").default(0),
-  isPremiumActive: boolean("is_premium_active").default(false),
+  resetPasswordToken: text("reset_password_token"),
+  resetPasswordExpires: timestamp("reset_password_expires"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

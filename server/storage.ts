@@ -26,6 +26,11 @@ export interface IStorage {
   checkUserTestLimits(userId: number): Promise<{ canTakeTest: boolean; reason?: string; testsRemaining?: number }>;
   consumeUserTest(userId: number): Promise<void>;
   grantPremiumAccess(userId: number, testsCount?: number): Promise<void>;
+  
+  // Password reset methods
+  generatePasswordResetToken(email: string): Promise<string>;
+  validatePasswordResetToken(token: string): Promise<User | null>;
+  resetPassword(token: string, newPassword: string): Promise<boolean>;
 
   // Test result operations
   createTestResult(testResult: InsertTestResult): Promise<TestResult>;
@@ -45,6 +50,87 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Password reset methods
+  async generatePasswordResetToken(email: string): Promise<string> {
+    try {
+      const user = await this.getUserByEmail(email);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const token = require('crypto').randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 3600000); // 1 hour
+
+      await withRetry(async () => {
+        await db.update(users)
+          .set({ 
+            resetPasswordToken: token, 
+            resetPasswordExpires: expires 
+          })
+          .where(eq(users.id, user.id));
+      });
+
+      // Clear cache
+      cache.delete(cache.getUserByEmailKey(email));
+      cache.delete(cache.getUserKey(user.id));
+
+      return token;
+    } catch (error) {
+      console.error('Error generating password reset token:', error);
+      return memoryStorage.generatePasswordResetToken(email);
+    }
+  }
+
+  async validatePasswordResetToken(token: string): Promise<User | null> {
+    try {
+      const [user] = await withRetry(async () => {
+        return await db.select()
+          .from(users)
+          .where(eq(users.resetPasswordToken, token));
+      });
+
+      if (!user || !user.resetPasswordExpires || user.resetPasswordExpires <= new Date()) {
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error validating password reset token:', error);
+      return memoryStorage.validatePasswordResetToken(token);
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    try {
+      const user = await this.validatePasswordResetToken(token);
+      if (!user) {
+        return false;
+      }
+
+      const bcrypt = require('bcrypt');
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await withRetry(async () => {
+        await db.update(users)
+          .set({ 
+            passwordHash: hashedPassword,
+            resetPasswordToken: null,
+            resetPasswordExpires: null 
+          })
+          .where(eq(users.id, user.id));
+      });
+
+      // Clear cache
+      cache.delete(cache.getUserByEmailKey(user.email));
+      cache.delete(cache.getUserKey(user.id));
+
+      return true;
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      return memoryStorage.resetPassword(token, newPassword);
+    }
+  }
+
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const cacheKey = cache.getUserKey(id);
