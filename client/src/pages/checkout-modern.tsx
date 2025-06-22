@@ -321,23 +321,7 @@ export default function CheckoutModern() {
                   )}
                 </div>
 
-                {/* Development Test Button - Only for internal testing */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <Button
-                      onClick={handleSimulatePayment}
-                      disabled={loading}
-                      variant="outline"
-                      className="w-full h-12 border-dashed border-2 border-red-300 text-red-600 hover:bg-red-50"
-                    >
-                      <Zap className="w-4 h-4 mr-2" />
-                      ⚠️ DESENVOLVIMENTO - Simular Pagamento
-                    </Button>
-                    <p className="text-xs text-red-500 text-center mt-2 font-medium">
-                      APENAS PARA DESENVOLVIMENTO - NÃO USAR EM PRODUÇÃO
-                    </p>
-                  </div>
-                )}
+
               </CardContent>
             </Card>
 

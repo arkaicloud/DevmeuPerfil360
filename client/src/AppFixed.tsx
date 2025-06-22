@@ -22,7 +22,7 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   // DEVELOPMENT MODE - Hide all test/checkout/login functionality
-  const isDevelopmentMode = true;
+  const isDevelopmentMode = false;
 
   return (
     <Switch>

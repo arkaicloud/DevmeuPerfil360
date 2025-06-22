@@ -24,7 +24,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   // DEVELOPMENT MODE - Hide all test/checkout/login functionality
-  const isDevelopmentMode = true;
+  const isDevelopmentMode = false;
 
   // Prevent any Stripe loading on home page
   useEffect(() => {
