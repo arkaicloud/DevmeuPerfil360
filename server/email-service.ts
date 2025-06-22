@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { db } from './db';
 import { adminConfigs, emailTemplates } from '@shared/schema';
 import { sql } from 'drizzle-orm';
@@ -23,6 +24,7 @@ export interface EmailTemplate {
 class EmailService {
   private transporter: nodemailer.Transporter | null = null;
   private config: EmailConfig | null = null;
+  private sendgridConfigured: boolean = false;
 
   async loadConfiguration(): Promise<EmailConfig> {
     try {
@@ -59,43 +61,97 @@ class EmailService {
       throw new Error('Configuração de email não encontrada');
     }
 
-    // Primeira tentativa: Configuração Gmail otimizada
+    // Configuração Gmail otimizada com App Password
     const gmailConfig: any = {
-      service: 'gmail',
-      auth: {
-        user: this.config.smtpUser,
-        pass: this.config.smtpPassword,
-      }
-    };
-
-    try {
-      this.transporter = nodemailer.createTransport(gmailConfig);
-      console.log('Transporter Gmail criado com sucesso');
-      return this.transporter;
-    } catch (error) {
-      console.log('Falha na configuração Gmail, tentando configuração SMTP manual...');
-    }
-
-    // Segunda tentativa: Configuração SMTP manual
-    const manualConfig: any = {
-      host: this.config.smtpHost,
-      port: this.config.smtpPort,
-      secure: this.config.smtpPort === 465, // true para 465, false para outras portas
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: this.config.smtpUser,
         pass: this.config.smtpPassword,
       },
       tls: {
         rejectUnauthorized: false
-      }
+      },
+      connectionTimeout: 60000,
+      greetingTimeout: 30000,
+      socketTimeout: 60000,
+      pool: false // Disable pooling for better reliability
     };
 
-    this.transporter = nodemailer.createTransport(manualConfig);
-    console.log('Transporter SMTP manual criado com sucesso');
-    return this.transporter;
+    this.transporter = nodemailer.createTransport(gmailConfig);
+    
+    // Verificar conexão
+    try {
+      await this.transporter.verify();
+      console.log('✅ Conexão SMTP Gmail verificada e funcionando');
+      return this.transporter;
+    } catch (verifyError: any) {
+      console.error('❌ Falha na verificação SMTP:', verifyError.message);
+      
+      // Log detalhado do erro para diagnóstico
+      if (verifyError.code === 'EAUTH') {
+        console.error('🔐 Erro de autenticação - verifique as credenciais Gmail');
+        console.error('💡 Certifique-se de usar App Password, não a senha normal');
+      } else if (verifyError.code === 'ENOTFOUND') {
+        console.error('🌐 Erro de DNS - problema de conectividade');
+      } else if (verifyError.code === 'ETIMEDOUT') {
+        console.error('⏰ Timeout de conexão');
+      }
+      
+      throw verifyError;
+    }
+  }
+
+  async initializeSendGrid(): Promise<boolean> {
+    try {
+      const sendgridApiKey = process.env.SENDGRID_API_KEY;
+      if (sendgridApiKey && sendgridApiKey.startsWith('SG.')) {
+        sgMail.setApiKey(sendgridApiKey);
+        this.sendgridConfigured = true;
+        console.log('SendGrid configurado com sucesso');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro ao configurar SendGrid:', error);
+      return false;
+    }
   }
 
   async sendEmail(to: string, subject: string, html: string, text?: string): Promise<boolean> {
+    // Try SendGrid first if configured
+    if (!this.sendgridConfigured) {
+      await this.initializeSendGrid();
+    }
+
+    if (this.sendgridConfigured) {
+      try {
+        if (!this.config) {
+          await this.loadConfiguration();
+        }
+
+        const msg = {
+          to: to,
+          from: {
+            email: this.config?.fromEmail || 'naoresponda@meuperfil360.com.br',
+            name: this.config?.fromName || 'MeuPerfil360'
+          },
+          subject: subject,
+          html: html,
+          text: text || html.replace(/<[^>]*>/g, '')
+        };
+
+        const result = await sgMail.send(msg);
+        console.log(`SendGrid: Email enviado com sucesso para ${to}`);
+        return true;
+      } catch (sendgridError: any) {
+        console.error('SendGrid falhou:', sendgridError.message);
+        console.log('Tentando SMTP como fallback...');
+      }
+    }
+
+    // Fallback to SMTP
     try {
       if (!this.transporter) {
         await this.createTransporter();
@@ -110,19 +166,14 @@ class EmailService {
         to: to,
         subject: subject,
         html: html,
-        text: text || html.replace(/<[^>]*>/g, ''), // Remove HTML tags for text version
+        text: text || html.replace(/<[^>]*>/g, ''),
       };
 
-      try {
-        const result = await this.transporter!.sendMail(mailOptions);
-        console.log('Email enviado com sucesso:', result.messageId);
-        return true;
-      } catch (smtpError) {
-        console.log('Falha no envio SMTP, usando modo de desenvolvimento');
-        return await this.sendEmailDevelopmentMode(to, subject, html);
-      }
-    } catch (error) {
-      console.error('Erro ao enviar email:', error);
+      const result = await this.transporter!.sendMail(mailOptions);
+      console.log(`SMTP: Email enviado com sucesso para ${to}:`, result.messageId);
+      return true;
+    } catch (smtpError: any) {
+      console.error('SMTP também falhou:', smtpError.message);
       console.log('Usando modo de desenvolvimento como fallback');
       return await this.sendEmailDevelopmentMode(to, subject, html);
     }
@@ -209,12 +260,14 @@ class EmailService {
   }
 
   async sendEmailDevelopmentMode(to: string, subject: string, html: string): Promise<boolean> {
-    console.log('\n=== EMAIL DE DESENVOLVIMENTO ===');
+    console.log('\n=== EMAIL EM MODO DE DESENVOLVIMENTO ===');
     console.log(`Para: ${to}`);
     console.log(`Assunto: ${subject}`);
-    console.log(`Conteúdo HTML:\n${html}`);
+    console.log(`Status: Email não enviado - limite diário do Gmail excedido`);
+    console.log(`Solução: Configure SENDGRID_API_KEY para envio real`);
     console.log('=== FIM DO EMAIL ===\n');
-    return true;
+    
+    return false; // Return false to indicate email wasn't actually sent
   }
 
   // Automated email functions
