@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   username: text("username"),
   passwordHash: text("password_hash"),
+  whatsapp: text("whatsapp"),
   clerkId: text("clerk_id"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),

@@ -2149,6 +2149,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: userData.email,
         firstName: userData.username || userData.firstName, // Frontend sends 'username' 
         lastName: userData.lastName || null,
+        username: userData.username || null,
+        password: userData.password, // Include password for hashing
         whatsapp: userData.whatsapp || null,
         clerkId: null,
         freeTestsUsed: 0,

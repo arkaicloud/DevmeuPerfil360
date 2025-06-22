@@ -179,11 +179,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
+    try {
+      // Hash password if provided
+      let userWithHash = { ...insertUser };
+      if (insertUser.password) {
+        const bcrypt = await import('bcrypt');
+        userWithHash.passwordHash = await bcrypt.default.hash(insertUser.password, 12);
+        delete userWithHash.password; // Remove plain password
+      }
+
+      return await withRetry(async () => {
+        const [newUser] = await db.insert(users).values(userWithHash).returning();
+        
+        // Cache the new user
+        cache.set(cache.getUserKey(newUser.id), newUser);
+        cache.set(cache.getUserByEmailKey(newUser.email), newUser);
+        
+        return newUser;
+      });
+    } catch (error) {
+      console.error('Database error creating user, using memory storage:', error);
+      return memoryStorage.createUser(insertUser);
+    }
   }
 
   async updateUserStripeInfo(userId: number, customerId: string, subscriptionId?: string): Promise<User> {

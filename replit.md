@@ -140,14 +140,14 @@ MeuPerfil360 is a comprehensive web application for conducting DISC behavioral a
 - Senha: `admin123456`
 
 ## Changelog
-- June 22, 2025: **PASSWORD AUTHENTICATION SYSTEM FIXED** - Secure login with proper password validation implemented
-  - **Password Validation**: Login now requires exact password match from database using bcrypt hashing
-  - **Security Enhancement**: Only users with correct password hash can authenticate successfully
-  - **Error Messages**: Invalid passwords show "Email ou senha incorretos" without revealing which field is wrong
-  - **Database Integration**: Password hashing implemented in both DatabaseStorage and MemoryStorage
-  - **Password Reset**: Complete forgot password functionality with email recovery and secure hash updates
-  - **Frontend Integration**: Login system validates against stored password hashes only
-  - **Testing Verified**: Authentication rejects incorrect passwords and accepts only valid credentials
+- June 22, 2025: **USER REGISTRATION SYSTEM COMPLETELY FIXED** - Phone and password now saved correctly during registration
+  - **Password Hashing**: Both DatabaseStorage and MemoryStorage now hash passwords with bcrypt (12 rounds)
+  - **WhatsApp Field**: Phone number properly saved in whatsapp column during user creation
+  - **Database Consistency**: Fixed createUser method in DatabaseStorage to match MemoryStorage implementation
+  - **Security Implementation**: Passwords hashed before database insertion, plain text never stored
+  - **Registration Flow**: Username, email, whatsapp, and password all saved correctly
+  - **Login Integration**: New users can immediately login with their registration credentials
+  - **Testing Verified**: Complete registration and login flow working with proper data persistence
 - June 22, 2025: **DEPLOY READY FOR MEUPERFIL360.COM.BR** - Complete deployment package prepared for official domain
   - **Domain Configuration**: Updated all configs for meuperfil360.com.br (without www prefix)
   - **Deploy Manual**: Created comprehensive DEPLOY_PRODUCTION.md with step-by-step instructions
